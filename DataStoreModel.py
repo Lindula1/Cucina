@@ -37,7 +37,6 @@ class DataBase():
         low = 0
         high = len(self.arr) - 1
         accounts = []
-
         while low <= high:
             mid = (low + high)//2
             midVal = self.arr[mid][0]
@@ -47,11 +46,11 @@ class DataBase():
                 while midVal == query:
                     accounts.append(self.arr[mid])
                     umid += 1
-                    midVal = self.arr[mid][0]
+                    midVal = self.arr[umid][0]
                 while midVal == query:
                     accounts.append(self.arr[mid])
                     lmid -= 1
-                    midVal = self.arr[mid][0]
+                    midVal = self.arr[lmid][0]
                 return accounts
             elif midVal < query:
                 low = mid + 1

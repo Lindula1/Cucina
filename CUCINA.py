@@ -30,11 +30,11 @@ class CUCINA():
                     c += 1
             if c < len(pwrd.strip()):
                 pavalid = True
-        if len(name.strip()) < 1:
-            print("name is too small")
+        if len(name.strip()) < 1 or name.lower() == "kesh":
+            print("You're too short")
         if uavalid and ulvalid and plvalid and pavalid:
-            account = {"uid": None, "username": usrm, "password": hashlib.sha256(pwrd.encode()), "name": name}
-            return account
+            account = {"uid": None, "username": usrm, "password":hashlib.sha256(pwrd.encode('utf-8')).hexdigest(), "name": name}
+            ds.AddTo(account)
         else:
             print("Too many checks were invalid")
 
@@ -42,34 +42,37 @@ class CUCINA():
         ulvalid = False
         uavalid = True
         plvalid = False
-        if len(usrm.strip())> 3:
+        if len(usrm.strip()) > 3: 
             ulvalid = True
             for i in usrm.strip():
                 if i.upper() not in al:
                     uavalid = False
                     break
-        if len(pwrd.strip()) > 3:
-            plvalid = True
+        if len(pwrd.strip()) > 3: plvalid = True
         if uavalid and ulvalid and plvalid:
             account = self.Search(usrm)
-            return account
+            if hashlib.sha256(pwrd.encode('utf-8')).hexdigest() == account[1]["password"]:
+                print("Login successful")
+            else:
+                print("Login unsuccessful")
         else:
             print("Too many checks were invalid")
     
     def Search(self, query):
         accountList = ds.BulkSearch(query)
-        print(accountList)
-        #for i in accountList:
-        #    if i[1]["username"] == query:
-        #        return i
+        for i in accountList:
+            if i[1]["username"] == query:
+                return i
 
 app = CUCINA()
 
-accounts = [{"uid":None, "username":"Lindt", "password":13}]
+accounts = [{"uid":None, "username":"Lindt", "password":hashlib.sha256("2039".encode('utf-8')).hexdigest()}]
 for j in range(12):
-    accounts.append({"uid":None, "username":''.join(random.choices(string.ascii_letters, k=5)), "password":j})
+    accounts.append({"uid":None, "username":''.join(random.choices(string.ascii_letters, k=5)), "password":hashlib.sha256(str(j+2034).encode('utf-8')).hexdigest()})
 for i in accounts:
     ds.AddTo(i)
 
-#print(app.Register("Lindt", "Choc", "Chocolate"))
-app.Search("Lindt")
+app.Register("Lindt", "Cho1", "Chocolate")
+print(ds.arr)
+#print(app.Search("Lindt"))
+#app.LogIn("Lindt", "2039")
