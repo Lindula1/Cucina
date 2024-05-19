@@ -44,13 +44,20 @@ class DataBase():
                 accounts.append(self.arr[mid])
                 umid = lmid = mid
                 while midVal == query:
-                    accounts.append(self.arr[mid])
                     umid += 1
-                    midVal = self.arr[umid][0]
-                while midVal == query:
-                    accounts.append(self.arr[mid])
+                    try:
+                        midVal = self.arr[umid][0]
+                    except IndexError:
+                        break
+                    if not midVal == query:
+                        break
+                    accounts.append(self.arr[umid])
+                while True:
                     lmid -= 1
                     midVal = self.arr[lmid][0]
+                    if not midVal == query:
+                        break
+                    accounts.append(self.arr[lmid])
                 return accounts
             elif midVal < query:
                 low = mid + 1
