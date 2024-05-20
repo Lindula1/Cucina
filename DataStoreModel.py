@@ -33,12 +33,14 @@ class DataBase():
         return -1
     
     def BulkSearch(self, query):
+        self.arr = self.Sort(self.arr)
         query = ord(query[0].upper())
         low = 0
         high = len(self.arr) - 1
         accounts = []
+        posRange = [0, 0]
         while low <= high:
-            mid = (low + high)//2
+            pos = mid = (low + high)//2
             midVal = self.arr[mid][0]
             if midVal == query:
                 accounts.append(self.arr[mid])
@@ -52,15 +54,17 @@ class DataBase():
                     if not midVal == query:
                         break
                     accounts.append(self.arr[umid])
+                    posRange[1] += 1
                 while True:
                     lmid -= 1
                     midVal = self.arr[lmid][0]
                     if not midVal == query:
                         break
                     accounts.append(self.arr[lmid])
-                return accounts
+                    posRange[0] += 1
+                return accounts, pos, posRange
             elif midVal < query:
                 low = mid + 1
             else:
                 high = mid - 1
-        return None
+        return None, None, None

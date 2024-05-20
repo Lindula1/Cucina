@@ -56,9 +56,12 @@ class Pantry():
     def Search(self, query, arr):
         arr, pos, ran = self.BulkSearch(self.arr)
         query = ord(query[0].upper())
-        for i in arr:
-            if i[0] == query:
-                return i
+        if query == None:
+            return query
+        else:
+            for i in arr:
+                if i[0] == query:
+                    return i
     
     def Remove(self, query):
         if len(self.arr) == 1:
@@ -76,6 +79,8 @@ class Pantry():
                     else:
                         delIndex = pos
                     self.arr.pop(delIndex)
+                    return "Item Deleted"
+        return "Item Not Found"
         
     def SortFunc(self, array, sortIndex):
         n = len(array)
@@ -95,15 +100,15 @@ pantry = Pantry()
 pantry.AddItem([112,2,7524,"sugar"])
 pantry.AddItem([122,2,6426,"bread"])
 pantry.AddItem([123,2,5524,"milk"])
-pantry.AddItem([142,2,6342,"eggs"])
-pantry.AddItem([152,2,6352,"oranges"])
-pantry.AddItem([1562,2,1245,"lead"])
-pantry.AddItem([1225,2,1256,"titanium"])
+pantry.AddItem([142,13,6342,"eggs"])
+pantry.AddItem([152,45,6352,"oranges"])
+pantry.AddItem([1562,5,1245,"lead"])
+pantry.AddItem([1225,6,1256,"titanium"])
 pantry.AddItem([1422,2,2345,"copper"])
 
+print(pantry.arr)
+pantry.SortFunc(pantry.arr, 1)
 print(pantry.arr)
 while len(pantry.arr) > 0:
     pantry.Remove(input("query: "))
     print(pantry.arr)
-#pantry.SortFunc(pantry.arr, 1)
-#print(pantry.arr)
