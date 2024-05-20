@@ -34,6 +34,9 @@ class DataBase():
     
     def BulkSearch(self, query):
         self.arr = self.Sort(self.arr)
+        if self.arr == -1: 
+            print("Fatal Error")
+            return None, None, None
         query = ord(query[0].upper())
         low = 0
         high = len(self.arr) - 1

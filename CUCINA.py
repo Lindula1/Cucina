@@ -18,11 +18,9 @@ class CUCINA():
         pavalid = False
         if len(usrm.strip())> 3:
             ulvalid = True
-            for i in usrm.strip():
-                if i.upper() not in al:
-                    uavalid = False
-                    print("Username Type error")
-                    break
+            if usrm[0].upper() not in al:
+                uavalid = False
+                print("Username Type error")
         else: print("Username Too short")
         if len(pwrd.strip()) > 3:
             plvalid = True
@@ -70,6 +68,7 @@ class CUCINA():
             ds.arr.pop(0)
         else:
             results, pos, ran = ds.BulkSearch(query)
+            if results == None: return "Item Not found"
             for i in range(len(results)):
                 if results[i][1]["username"] == query:
                     if (i - ran[0]) < 0:
@@ -99,7 +98,7 @@ for i in accounts:
     ds.AddTo(i)
 
 '''
-app.Register("Lindt", "Cho1", "Chocolate")
+app.Register("Kesh", "Cho1", "Kesh")
 print(ds.arr)
 print(app.Search("Lindt"))
 app.LogIn("Lindt", "2039")
@@ -110,8 +109,9 @@ print(ds.arr)
 print(app.Search("Lindt"))
 app.Register("Lindt", "Cho1", "Chocolate")
 print(ds.arr)
-'''
 print(ds.arr)
 while len(ds.arr) > 0:
-    print(app.Remove(input("query: ")))
+    print(app.Remove(input("Delete user: ")))
     print(ds.arr)
+'''
+app.Register(input("Enter a Username: "), input("Enter a Password: "), input("Enter your name: "))

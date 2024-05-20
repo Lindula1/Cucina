@@ -18,6 +18,9 @@ class Pantry():
     
     def BulkSearch(self, query):
         self.arr = self.SortFunc(self.arr, 0)
+        if self.arr == -1: 
+            print("Fatal Error")
+            return None, None, None
         query = ord(query[0].upper())
         low = 0
         high = len(self.arr) - 1
