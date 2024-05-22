@@ -1,5 +1,6 @@
 import random
 import string
+import CSVHandler as CS
 #item = ["letter sort value (left empty)", "nutritional value", "quantity", "expiry date" "ingredient name"]
 
 class Pantry():
@@ -96,11 +97,15 @@ class Pantry():
             if sorted == True:
                 return array
         return -1
+
+    def SaveToDevice(self):
+        CS.Write(self.arr)
     
 pantry = Pantry()
-#for i in range(23):
-#    pantry.AddItem([random.randint(23,290), random.randint(2,23), random.randint(123,2394), ''.join(random.choices(string.ascii_letters, k=7))])
-pantry.AddItem([112,2,7524,"sugar"])
+#for i in range(590):
+#    pantry.AddItem([random.randint(23, 259), random.randint(2,23), random.randint(123,2394), ''.join(random.choices(string.ascii_letters, k=7))])
+
+pantry.AddItem([112,67,7524,"sugar"])
 pantry.AddItem([122,2,6426,"bread"])
 pantry.AddItem([123,2,5524,"milk"])
 pantry.AddItem([142,13,6342,"eggs"])
@@ -109,9 +114,14 @@ pantry.AddItem([1562,5,1245,"lead"])
 pantry.AddItem([1225,6,1256,"titanium"])
 pantry.AddItem([1422,2,2345,"copper"])
 
+pantry.SaveToDevice()
+print(CS.Reader())
+
+'''
 print(pantry.arr)
-pantry.SortFunc(pantry.arr, 1)
-print(pantry.arr)
+pantry.SortFunc(pantry.arr, 0)
+print(pantry.BulkSearch(int(input("number:"))))
 while len(pantry.arr) > 0:
     pantry.Remove(input("query: "))
     print(pantry.arr)
+'''

@@ -16,13 +16,13 @@ class CUCINA():
         uavalid = True
         plvalid = False
         pavalid = False
-        if len(usrm.strip())> 3:
+        if len(usrm.strip()) >= 3:
             ulvalid = True
             if usrm[0].upper() not in al:
                 uavalid = False
                 print("Username Type error")
         else: print("Username Too short")
-        if len(pwrd.strip()) > 3:
+        if len(pwrd.strip()) >= 3:
             plvalid = True
             c = 0
             for j in pwrd.strip():
@@ -33,33 +33,32 @@ class CUCINA():
             else:
                 print("Password Type error")
         else: print("Password Too short")
-        if len(name.strip()) < 1 or name.lower() == "kesh" or "chan" in name.lower():
-            print("You're too short")
         if uavalid and ulvalid and plvalid and pavalid and self.Search(usrm) == None:
             account = {"uid": None, "username": usrm, "password":hashlib.sha256(pwrd.encode('utf-8')).hexdigest(), "name": name}
             ds.AddTo(account)
+            print("Account Registered")
         else:
-            print("Too many checks were invalid")
+            print("Too many checks were invalid or the username already exists")
 
     def LogIn(self, usrm, pwrd):
         ulvalid = False
         uavalid = True
         plvalid = False
-        if len(usrm.strip()) > 3: 
-            ulvalid = True
-            for i in usrm.strip():
-                if i.upper() not in al:
-                    uavalid = False
-                    break
-        if len(pwrd.strip()) > 3: plvalid = True
+        if usrm[0].strip().upper() not in al: 
+            uavalid = False
+            print("username has an invalid leader")
+        if len(usrm.strip()) >= 3: ulvalid = True
+        else: print("username is too short")
+        if len(pwrd.strip()) >= 3: plvalid = True
+        else: print("password is too short")
         if uavalid and ulvalid and plvalid:
             account = self.Search(usrm)
             if hashlib.sha256(pwrd.encode('utf-8')).hexdigest() == account[1]["password"]:
-                print("Login successful")
+                return "Login successful"
             else:
-                print("Login unsuccessful")
+                return "Login unsuccessful"
         else:
-            print("Too many checks were invalid")
+            return "Too many checks were invalid"
 
     def Remove(self, query):
         if len(query) < 1: return "Query length too short"
@@ -92,7 +91,7 @@ class CUCINA():
 app = CUCINA()
 
 accounts = [{"uid":None, "username":"Lindt", "password":hashlib.sha256("2039".encode('utf-8')).hexdigest()}]
-for j in range(5):
+for j in range(12):
     accounts.append({"uid":None, "username":''.join(random.choices(string.ascii_letters, k=5)), "password":hashlib.sha256(str(j+2034).encode('utf-8')).hexdigest()})
 for i in accounts:
     ds.AddTo(i)
@@ -114,4 +113,25 @@ while len(ds.arr) > 0:
     print(app.Remove(input("Delete user: ")))
     print(ds.arr)
 '''
-app.Register(input("Enter a Username: "), input("Enter a Password: "), input("Enter your name: "))
+
+
+#'''
+while True:
+    usrm = input("Enter a Username (do not lead with a non alphabetical character, min length of 3): ")
+    if usrm == "back":
+        pass
+    else:
+        pwrd = input("Enter a secure Password (must include a number or special character, min length of 3): ")
+        name = input("Enter your own name: ") 
+        app.Register(usrm, pwrd, name)
+        if input("Break? [yes or no] ").strip().lower() == 'yes': break
+
+while True:
+    if app.LogIn(input("Enter your username: "), input("Enter your password: ")) == "Login successful": break
+    if input("Break? [yes or no] ").strip().lower() == 'yes': break
+#'''
+print(ds.arr)
+
+while len(ds.arr) > 0:
+    print(app.Remove(input("Enter a username to remove it: ")))
+    print(ds.arr)

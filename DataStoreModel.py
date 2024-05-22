@@ -21,21 +21,24 @@ class DataBase():
         return account
     
     def Sort(self, array):
-        n = len(array)
-        for i in range(n):
-            sorted = True
-            for j in range(n - i - 1):
-                if array[j][0] > array[j + 1][0]:
-                    array[j], array[j + 1] = array[j + 1], array[j]
-                    sorted = False
-            if sorted == True:
-                return array
-        return -1
+        if len(self.arr) > 0:
+            n = len(array)
+            for i in range(n):
+                sorted = True
+                for j in range(n - i - 1):
+                    if array[j][0] > array[j + 1][0]:
+                        array[j], array[j + 1] = array[j + 1], array[j]
+                        sorted = False
+                if sorted == True:
+                    return array
+        return []
+        
+        
     
     def BulkSearch(self, query):
         self.arr = self.Sort(self.arr)
-        if self.arr == -1: 
-            print("Fatal Error")
+        if self.arr == []: 
+            print("Fatal Error List Is Empty")
             return None, None, None
         query = ord(query[0].upper())
         low = 0
