@@ -2,6 +2,9 @@ import hashlib
 import random
 import string
 from DataStoreModel import DataBase
+import PDFHandler as PDF
+#import IngredientDataStore as Pantry
+import pwinput
 ds = DataBase()
 
 h = hashlib.new('sha256')
@@ -11,7 +14,7 @@ class CUCINA():
     def __init__(self):
         pass
 
-    def Register(self, usrm, pwrd, name):
+    def RegisterAccount(self, usrm, pwrd, name):
         ulvalid = False
         uavalid = True
         plvalid = False
@@ -20,8 +23,8 @@ class CUCINA():
             ulvalid = True
             if usrm[0].upper() not in al:
                 uavalid = False
-                print("Username Type error")
-        else: print("Username Too short")
+                return "Username Type error"
+        else: return "Username Too short"
         if len(pwrd.strip()) >= 3:
             plvalid = True
             c = 0
@@ -31,14 +34,14 @@ class CUCINA():
             if c < len(pwrd.strip()):
                 pavalid = True
             else:
-                print("Password Type error")
-        else: print("Password Too short")
+                return "Password Type error"
+        else: return "Password Too short"
         if uavalid and ulvalid and plvalid and pavalid and self.Search(usrm) == None:
             account = {"uid": None, "username": usrm, "password":hashlib.sha256(pwrd.encode('utf-8')).hexdigest(), "name": name}
             ds.AddTo(account)
-            print("Account Registered")
+            return 1
         else:
-            print("Too many checks were invalid or the username already exists")
+            return "Username already exists"
 
     def LogIn(self, usrm, pwrd):
         ulvalid = False
@@ -60,7 +63,7 @@ class CUCINA():
         else:
             return "Too many checks were invalid"
 
-    def Remove(self, query):
+    def RemoveAccount(self, query):
         if len(query) < 1: return "Query length too short"
         if len(ds.arr) == 1:
             print("This is the last account in the database.")
@@ -87,8 +90,26 @@ class CUCINA():
             for i in accountList:
                 if i[1]["username"] == query:
                     return i
+                
+    def AddToPantry(self, item):
+        Pantry.pantry.AddItem(item)
+        
+    
+    def DishSearch(self, dishName):
+        ingredients, text, steps = PDF.Read(dishName)
+        ingredients = ingredients
+        pantryItems = Pantry.pantry.PantryList()
+        #print(ingredients, pantryItems)
+        matches = []
+        for i in pantryItems:
+            for j in ingredients:
+                if i in j: matches.append(j)
+        return matches
 
 app = CUCINA()
+
+#Debugging Code
+print("This is a backend representation of the software solution and any errors made while entering values is not checked for.\nIf you make any errors the code will simply restart from the beginning or crash :)")
 
 accounts = [{"uid":None, "username":"Lindt", "password":hashlib.sha256("2039".encode('utf-8')).hexdigest()}]
 for j in range(12):
@@ -96,42 +117,37 @@ for j in range(12):
 for i in accounts:
     ds.AddTo(i)
 
-'''
-app.Register("Kesh", "Cho1", "Kesh")
-print(ds.arr)
-print(app.Search("Lindt"))
-app.LogIn("Lindt", "2039")
-print(len(ds.arr))
-print(app.Remove("Lindt"))
-print(len(ds.arr))
-print(ds.arr)
-print(app.Search("Lindt"))
-app.Register("Lindt", "Cho1", "Chocolate")
-print(ds.arr)
-print(ds.arr)
-while len(ds.arr) > 0:
-    print(app.Remove(input("Delete user: ")))
-    print(ds.arr)
-'''
-
-
-#'''
 while True:
-    usrm = input("Enter a Username (do not lead with a non alphabetical character, min length of 3): ")
-    if usrm == "back":
+    prompt = ["Enter a Username (do not lead with a non alphabetical character, min length of 3): ", "Enter a secure Password (must include a number or special character, min length of 3): ", "Enter your own name: "]
+    account = []
+    for i in range(3):
+        entry = input(prompt[i])
+        if not entry.isdigit():
+            account.append(entry)
+        elif entry == "end":
+            account = []
+            break
+        else:
+            print("Input is invalid, Try again")
+            break
+    if account == []:
         pass
     else:
-        pwrd = input("Enter a secure Password (must include a number or special character, min length of 3): ")
-        name = input("Enter your own name: ") 
-        app.Register(usrm, pwrd, name)
-        if input("Break? [yes or no] ").strip().lower() == 'yes': break
+        result = app.RegisterAccount(account[0], account[1], account[2])
+        if result == 1:
+            print("Account registered successfully")
+            break
+        else:
+            print(result)
+            print("Please read the instructions")
 
 while True:
-    if app.LogIn(input("Enter your username: "), input("Enter your password: ")) == "Login successful": break
+    if app.LogIn(input("Enter your username: "), pwinput.pwinput("Enter your password: ")) == "Login successful": break
     if input("Break? [yes or no] ").strip().lower() == 'yes': break
-#'''
+'''
+'''
 print(ds.arr)
 
 while len(ds.arr) > 0:
-    print(app.Remove(input("Enter a username to remove it: ")))
+    print(app.RemoveAccount(input("Enter a username to remove it: ")))
     print(ds.arr)

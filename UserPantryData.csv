@@ -1,27 +1,7 @@
-Letter sort value,Nutritional value,Quantity,Expiry date,Ingredient name
-
-83,112,67,7524,sugar
-
-66,122,2,6426,bread
-
-77,123,2,5524,milk
-
-69,142,13,6342,eggs
-
-79,152,45,6352,oranges
-
-76,1562,5,1245,lead
-
-84,1225,6,1256,titanium
-
-67,1422,2,2345,copper
-
 Letter sort value,Nutritional value,Quantity,Expiry date,Ingredient name
-83,112,67,7524,sugar
-66,122,2,6426,bread
-77,123,2,5524,milk
-69,142,13,6342,eggs
-79,152,45,6352,oranges
-76,1562,5,1245,lead
-84,1225,6,1256,titanium
-67,1422,2,2345,copper
+77,100,200,653194,butter
+1,1,1,1,cheese
+1,1,1,1,shallot
+1,1,1,1,tomato
+1,1,1,1,mushroom
+67,1,1,689687,carrot
