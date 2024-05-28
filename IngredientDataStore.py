@@ -116,19 +116,18 @@ class Pantry():
         return "Fatal Error"
         
     def SortFunc(self, array, sortIndex):
-        if len(array) > 0:
-            if sortIndex < 0 or sortIndex > (len(self.arr[0])-1):
-                print("Sort index out of range")
-                return self.arr
-            n = len(array)
-            for i in range(n):
-                sorted = True
-                for j in range(n - i - 1):
-                    if array[j][sortIndex] > array[j + 1][sortIndex]:
-                        array[j], array[j + 1] = array[j + 1], array[j]
-                        sorted = False
-                if sorted == True:
-                    return array
+        if sortIndex < 0 or sortIndex > (len(self.arr[0])-1):
+            print("Sort index out of range")
+            return self.arr
+        n = len(array)
+        for i in range(n):
+            sorted = True
+            for j in range(n - i - 1):
+                if array[j][sortIndex] > array[j + 1][sortIndex]:
+                    array[j], array[j + 1] = array[j + 1], array[j]
+                    sorted = False
+            if sorted == True:
+                return array
         return []
 
     def SaveToDevice(self):
@@ -164,7 +163,7 @@ while True:
         else:
             print("Not a valid input")
     elif choice.lower() == "r":
-        pantry.Remove(input("query: "))
+        print(pantry.Remove(input("query: ")))
         print(pantry.arr)
     elif choice.lower() == "a":
         while True:

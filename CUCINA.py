@@ -15,59 +15,36 @@ class CUCINA():
         pass
 
     def RegisterAccount(self, usrm, pwrd, name):
-        ulvalid = False
-        uavalid = True
-        plvalid = False
-        pavalid = False
-        if len(usrm.strip()) >= 3:
-            ulvalid = True
-            if usrm[0].upper() not in al:
-                uavalid = False
-                return "Username Type error"
-        else: return "Username Too short"
-        if len(pwrd.strip()) >= 3:
-            plvalid = True
-            c = 0
-            for j in pwrd.strip():
-                if j.upper() in al:
-                    c += 1
-            if c < len(pwrd.strip()):
-                pavalid = True
-            else:
-                return "Password Type error"
-        else: return "Password Too short"
-        if uavalid and ulvalid and plvalid and pavalid and self.Search(usrm) == None:
+        if len(usrm.strip()) < 3: return "Username is too short"
+        if usrm[0].upper() not in al: return "Username type error"
+        if len(pwrd.strip()) < 3: return "Password is too short"
+        c = 0
+        for j in pwrd.strip():
+            if j.upper() in al:
+                c += 1
+        if c > len(pwrd.strip()):
+            return "Password Type error"
+        if self.Search(usrm) == None:
             account = {"uid": None, "username": usrm, "password":hashlib.sha256(pwrd.encode('utf-8')).hexdigest(), "name": name}
             ds.AddTo(account)
-            return 1
+            return "Success"
         else:
             return "Username already exists"
 
     def LogIn(self, usrm, pwrd):
-        ulvalid = False
-        uavalid = True
-        plvalid = False
-        if usrm[0].strip().upper() not in al: 
-            uavalid = False
-            print("username has an invalid leader")
-        if len(usrm.strip()) >= 3: ulvalid = True
-        else: print("username is too short")
-        if len(pwrd.strip()) >= 3: plvalid = True
-        else: print("password is too short")
-        if uavalid and ulvalid and plvalid:
-            account = self.Search(usrm)
-            if hashlib.sha256(pwrd.encode('utf-8')).hexdigest() == account[1]["password"]:
-                return "Login successful"
-            else:
-                return "Login unsuccessful"
+        if usrm[0].strip().upper() not in al: return "username has an invalid leader"
+        account = self.Search(usrm)
+        if account == None: return "Username doesn't exist"
+        if hashlib.sha256(pwrd.encode('utf-8')).hexdigest() == account[1]["password"]: 
+            #Login unlocked functions
+            return "Login successful"
         else:
-            return "Too many checks were invalid"
+            return "Login unsuccessful"
 
     def RemoveAccount(self, query):
-        if len(query) < 1: return "Query length too short"
         if len(ds.arr) == 1:
-            print("This is the last account in the database.")
             ds.arr.pop(0)
+            return "The last item in the database has been removed."
         else:
             results, pos, ran = ds.BulkSearch(query)
             if results == None: return "Item Not found"
@@ -118,36 +95,54 @@ for i in accounts:
     ds.AddTo(i)
 
 while True:
+    if input("Skip Login [y/n]: ") == "y": break
     prompt = ["Enter a Username (do not lead with a non alphabetical character, min length of 3): ", "Enter a secure Password (must include a number or special character, min length of 3): ", "Enter your own name: "]
     account = []
     for i in range(3):
         entry = input(prompt[i])
         if not entry.isdigit():
             account.append(entry)
-        elif entry == "end":
-            account = []
-            break
         else:
             print("Input is invalid, Try again")
+            account = []
             break
     if account == []:
         pass
     else:
         result = app.RegisterAccount(account[0], account[1], account[2])
-        if result == 1:
+        if result == "Success":
             print("Account registered successfully")
             break
         else:
             print(result)
             print("Please read the instructions")
 
-while True:
-    if app.LogIn(input("Enter your username: "), pwinput.pwinput("Enter your password: ")) == "Login successful": break
-    if input("Break? [yes or no] ").strip().lower() == 'yes': break
-'''
-'''
-print(ds.arr)
+print("Please LogIn")
 
-while len(ds.arr) > 0:
-    print(app.RemoveAccount(input("Enter a username to remove it: ")))
-    print(ds.arr)
+while True:
+    prompt = ["Enter your username: ", "Enter your password: "]
+    account = []
+    for i in range(2):
+        entry = input(prompt[i])
+        if len(entry) < 1:
+            print("Input is invalid, Try again")
+            account = []
+            break
+        account.append(entry)
+    if account == []:
+        pass
+    else:
+        result = app.LogIn(account[0], account[1])
+        if result == "Login successful":
+            print("result")
+            print(ds.arr)
+            while True:
+                query = input("Enter a username to remove an account: ")
+                if query == "end": break   
+                elif len(query) > 0 and not query.isdigit():
+                    print(app.RemoveAccount(query))
+                    print(ds.arr)
+                else: pass                    
+        else:
+            print(result)
+            print("Please read the instructions")

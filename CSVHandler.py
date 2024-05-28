@@ -1,19 +1,5 @@
 import csv
 
-'''
-with open("UserPantryData.txt", 'a') as pantry:
-    reader = csv.reader(pantry, delimiter=',')
-    lCount = 0
-    for row in reader:
-        if lCount == 0:
-            print(f"Column names {", ".join(row)}")
-            lCount += 1
-        else:
-            print(row)
-            lCount += 1
-    print(f"Lines Processed {lCount}")
-    '''
-
 def Reader():
     with open('UserPantryData.csv', mode='r') as pantry:
         array = []
