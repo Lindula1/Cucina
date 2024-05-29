@@ -2,7 +2,7 @@ import random
 import string
 import pwinput
 import CSVHandler as CS
-from datetime import date
+import datetime
 #item = ["letter sort value (left empty)", "nutritional value", "quantity", "expiry date" "ingredient name"]
 
 class Pantry():
@@ -14,11 +14,21 @@ class Pantry():
             self.arr = []
         
     def FormatDate(self, item):
-        d0 = date(item[3][0], item[3][1], item[3][2])
-        d1 = date(1889, 4, 20)
-        delta = d1 - d0
+        d0 = datetime.date(item[3][0], item[3][1], item[3][2])
+        self.d1 = datetime.date(1889, 4, 20)
+        delta = d0 - self.d1
         item[3] = delta.days
         return item
+    
+    def DateRevert(self, item):
+        d0 = datetime.timedelta(item[3] - 1)
+        d1 = datetime.datetime(1889,4,20,0,0)
+        d2 = datetime.date.today()
+        expDate = (d1 + d0).strftime("%Y/%m/%d")
+        explist = expDate.split("/")
+        daysLeft = datetime.date(int(explist[0]), int(explist[1]), int(explist[2])) - d2
+        return expDate, daysLeft.days
+
 
     def PantryList(self):
         try:
@@ -45,7 +55,7 @@ class Pantry():
     def BulkSearch(self, query):
         self.arr = self.SortFunc(self.arr, 0)
         if self.arr == []: 
-            print("Fatal Error")
+            print("No items left to delete")
             return None, None, None
         query = ord(query[0].upper())
         low = 0
@@ -83,7 +93,7 @@ class Pantry():
         return None, None, None
     
     def Search(self, query, arr):
-        arr, pos, ran = self.BulkSearch(self.arr)
+        arr, pos, ran = self.BulkSearch(query)
         query = ord(query[0].upper())
         if query == None:
             return query
@@ -93,6 +103,7 @@ class Pantry():
                     return i
     
     def Remove(self, query):
+        query = query.lower()
         if len(self.arr) == 1:
             print("This is the last item in your pantry")
             self.arr.pop(0)
@@ -102,17 +113,18 @@ class Pantry():
             results, pos, ran = self.BulkSearch(query)
             if results == None:
                 return "Item Not Found"
-            for i in range(len(results)):
-                if results[i][4] == query:
-                    if (i - ran[0]) < 0:
-                        delIndex = pos - i
-                    elif (i - ran[0]) > 0:
-                        delIndex = pos + i
-                    else:
-                        delIndex = pos
-                    self.arr.pop(delIndex)
-                    pantry.SaveToDevice()
-                    return "Item Deleted"
+            else:
+                for i in range(len(results)):
+                    if results[i][4].lower() == query.lower():
+                        if (i - ran[0]) < 0:
+                            delIndex = pos - i
+                        elif (i - ran[0]) > 0:
+                            delIndex = pos + i
+                        else:
+                            delIndex = pos
+                        self.arr.pop(delIndex)
+                        pantry.SaveToDevice()
+                        return "Item Deleted"
         return "Fatal Error"
         
     def SortFunc(self, array, sortIndex):
@@ -135,6 +147,10 @@ class Pantry():
         CS.Write(self.arr)
         return "Write Completed Successfully"
     
+    def Clear(self):
+        self.arr = []
+        self.SaveToDevice()
+    
 pantry = Pantry()
 #for i in range(590):
 #   pantry.AddItem([random.randint(23, 259), random.randint(2,23), random.randint(123,2394), ''.join(random.choices(string.ascii_letters, k=7))])
@@ -149,61 +165,3 @@ print(pantry.AddItem([1225,6,1256,"titanium"]))
 print(pantry.AddItem([1422,2,2345,"copper"]))
 pantry.SaveToDevice()
 '''
-
-#Debugging Code
-print("This is a backend representation of the software solution and any errors made while entering values is not checked for.\nIf you make any errors the code will simply restart from the beginning or crash :)")
-while True:
-    choice = input("Enter [a] to Add an item, Enter [s] to Sort the list, Enter [r] to Remove an Item: ")
-    if choice.lower() == "s":
-        t = input("Enter a sort Index [0 = Alphabetical, 1 = Nutritional Value, 2 = Quantity, 3 = Expeiry Date]: ")
-        if t.isdigit():
-            t = int(t)
-            pantry.SortFunc(pantry.arr, t)
-            print(pantry.arr)
-        else:
-            print("Not a valid input")
-    elif choice.lower() == "r":
-        print(pantry.Remove(input("query: ")))
-        print(pantry.arr)
-    elif choice.lower() == "a":
-        while True:
-            iToAdd = []
-            n = input("Enter the nutrional value of the item [numbers only]: ")
-            if n.isdigit():
-                n = int(n)
-                iToAdd.append(n)
-            q = input("Enter the quantity of the item you have [numbers only]: ")
-            if q.isdigit():
-                q = int(q)
-                iToAdd.append(q)
-            print("Enter Expeiry date in the following format")
-            y = input("Enter the year of expeiry [1890 or greater]: ")
-            if y.isdigit():
-                m = input("Enter the month of expeiry [1-12]: ")
-                if m.isdigit():
-                    if 1 <= int(m) <= 12:
-                        d = input("Enter the date of expeiry, if it exists. Else enter 0: ")
-                        if d.isdigit():
-                            y = int(n)
-                            m = int(m)
-                            d = int(d)
-                            iToAdd.append([y, m, d])
-                            name = input("Enter the name of the item [Do not enter a number first]: ")
-                            if not name[0].isdigit():
-                                try:
-                                    iToAdd.append(name)  
-                                    print(pantry.AddItem(iToAdd))
-                                    break
-                                except ValueError:
-                                    print("That date doesn't exist, Try again")
-                            else:
-                                print("Not a valid name, Please reconsider your education")
-                    else:
-                        print("Not a number, Try again")
-                else:
-                    print("Not a valid month, Try again")
-            else:
-                print("You did not enter a valid number. Try again genius")
-    elif choice.lower() == "end": break
-    else:
-        print(f"'{choice}' is not an option. Learn to read before using this program please.")
