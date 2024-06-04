@@ -4,7 +4,6 @@ import string
 from DataStoreModel import DataBase
 import PDFHandler as PDF
 import IngredientDataStore as Pantry
-import pwinput
 import datetime
 ds = DataBase()
 
@@ -13,18 +12,36 @@ al = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 class CUCINA():
     def __init__(self):
-        pass
+        self.errors = []
+        if ds.checks == False:
+            self.errors.append("Database error detected, File is empty.")
+        if Pantry.pantry.checks == False:
+            self.errors.append("Pantry error detected, File is empty.")
+        if len(self.errors) > 0:
+            for i in self.errors: print(self.errors[i])
+            print(f"An error was detected in dependancies.\nThe progam may not be able to run properley.")
 
     def RegisterAccount(self, usrm, pwrd, name):
-        if len(usrm.strip()) < 3: return "Username is too short"
+        usLength = 0
+        for u in usrm:
+            if u == " ":
+                pass
+            else:
+                usLength += 1
+        psLength = 0
+        for p in pwrd:
+            if p == " ":
+                pass
+            else:
+                psLength += 1
+        if usLength < 3: return "Username is too short"
         if usrm[0].upper() not in al: return "Username type error"
-        if len(pwrd.strip()) < 3: return "Password is too short"
+        if psLength < 3: return "Password is too short"
         c = 0
         for j in pwrd.strip():
             if j.upper() in al:
                 c += 1
-        if c > len(pwrd.strip()):
-            return "Password Type error"
+        if c == len(pwrd.strip()): return "Password Type error"
         if self.Search(usrm) == None:
             account = {"uid": None, "username": usrm, "password":hashlib.sha256(pwrd.encode('utf-8')).hexdigest(), "name": name}
             ds.AddTo(account)
@@ -34,7 +51,7 @@ class CUCINA():
 
     def LogIn(self, usrm, pwrd):
         if usrm[0].strip().upper() not in al: return "username has an invalid leader"
-        account = self.Search(usrm)
+        account = self.Search(usrm.lower())
         if account == None: return "Username doesn't exist"
         if hashlib.sha256(pwrd.encode('utf-8')).hexdigest() == account[1]["password"]: 
             #Login unlocked functions
@@ -47,7 +64,7 @@ class CUCINA():
             ds.arr.pop(0)
             return "The last item in the database has been removed."
         else:
-            results, pos, ran = ds.BulkSearch(query)
+            results, pos, ran = ds.BulkSearch(query.lower())
             if results == None: return "Item Not found"
             for i in range(len(results)):
                 if results[i][1]["username"] == query:
@@ -62,11 +79,11 @@ class CUCINA():
         return "Item Not Found"
     
     def Search(self, query):
-        accountList, pos, ran = ds.BulkSearch(query)
+        accountList, pos, ran = ds.BulkSearch(query.lower())
         if accountList == None: return None
         else:
             for i in accountList:
-                if i[1]["username"] == query:
+                if i[1]["username"].lower() == query.lower():
                     return i
                 
     def AddToPantry(self, item):
@@ -86,17 +103,21 @@ class CUCINA():
 
 app = CUCINA()
 
+#for i in Pantry.pantry.arr:
+#    print(Pantry.pantry.DateRevert(i))
+
 #Debugging Code
 print("This is a backend representation of the software solution and any errors made while entering values is loosely checked for.\nEntering incorrect values will have the program slander you for your blunder.\nIf you make any errors the code will simply restart from the beginning or crash :)")
-
+'''
 accounts = [{"uid":None, "username":"Lindt", "password":hashlib.sha256("2039".encode('utf-8')).hexdigest()}]
-for j in range(12):
-    accounts.append({"uid":None, "username":''.join(random.choices(string.ascii_letters, k=5)), "password":hashlib.sha256(str(j+2034).encode('utf-8')).hexdigest()})
+for j in range(74):
+    accounts.append({"uid":None, "username":''.join(random.choices(string.ascii_letters, k=5)), "password":hashlib.sha256(str(j+2034).encode('utf-8')).hexdigest(), "name":''.join(random.choices(string.ascii_letters, k=13))})
 for i in accounts:
     ds.AddTo(i)
+'''
 
 while True:
-    if input("Skip to Login [y/n]: ") == "y": break
+    if input("Skip Account Registration? [y/n] Warning! You cannot go back: ") == "y": break
     print("Account Registration")
     prompt = ["Enter a Username (do not lead with a non alphabetical character, min length of 3): ", "Enter a secure Password (must include a number or special character, min length of 3): ", "Enter your own name: "]
     account = []
@@ -138,7 +159,7 @@ while run:
         if result == "Login successful":
             print(result)
             while True:
-                choice = input("Enter [a] to Add an item, Enter [s] to Sort the list, Enter [r] to Remove an Item: ")
+                choice = input("Enter [a] to Add an item, Enter [s] to Sort the list, Enter [v] for recipe finder beta, Enter [i] to view an item: ")
                 if choice.lower() == "s":
                     t = input("Enter a sort Index [0 = Alphabetical, 1 = Nutritional Value, 2 = Quantity, 3 = Expeiry Date]: ")
                     if t.isdigit():
@@ -147,9 +168,6 @@ while run:
                         print(Pantry.pantry.arr)
                     else:
                         print("Numbers are the following uniquer characters that represent quantaties [0,1,2,3,4,5,6,7,8,9] this program requires that you used them in the correct way.")
-                elif choice.lower() == "r":
-                    print(Pantry.pantry.Remove(input("Enter the name of the item you want to delete: ")))
-                    print(Pantry.pantry.arr)
                 elif choice.lower() == "a":
                     endLoop = True
                     while endLoop:
@@ -159,17 +177,21 @@ while run:
                         for l in range(4):
                             entry = input(prompts[l])
                             if l == 2:
-                                dtime = entry.split("/")
-                                for i in range(len(dtime)): dtime[i] = int(dtime[i])
-                                try:
-                                    d = datetime.date(dtime[0], dtime[1], dtime[2])
-                                    iToAdd.append(dtime)
-                                except ValueError:
-                                    print("That date doesn't exist, please reconsider your education")
+                                if "/" in entry:
+                                    dtime = entry.split("/")
+                                    for i in range(len(dtime)): dtime[i] = int(dtime[i])
+                                    try:
+                                            d = datetime.date(dtime[0], dtime[1], dtime[2])
+                                            iToAdd.append(dtime)
+                                    except ValueError:
+                                        print("That date doesn't exist, please reconsider your education")
+                                        break
+                                else:
+                                    print("Wrong format, genius")
                                     break
                             elif l == 3:
                                 if entry[0].isdigit():
-                                    print("Name leads with a number, Further your understanding of numarical values and return to the program another time")
+                                    print("Name leads with a number, Further your understanding of numarical values and return to the program another time :)")
                                     break
                                 else:
                                     iToAdd.append(entry)
@@ -184,6 +206,27 @@ while run:
                             else:
                                 print("Humans have developed a base 10 counting system that is proficient at representing any quantity of items, please use it.")
                                 break
+                elif choice.lower() == "v":
+                    recipe = input("Recipe name: ")
+                    owned = app.DishSearch(recipe)
+                    print(f"Ingredients you might have for your {recipe} are, {owned}")
+                elif choice.lower() == "i":
+                    entry = input("Enter the name of the item you want to search or enter [a] to view all items: ")
+                    if entry == "a":
+                        result = Pantry.pantry.arr
+                        for item in result:
+                            print(item[4])
+                    else:
+                        print(f"RESULT\n{Pantry.pantry.Search(entry)}\nWhat do you wish to do with this item?")
+                        option = input("Enter [r] to remove, Enter [v] to view the expiry date: ")
+                        if option == "r":
+                            print(Pantry.pantry.Remove(entry))
+                        elif option == "v":
+                            date, days = Pantry.pantry.DateRevert(Pantry.pantry.Search(entry))
+                            print(f"This item will expire on the, {date}, You have {days} to use it")
+                        else:
+                            print("Invalid option entered")
+                            break
                 elif choice.lower() == "end": 
                     run = False
                     break

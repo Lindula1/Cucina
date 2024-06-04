@@ -4,10 +4,10 @@ sys.path.insert(0, "../Cucina/PDFs")
 
 def Read(pdf):
     try:
-        reader = PdfReader(f"{pdf}.pdf")
+        reader = PdfReader(f"../Cucina/Pdfs/{pdf}.pdf")
     except FileNotFoundError:
-        print("Directory Error, local file location used")
         reader = PdfReader(f"C:/Users/budwi/OneDrive/Documents/GitHub/Cucina/PDFs/{pdf}.pdf")
+        print("Directory Error, local file location used")
     text = []
     ingredients = []
     steps = []
@@ -18,16 +18,16 @@ def Read(pdf):
         page = i.extract_text()
         #print(page)
         for line in page.split("\n"):
-            if "ingredients" in line.lower():
-                print("Ingredients being added")
+            if "ingredient" in line.lower():
+                #print("Ingredients being added")
                 ingLine = True
                 stepLine = False
             elif "method" in line.lower() or "step" in line.lower():
-                print("Steps being added")
+                #print("Steps being added")
                 stepLine = True
                 ingLine = False
             elif "utensils" in line.lower() or  "options"  in line.lower():
-                print("Random stuff")
+                #print("Random stuff")
                 ingLine = False
                 stepLine = False
             else:
@@ -65,10 +65,14 @@ def Read(pdf):
 
     return ingredients, steps, text
 
-#ingredients, steps, text = Read("Mushroom_Risotto")
 
-#for i in steps: print(i)
-#print("\n")
-#for j in ingredients: print(j)
-#print("\n")
-#print(text)
+if __name__ == "__main__":
+    ingredients, steps, text = Read("Beef_Stroganoff")
+
+    print("***********STEPS***********")
+    for i in steps: print(i)
+    print("***********INGREDIENTS***********")
+    for j in ingredients: print(j)
+    print("***********TEXT***********")
+    print(text)
+

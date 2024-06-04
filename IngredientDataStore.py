@@ -7,10 +7,11 @@ import datetime
 
 class Pantry():
     def __init__(self):
+        self.checks = False
         try:
             self.arr = CS.Reader()
+            self.checks = True
         except FileNotFoundError:
-            print("New ingredient list made")
             self.arr = []
         
     def FormatDate(self, item):
@@ -21,7 +22,7 @@ class Pantry():
         return item
     
     def DateRevert(self, item):
-        d0 = datetime.timedelta(item[3] - 1)
+        d0 = datetime.timedelta(item[3])
         d1 = datetime.datetime(1889,4,20,0,0)
         d2 = datetime.date.today()
         expDate = (d1 + d0).strftime("%Y/%m/%d")
@@ -34,7 +35,7 @@ class Pantry():
         try:
             raw = CS.Reader()
         except FileNotFoundError:
-            print("Fatal Error. No items in pantry")
+            print("Fatal Error. No items in pantry. Creating empty list")
             raw = []
         ilist = []
         for item in raw: ilist.append(item[4])
@@ -92,14 +93,13 @@ class Pantry():
                 high = mid - 1
         return None, None, None
     
-    def Search(self, query, arr):
-        arr, pos, ran = self.BulkSearch(query)
-        query = ord(query[0].upper())
-        if query == None:
-            return query
+    def Search(self, query):
+        result, pos, ran = self.BulkSearch(query)
+        if result == None:
+            return "No item found"
         else:
-            for i in arr:
-                if i[0] == query:
+            for i in result:
+                if i[4].lower() == query.lower():
                     return i
     
     def Remove(self, query):
@@ -110,10 +110,16 @@ class Pantry():
             pantry.SaveToDevice()
             return "Item Deleted"
         else:
-            results, pos, ran = self.BulkSearch(query)
+            results, pos, ran = self.BulkSearch(query.lower())
             if results == None:
                 return "Item Not Found"
             else:
+                count = 0
+                for item in results:
+                    if item[4].lower() == query.lower():
+                        count += 1
+                if count > 1:
+                    return "Too many items match query"
                 for i in range(len(results)):
                     if results[i][4].lower() == query.lower():
                         if (i - ran[0]) < 0:

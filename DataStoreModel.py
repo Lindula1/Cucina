@@ -1,10 +1,15 @@
 import hashlib
 import random
-import string
+import json
 
 class DataBase():
     def __init__(self):
-        self.arr = []
+        self.checks = False
+        try:
+            self.arr = self.ReadJson()
+            self.checks = True
+        except FileNotFoundError:
+            self.arr = []
     
     def AddTo(self, account):
         self.arr.append(self.AddUserID(account))
@@ -13,10 +18,13 @@ class DataBase():
     def AddUserID(self, account):
         usrnmIL = account["username"][0].upper()
         oId = ord(usrnmIL)
-        if oId >= 99:
-            print("oId out of range", oId)
         nId = random.randint(1000000000, 9999999999)
         account["uid"] = nId
+        if oId >= 99:
+            print("Fatal Error, oId out of range", oId)
+            oId = 0
+            account = [oId, account]
+            return account
         account = [oId, account]
         return account
     
@@ -32,13 +40,21 @@ class DataBase():
                 if sorted == True:
                     return array
         return []
-        
-        
+    
+    def SaveLocally(self):
+        dumped = json.dumps(self.arr, indent=4)
+        with open("Accounts.json", "w") as file:
+            file.write(dumped)
+
+    def ReadJson(self):
+        with open("Accounts.json", "r") as file:
+            raw = json.load(file)
+            return raw
     
     def BulkSearch(self, query):
         self.arr = self.Sort(self.arr)
         if self.arr == []: 
-            print("Fatal Error List Is Empty")
+            print("Fatal Error, List Is Empty")
             return None, None, None
         query = ord(query[0].upper())
         low = 0
@@ -74,3 +90,5 @@ class DataBase():
             else:
                 high = mid - 1
         return None, None, None
+    
+run = DataBase()
