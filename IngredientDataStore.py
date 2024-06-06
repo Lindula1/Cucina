@@ -54,44 +54,48 @@ class Pantry():
         return item
     
     def BulkSearch(self, query):
-        self.arr = self.SortFunc(self.arr, 0)
-        if self.arr == []: 
-            print("No items left to delete")
+        if len(query) > 0:
+            self.arr = self.SortFunc(self.arr, 0)
+            if self.arr == []: 
+                print("No items left in pantry")
+                return None, None, None
+            query = ord(query[0].upper())
+            low = 0
+            high = len(self.arr) - 1
+            ingredients = []
+            posRange = [0, 0]
+            while low <= high:
+                pos = mid = (low + high)//2
+                midVal = self.arr[mid][0]
+                if midVal == query:
+                    ingredients.append(self.arr[mid])
+                    umid = lmid = mid
+                    while True:
+                        umid += 1
+                        try:
+                            midVal = self.arr[umid][0]
+                        except IndexError:
+                            break
+                        if not midVal == query:
+                            break
+                        ingredients.append(self.arr[umid])
+                        posRange[1] += 1
+                    while True:
+                        lmid -= 1
+                        midVal = self.arr[lmid][0]
+                        if not midVal == query:
+                            break
+                        ingredients.append(self.arr[lmid])
+                        posRange[0] += 1
+                    return ingredients, pos, posRange
+                elif midVal < query:
+                    low = mid + 1
+                else:
+                    high = mid - 1
             return None, None, None
-        query = ord(query[0].upper())
-        low = 0
-        high = len(self.arr) - 1
-        ingredients = []
-        posRange = [0, 0]
-        while low <= high:
-            pos = mid = (low + high)//2
-            midVal = self.arr[mid][0]
-            if midVal == query:
-                ingredients.append(self.arr[mid])
-                umid = lmid = mid
-                while True:
-                    umid += 1
-                    try:
-                        midVal = self.arr[umid][0]
-                    except IndexError:
-                        break
-                    if not midVal == query:
-                        break
-                    ingredients.append(self.arr[umid])
-                    posRange[1] += 1
-                while True:
-                    lmid -= 1
-                    midVal = self.arr[lmid][0]
-                    if not midVal == query:
-                        break
-                    ingredients.append(self.arr[lmid])
-                    posRange[0] += 1
-                return ingredients, pos, posRange
-            elif midVal < query:
-                low = mid + 1
-            else:
-                high = mid - 1
-        return None, None, None
+        else:
+            print("Query length too short")
+            return None, None, None
     
     def Search(self, query):
         result, pos, ran = self.BulkSearch(query)
@@ -119,7 +123,17 @@ class Pantry():
                     if item[4].lower() == query.lower():
                         count += 1
                 if count > 1:
-                    return "Too many items match query"
+                    for i in range(len(results)):
+                        if results[i][4].lower() == query.lower():
+                            if (i - ran[0]) < 0:
+                                delIndex = pos - i
+                            elif (i - ran[0]) > 0:
+                                delIndex = pos + i
+                            else:
+                                delIndex = pos
+                            self.arr.pop(delIndex)
+                            pantry.SaveToDevice()
+                    return "First instance of item deleted."
                 for i in range(len(results)):
                     if results[i][4].lower() == query.lower():
                         if (i - ran[0]) < 0:
@@ -135,7 +149,7 @@ class Pantry():
         
     def SortFunc(self, array, sortIndex):
         if sortIndex < 0 or sortIndex > (len(self.arr[0])-1):
-            print("Sort index out of range")
+            print("Sort index out of range, Item list not sorted")
             return self.arr
         n = len(array)
         for i in range(n):

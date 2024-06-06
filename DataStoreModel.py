@@ -14,6 +14,7 @@ class DataBase():
     def AddTo(self, account):
         self.arr.append(self.AddUserID(account))
         self.arr = self.Sort(self.arr)
+        self.SaveLocally()
 
     def AddUserID(self, account):
         usrnmIL = account["username"][0].upper()

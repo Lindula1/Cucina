@@ -1,5 +1,7 @@
 import sys
+import os
 from pypdf import PdfReader
+import json
 sys.path.insert(0, "../Cucina/PDFs")
 
 def Read(pdf):
@@ -47,6 +49,8 @@ def Read(pdf):
                         ingredients.append(j.strip())
                 else:
                     ingredients.append(line.strip())
+                    itm, qty = Quantity(line)
+                    #print(f"Item: {itm}, The quantity: {qty}")
                 # ingredients.append(' '.join([print(word.strip()) or 'a' for word in line.split(' ')]))
                 # for word in line.split(' '):
                 #    print(':', word.strip(), ':', sep='')
@@ -65,14 +69,48 @@ def Read(pdf):
 
     return ingredients, steps, text
 
+def ListPDFs():
+    items = []
+    with os.scandir("../Cucina/Pdfs/") as files:
+        for item in files: items.append(item.name)
+    SavePDFData(items)
+
+def SavePDFData(arr):
+    path = os.path.join("../Cucina/PDFs","PdfInformation.json")
+    dumped = json.dumps(arr, indent=4)
+    with open(path, "w") as jsn:
+        jsn.write(dumped)
+        
+def ReadPDFData():
+    path = os.path.join("../Cucina/PDFs","PdfInformation.json")
+    with open(path, "r") as jsn:
+        raw = json.load(jsn)
+        for i in range(len(raw)):
+            raw[i] = raw[i].rstrip(".pdf")
+        return raw
+
+def Quantity(entry):
+    sep = entry.split(" ")
+    item = ""
+    quantity = None
+    for word in sep:
+        if any(char.isdigit() for char in word):
+            quantity = word
+        else:
+            item = item.strip() + " " + word.strip()
+    #item = " ".join(sep)
+    return item, quantity
 
 if __name__ == "__main__":
-    ingredients, steps, text = Read("Beef_Stroganoff")
+    ingredients, steps, text = Read("beef_stroganoff")
+    print(ReadPDFData())
 
+'''
     print("***********STEPS***********")
     for i in steps: print(i)
     print("***********INGREDIENTS***********")
     for j in ingredients: print(j)
     print("***********TEXT***********")
     print(text)
+'''
 
