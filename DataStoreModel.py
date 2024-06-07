@@ -4,12 +4,13 @@ import json
 
 class DataBase():
     def __init__(self):
-        self.checks = False
         try:
             self.arr = self.ReadJson()
             self.checks = True
         except FileNotFoundError:
             self.arr = []
+        if self.arr == []:
+            self.checks = False
     
     def AddTo(self, account):
         self.arr.append(self.AddUserID(account))
@@ -22,7 +23,7 @@ class DataBase():
         nId = random.randint(1000000000, 9999999999)
         account["uid"] = nId
         if oId >= 99:
-            print("Fatal Error, oId out of range", oId)
+            print("\033[31mFATAL ERROR, oId out of range\033[0m", oId)
             oId = 0
             account = [oId, account]
             return account
@@ -55,7 +56,7 @@ class DataBase():
     def BulkSearch(self, query):
         self.arr = self.Sort(self.arr)
         if self.arr == []: 
-            print("Fatal Error, List Is Empty")
+            print("\033[41mFATAL ERROR DATABSE EMPTY\033[0m")
             return None, None, None
         query = ord(query[0].upper())
         low = 0

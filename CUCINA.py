@@ -5,6 +5,7 @@ from DataStoreModel import DataBase
 import PDFHandler as PDF
 import IngredientDataStore as Pantry
 import datetime
+from Hashing import HashingFunc
 ds = DataBase()
 
 h = hashlib.new('sha256')
@@ -15,12 +16,12 @@ class CUCINA():
         self.admin = False
         self.errors = []
         if ds.checks == False:
-            self.errors.append("Database error detected, File is empty.")
+            self.errors.append("\033[31mFATAL ERROR DATABSE EMPTY\033[0m")
         if Pantry.pantry.checks == False:
-            self.errors.append("Pantry error detected, File is empty.")
+            self.errors.append("\033[31mPANTRY IS EMPTY\033[0m")
         if len(self.errors) > 0:
-            for i in self.errors: print(self.errors[i])
-            print(f"An error was detected in dependancies.\nThe progam may not be able to run properley.")
+            for i in self.errors: print(i)
+            print(f"\033[33mAn error was detected in dependancies.\nThe progam may not be able to run properley.\033[0m\n")
 
     def RegisterAccount(self, usrm, pwrd, name):
         usLength = 0
@@ -44,7 +45,7 @@ class CUCINA():
                 c += 1
         if c == len(pwrd.strip()): return "Password Type error"
         if self.Search(usrm) == None:
-            account = {"uid": None, "username": usrm, "password":hashlib.sha256(pwrd.encode('utf-8')).hexdigest(), "name": name}
+            account = {"uid": None, "username": usrm, "password":HashingFunc(pwrd), "name": name}
             ds.AddTo(account)
             return "Success"
         else:
@@ -54,7 +55,7 @@ class CUCINA():
         if usrm[0].strip().upper() not in al: return "username has an invalid leader"
         account = self.Search(usrm.lower())
         if account == None: return "Username doesn't exist"
-        if hashlib.sha256(pwrd.encode('utf-8')).hexdigest() == account[1]["password"]: 
+        if HashingFunc(pwrd) == account[1]["password"]: 
             if len(account[1]) < 4:
                 self.admin = True
                 return "Logged in as Admin"
@@ -128,18 +129,19 @@ app = CUCINA()
 #    print(Pantry.pantry.DateRevert(i))
 
 #Debugging Code
+"""
+accounts = [{"uid":None, "username":"Lindt", "password":HashingFunc("2039")}]
+for j in range(74):
+    accounts.append({"uid":None, "username":''.join(random.choices(string.ascii_letters, k=5)), "password":HashingFunc(str(j+2034)), "name":''.join(random.choices(string.ascii_letters, k=13))})
+for i in accounts:
+    ds.AddTo(i)
+"""
+
 if __name__ == "__main__":
     print("\033[33m***PLEASE READ ALL THE TEXT BELOW BEFORE USING THIS SOFTWARE***\033[0m")
-    print("This is a backend representation of the software solution and any errors made while entering values is loosely checked for.\nEntering incorrect values will have the program slander you for your blunder.\nIf you make any errors the code will simply restart from the beginning or crash :)")
-    '''
-    accounts = [{"uid":None, "username":"Lindt", "password":hashlib.sha256("2039".encode('utf-8')).hexdigest()}]
-    for j in range(74):
-        accounts.append({"uid":None, "username":''.join(random.choices(string.ascii_letters, k=5)), "password":hashlib.sha256(str(j+2034).encode('utf-8')).hexdigest(), "name":''.join(random.choices(string.ascii_letters, k=13))})
-    for i in accounts:
-        ds.AddTo(i)
-    '''
+    print("This is a backend representation of the software solution and any errors made while entering values is loosely checked for.\nEntering incorrect values will have the program slander you for your blunder.")
     print("Register your account if this is your first time using the application")
-    yn = input("Enter [y] to register a new account: ") == "y"
+    yn = input("Enter [y] to register a new account: ")
     while True:
         if yn == "y":
             print("Account Registration")
@@ -158,6 +160,7 @@ if __name__ == "__main__":
             else:
                 result = app.RegisterAccount(account[0], account[1], account[2])
                 if result == "Success":
+                    yn = "n"
                     print("Account registered successfully")
                 else:
                     print(result)
@@ -301,7 +304,7 @@ if __name__ == "__main__":
                                             c = input("Generate new UID? [y/n]: ")
                                             if c == "y":      
                                                 nId = random.randint(1000000000, 9999999999)
-                                                account["uid"] = nId
+                                                account[1]["uid"] = nId
                                                 app.RemoveAccount(originalUser)
                                                 ds.arr.append(account)
                                                 ds.SaveLocally()
@@ -312,7 +315,7 @@ if __name__ == "__main__":
                                             ds.arr.append(account)
                                             ds.SaveLocally()
                                         elif entry == "password":
-                                            account[1]["password"] = hashlib.sha256((input("Enter a new password for this user: ")).encode('utf-8')).hexdigest()
+                                            account[1]["password"] = HashingFunc(input("Enter a new password for this user: "))
                                             app.RemoveAccount(originalUser)
                                             ds.arr.append(account)
                                             ds.SaveLocally()
