@@ -1,6 +1,6 @@
-import hashlib
 import random
 import json
+import datetime
 
 class DataBase():
     def __init__(self):
@@ -20,7 +20,8 @@ class DataBase():
     def AddUserID(self, account):
         usrnmIL = account["username"][0].upper()
         oId = ord(usrnmIL)
-        nId = random.randint(1000000000, 9999999999)
+        time = datetime.datetime.now()
+        nId = time.strftime('%Y%m%d%H%M%S%f')
         account["uid"] = nId
         if oId >= 99:
             print("\033[31mFATAL ERROR, oId out of range\033[0m", oId)
@@ -29,7 +30,20 @@ class DataBase():
             return account
         account = [oId, account]
         return account
-    
+
+    def RevertId(self, account):
+        uId = account[1]["uid"]
+        date = []
+        for i in range(4,len(uId),2):
+            if i == 4:
+                date.append(uId[i-4:i])
+            elif i == 16:
+                date.append(uId[i-2:len(uId)])
+                break
+            else:
+                date.append(uId[i-2:i])
+        return date
+
     def Sort(self, array):
         if len(self.arr) > 0:
             n = len(array)
@@ -94,3 +108,6 @@ class DataBase():
         return None, None, None
     
 run = DataBase()
+
+if __name__ == "__main__":
+    run.RevertId(run.AddUserID({"uid":None, "username": "lindt", "password": "2039", "name": "Admin"}))

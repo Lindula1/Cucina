@@ -6,7 +6,7 @@ sys.path.insert(0, "../Cucina/PDFs")
 
 def Read(pdf):
     try:
-        reader = PdfReader(f"../Cucina/Pdfs/{pdf}.pdf")
+        reader = PdfReader(f"../Cucina/PDFs/{pdf}.pdf")
     except FileNotFoundError:
         reader = PdfReader(f"C:/Users/budwi/OneDrive/Documents/GitHub/Cucina/PDFs/{pdf}.pdf")
         print("Directory Error, local file location used")

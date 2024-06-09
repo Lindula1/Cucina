@@ -1,4 +1,3 @@
-import hashlib
 import random
 import string
 from DataStoreModel import DataBase
@@ -7,8 +6,6 @@ import IngredientDataStore as Pantry
 import datetime
 from Hashing import HashingFunc
 ds = DataBase()
-
-h = hashlib.new('sha256')
 al = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 class CUCINA():
@@ -129,13 +126,16 @@ app = CUCINA()
 #    print(Pantry.pantry.DateRevert(i))
 
 #Debugging Code
-"""
+'''
+ds.arr = []
+ds.SaveLocally
 accounts = [{"uid":None, "username":"Lindt", "password":HashingFunc("2039")}]
 for j in range(74):
-    accounts.append({"uid":None, "username":''.join(random.choices(string.ascii_letters, k=5)), "password":HashingFunc(str(j+2034)), "name":''.join(random.choices(string.ascii_letters, k=13))})
+    accounts.append({"uid":None, "username":''.join(random.choices(string.ascii_letters, k=6)), "password":HashingFunc(str(random.choices(string.ascii_letters, k=5))), "name":''.join(random.choices(string.ascii_letters, k=13))})
 for i in accounts:
     ds.AddTo(i)
-"""
+'''
+
 
 if __name__ == "__main__":
     print("\033[33m***PLEASE READ ALL THE TEXT BELOW BEFORE USING THIS SOFTWARE***\033[0m")
@@ -289,42 +289,44 @@ if __name__ == "__main__":
                                                 ds.SaveLocally()
                                 elif len(query) > 0 and not query.isdigit():
                                     account = app.Search(query)
-                                    originalUser = account[1]["username"]
-                                    if len(account[1]) > 4:
-                                        print("Cannot view admin accounts")
+                                    if account == None:
+                                        print("No account found with that username")
                                     else:
-                                        print(f"Sort ID: {account[0]}")
-                                        for o in account[1].keys():
-                                            d = account[1][o]
-                                            print(f"{o}: {d}")
-                                        entry = input("Enter [r] to remove the account, Enter [uid, username, name] to edit values: ")
-                                        if entry == "r":
-                                            print(app.RemoveAccount(query))
-                                        elif entry == "uid":
-                                            c = input("Generate new UID? [y/n]: ")
-                                            if c == "y":      
-                                                nId = random.randint(1000000000, 9999999999)
-                                                account[1]["uid"] = nId
+                                        originalUser = account[1]["username"]
+                                        if len(account[1]) > 4:
+                                            print("Cannot view admin accounts")
+                                        else:
+                                            print(f"Sort ID: {account[0]}")
+                                            for o in account[1].keys():
+                                                d = account[1][o]
+                                                print(f"{o}: {d}")
+                                            entry = input("Enter [r] to remove the account\nEnter [username, name] to edit values\nEnter [date] to view the account creation date: ")
+                                            if entry == "r":
+                                                print(app.RemoveAccount(query))
+                                            elif entry == "date":
+                                                form = ["Year: ", "Month: ", "Day: ", "Hour: ", "Minute: ", "Second: ", "Microsecond: "]
+                                                date = ds.RevertId(account)
+                                                for v in range(len(date)):
+                                                    print(f"{form[v]} {date[v]}")
+                                            elif entry == "username":
+                                                account[1]["username"] = input("Enter a new username for this user (Sort ID requires first value to be a non-integer): ")
+                                                account[0] = ord(account[1]["username"][0])
                                                 app.RemoveAccount(originalUser)
                                                 ds.arr.append(account)
                                                 ds.SaveLocally()
-                                        elif entry == "username":
-                                            account[1]["username"] = input("Enter a new username for this user (Sort ID requires first value to be a non-integer): ")
-                                            account[0] = ord(account[1]["username"][0])
-                                            app.RemoveAccount(originalUser)
-                                            ds.arr.append(account)
-                                            ds.SaveLocally()
-                                        elif entry == "password":
-                                            account[1]["password"] = HashingFunc(input("Enter a new password for this user: "))
-                                            app.RemoveAccount(originalUser)
-                                            ds.arr.append(account)
-                                            ds.SaveLocally()
-                                        elif entry == "name":
-                                            account[1]["name"] = input("Enter a new name for this user: ")
-                                            app.RemoveAccount(originalUser)
-                                            ds.arr.append(account)
-                                            ds.SaveLocally()
-                                    print("Account updated successfully")
+                                                print("Account updated successfully")
+                                            elif entry == "password":
+                                                account[1]["password"] = HashingFunc(input("Enter a new password for this user: "))
+                                                app.RemoveAccount(originalUser)
+                                                ds.arr.append(account)
+                                                ds.SaveLocally()
+                                                print("Account updated successfully")
+                                            elif entry == "name":
+                                                account[1]["name"] = input("Enter a new name for this user: ")
+                                                app.RemoveAccount(originalUser)
+                                                ds.arr.append(account)
+                                                ds.SaveLocally()
+                                                print("Account updated successfully")
                             elif choice.lower() == "end": 
                                 run = False
                                 print("Successfully logged out.")
