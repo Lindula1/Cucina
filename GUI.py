@@ -1,5 +1,6 @@
 import customtkinter as CTK
 import tkinter as TK
+from CUCINA import app as cucina
 
 CTK.set_appearance_mode("System")
 CTK.set_default_color_theme("green")
@@ -10,17 +11,35 @@ class App(CTK.CTk):
         super().__init__(*args, **kwargs)
         self.title("CUCINA")
         self.geometry(f"{aWidth}x{aHeight}")
-        
-        self.topFrame = CTK.CTkFrame(self, bg_color= "transparent")
-        self.topFrame.pack(fill="x", anchor="n", expand=True)
+    
+    def LoginWindow(self):
+        # Top Frame
+        self.frA = CTK.CTkFrame(self, bg_color= "transparent")
+        self.frA.pack(fill="both", padx=20, pady=60, expand=True)
         # Username Label
-        self.nameLbl = CTK.CTkLabel(self.topFrame, text="USERNAME", font=('Helvetica', 38))
-        self.nameLbl.pack(side="top", expand=True)
+        self.lblA1 = CTK.CTkLabel(self.frA, text="USERNAME", font=('Helvetica', 38))
+        self.lblA1.pack(padx=12, pady=10)
  
         # Username Entry Field
-        self.nameEntry = CTK.CTkEntry(self.topFrame, placeholder_text="ENTER YOUR USERNAME", font=('Helvetica', 28))
-        self.nameEntry.pack(side="top", expand=True)
+        self.etyA1 = CTK.CTkEntry(self.frA, placeholder_text="USERNAME", font=('Helvetica', 28))
+        self.etyA1.pack(padx=12, pady=10)
+        # Password Entry Field
+        self.etyA2 = CTK.CTkEntry(self.frA, placeholder_text="PASSWORD", font=('Helvetica', 28))
+        self.etyA2.pack(padx=12, pady=10)
+        # Log In button
+        self.btnA1 = CTK.CTkButton(self.frA, text="Login", command=lambda: self.Login())
+        self.btnA1.pack(padx=12, pady=12)
+
+    def Login(self):
+        usrm = self.etyA1.get()
+        pwrd = self.etyA2.get()
+        if usrm == "" or pwrd == "":
+            pass
+        else:
+            result = cucina.LogIn(usrm, pwrd)
+            self.btnA1.configure(True, text=result)
     
 if __name__ == "__main__":
     app = App()
+    app.LoginWindow()
     app.mainloop() 

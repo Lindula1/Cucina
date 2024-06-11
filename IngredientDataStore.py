@@ -102,9 +102,11 @@ class Pantry():
         if result == None:
             return "No item found"
         else:
-            for i in result:
-                if i[4].lower() == query.lower():
-                    return i
+            for i in range(len(result)):
+                if result[i][4].lower() == query.lower():
+                    if result[i + 1][4].lower() == query.lower():
+                        return "Too many items match query"
+                    return result[i]
     
     def Remove(self, query):
         query = query.lower()

@@ -49,7 +49,7 @@ class CUCINA():
             return "Username already exists"
 
     def LogIn(self, usrm, pwrd):
-        if usrm[0].strip().upper() not in al: return "username has an invalid leader"
+        if usrm[0].upper() not in al: return "username has an invalid leader"
         account = self.Search(usrm.lower())
         if account == None: return "Username doesn't exist"
         if HashingFunc(pwrd) == account[1]["password"]: 
@@ -135,7 +135,6 @@ for j in range(74):
 for i in accounts:
     ds.AddTo(i)
 '''
-
 
 if __name__ == "__main__":
     print("\033[33m***PLEASE READ ALL THE TEXT BELOW BEFORE USING THIS SOFTWARE***\033[0m")

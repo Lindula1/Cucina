@@ -25,19 +25,19 @@ def HashingFunc(entry):
         h = ((int(h) * math.factorial(len(s))) % key) + 1
     except ZeroDivisionError:
         print("FATAL ERROR. HOW?")
-        h = key - (ord(entry[0]) + ord(entry[-1]) + ord(entry[1]))
+        h = key - (ord(entry[0]))
 
     pinum = pi[h:h+65]
     nums = int("".join(pinum))
     digits = list(Digitize(nums, 26))
     hashed = ""
     for num in digits:
-        hashed += chr(abs(num - 101))
+        hashed += chr(abs(num - 88))
 
     return hashed
 
 if __name__ == "__main__":
-    tstWrds = ["password", "fortnite420", "green", "hotdog69", "hotdog23", "h", "ho"]
+    tstWrds = ["password", "fortnite420", "green", "hotdog69", "hotdog23", "h", "ho", "the sly fox jumped over the lazy dog", "the sly fox jumped over the lanky dog", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam posuere libero dolor, quis placerat lectus sagittis at. Fusce sed elit sem. Nunc in placerat velit. Vivamus eu ex rhoncus, sollicitudin odio ut, scelerisque arcu. Aliquam ornare blandit magna sed venenatis. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Suspendisse varius neque at erat vehicula, in malesuada sapien facilisis. Etiam cursus quam eget arcu tristique, ac ultricies elit fringilla. Aliquam quis tincidunt libero. Nulla eget efficitur odio. Sed congue dictum volutpat. Suspendisse potenti. Praesent pretium scelerisque euismod. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam posuere libero dolor, quis placerat lectus sagittis at. Fusce sed elit sem. Nunc in placerat velit. Vivamus eu ex rhoncus, sollicitudin odio ut, scelerisque arcu. Aliquam ornare blandit magna sed venenatis. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Suspendisse varius neque at erat vehicula, in malesuada sapien facilisis. Etiam cursus quam eget arcu tristique, ac ultricies elit fringilla. Aliquam quis tincidunt libero. Nulla eget efficitur odio. Sed congue dictum volutpat. Suspendisse potenti. Praesent pretium scelerisque euismod. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas"]
     for wrd in tstWrds:
         h = HashingFunc(wrd)
         print(f"'{wrd}' Hashed: {h}")
