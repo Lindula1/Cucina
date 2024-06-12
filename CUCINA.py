@@ -1,21 +1,28 @@
-import random
-import string
-from DataStoreModel import DataBase
-import PDFHandler as PDF
-import IngredientDataStore as Pantry
-import datetime
-from Hashing import HashingFunc
-ds = DataBase()
-al = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+try:
+    import random
+    import string
+    from DataStoreModel import DataBase
+    import PDFHandler as PDF
+    import IngredientDataStore as Pantry
+    import datetime
+    from Hashing import HashingFunc
+    ds = DataBase()
+    al = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+except ModuleNotFoundError:
+    print("\033[31mFATAL ERROR. Dependenant modules missing.\nThe software must terminate\033[0m")
+    exit()
 
 class CUCINA():
     def __init__(self):
+        self.disableLogin = False
         self.admin = False
         self.errors = []
         if ds.checks == False:
             self.errors.append("\033[31mFATAL ERROR DATABSE EMPTY\033[0m")
         if Pantry.pantry.checks == False:
             self.errors.append("\033[31mPANTRY IS EMPTY\033[0m")
+            self.disableLogin = True
         if len(self.errors) > 0:
             for i in self.errors: print(i)
             print(f"\033[33mAn error was detected in dependancies.\nThe progam may not be able to run properley.\033[0m\n")
@@ -49,6 +56,8 @@ class CUCINA():
             return "Username already exists"
 
     def LogIn(self, usrm, pwrd):
+        if self.disableLogin:
+            return "Login feature is disabled"
         if usrm[0].upper() not in al: return "username has an invalid leader"
         account = self.Search(usrm.lower())
         if account == None: return "Username doesn't exist"
@@ -91,7 +100,6 @@ class CUCINA():
                 
     def AddToPantry(self, item):
         Pantry.pantry.AddItem(item)
-        
     
     def DishSearch(self, recipe):
         ingredients, text, steps = PDF.Read(recipe)
