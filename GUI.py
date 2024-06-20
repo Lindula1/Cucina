@@ -5,6 +5,7 @@ import tkinter.font as Font
 from PIL import Image, ImageTk
 import sys
 import os
+import keyboard
 
 
 sys.path.insert(0, "../Cucina/Images")
@@ -24,6 +25,8 @@ class App(CTK.CTk):
         self.frA = CTK.CTkFrame(self, bg_color= "transparent")
         self.frB = CTK.CTkFrame(self, bg_color= "transparent")
         self.frC = CTK.CTkFrame(self, bg_color= "transparent")
+        self.frBA = CTK.CTkFrame(self.frB, bg_color= "transparent")
+        self.frBB = CTK.CTkFrame(self.frB, bg_color= "transparent")
     
     def LoadImages(self):
         self.images = []
@@ -44,8 +47,12 @@ class App(CTK.CTk):
             pass
         elif next == 1:
             self.after(0, self.LoginWindow())
+            self.after(0, self.bind('<Return>', self.Login))
         elif next == 2:
+            self.after(0, self.bind('<Return>', self.Register))
             self.after(0, self.RegistrationWindow())
+        elif next == 3:
+            self.after(0, self.HomePage())
 
     def UnmapFrames(self):
         if self.frA.winfo_ismapped():
@@ -63,7 +70,7 @@ class App(CTK.CTk):
         LblFont = CTK.CTkFont(family="Arial Bold", size=54, weight=Font.BOLD)
         BtnFont = CTK.CTkFont(family="Times Bold", size=32, weight=Font.BOLD)
         EtyFont = CTK.CTkFont(family="Helvetica", size=39, weight=Font.NORMAL) 
-        titles = [ "USER LOG-IN","ENTER USERNAME BELOW" ,"USERNAME", "ENTER PASSWORD BELOW", "PASSWORD", "          LOG IN          ", "REGISTER?"]
+        titles = ["USER LOG-IN","ENTER USERNAME BELOW" ,"USERNAME", "ENTER PASSWORD BELOW", "PASSWORD", "          LOG IN          ", "REGISTER?"]
         # Frames
         self.frA.pack(fill="both", expand=True, side="left")
         self.frB.pack(fill="both", expand=True, side="left")
@@ -74,7 +81,7 @@ class App(CTK.CTk):
         self.btnA2 = CTK.CTkButton(self.frA, image=self.images[4], text=None, fg_color="transparent", hover_color="grey90")
         self.btnA2.pack(padx=12, pady=160)
         self.btnC3 = CTK.CTkButton(self.frC, text="SECURITY INFORMATION\n\nTERMS OF SERVICE", fg_color="transparent", hover_color="grey90", text_color="grey4",anchor="e")
-        self.btnC3.pack(padx=2, pady=32, side="top")
+        self.btnC3.pack(padx=12, pady=32, side="top", anchor="ne")
         self.btnC4 = CTK.CTkButton(self.frC, image=self.images[4], text=None, fg_color="transparent", hover_color="grey90")
         self.btnC4.pack(padx=12, pady=198)
         # Title
@@ -96,6 +103,42 @@ class App(CTK.CTk):
         # Regist button
         self.btnB2 = CTK.CTkButton(self.frB, text=titles[6], font=BtnFont, command=lambda: self.WindowHandler(2), corner_radius=30, height=20)
 
+    def HomePage(self):
+        TtlFont = CTK.CTkFont(family="Arial Black", size=80, weight=Font.BOLD)
+        LblFont = CTK.CTkFont(family="Arial Bold", size=54, weight=Font.BOLD)
+        BtnFont = CTK.CTkFont(family="Times Bold", size=32, weight=Font.BOLD)
+        EtyFont = CTK.CTkFont(family="Helvetica", size=39, weight=Font.NORMAL) 
+        try:
+            name = self.account[1]["name"]
+            titles = [name + "'s Kitchen", "DISCOVER RECIPES", "SEARCH YOUR PANTRY", "LOGOUT"]
+        except KeyError:
+            titles = ["Admin Access", "DISCOVER RECIPES", "SEARCH YOUR PANTRY", "LOGOUT"]
+        # Frames
+        self.frA.pack(fill="both", expand=True, side="top")
+        self.frB.pack(fill="both", expand=True, side="left")
+        self.frC.pack(fill="both", expand=True, side="right")
+        #self.frBA.pack(fill="both", expand=True, side="left")
+        #self.frBB.pack(fill="both", expand=True, side="right")
+        # IMAGES
+        self.btnB1 = CTK.CTkButton(self.frB, image=self.images[4], text=None, fg_color="transparent", hover_color="grey90")
+        self.btnB1.pack(padx=12, pady=10, side="top")
+        self.btnC2 = CTK.CTkButton(self.frC, image=self.images[4], text=None, fg_color="transparent", hover_color="grey90")
+        self.btnC2.pack(padx=12, pady=10, side="top")
+        # Alignment button
+        self.btnA0 = CTK.CTkButton(self.frA, text=titles[3], font=BtnFont, corner_radius=30, height=80, text_color_disabled="#f3e8c6", fg_color="#f3e8c6", hover="#f3e8c6",text_color="#f3e8c6", command=None)
+        self.btnA0.pack(padx=12, pady=20, side="left")
+        # Title
+        self.lblA1 = CTK.CTkLabel(self.frA, text=titles[0], font=TtlFont, justify="center", text_color="#cc5308")
+        self.lblA1.pack(padx=12, pady=20, side="left", anchor="n", fill="x", expand=True)
+        # Log Out button
+        self.btnA1 = CTK.CTkButton(self.frA, text=titles[3], font=BtnFont, command=lambda: self.WindowHandler(1), corner_radius=30, height=80)
+        self.btnA1.pack(padx=12, pady=20, side="right", anchor="ne")
+        # Navigation buttons
+        self.btnB2 = CTK.CTkButton(self.frB, text=titles[1], font=BtnFont, command=lambda: self.Login(), corner_radius=30, height=80)
+        self.btnB2.pack(padx=12, pady=15)
+        self.btnC2 = CTK.CTkButton(self.frC, text=titles[2], font=BtnFont, command=lambda: self.Login(), corner_radius=30, height=80)
+        self.btnC2.pack(padx=12, pady=15)
+    
     def RegistrationWindow(self):
         TtlFont = CTK.CTkFont(family="Arial Black", size=54, weight=Font.BOLD)
         LblFont = CTK.CTkFont(family="Arial Bold", size=36, weight=Font.BOLD)
@@ -169,7 +212,8 @@ class App(CTK.CTk):
             result = cucina.LogIn(usrm, pwrd)
             if result == "Logged in as Admin" or result == "Login successful":
                 self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="cornflower blue")
-                self.after(640, lambda: self.btnB1.configure(True, text="LOG IN", state="normal", text_color="#fbf4ed"))
+                self.account = cucina.Search(usrm)
+                self.WindowHandler(3)
             elif self.lgnFailCount > 0:
                 self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="cornflower blue")
                 self.after(640, lambda: self.btnB1.configure(True, text="LOG IN", state="normal", text_color="#fbf4ed"))
@@ -183,6 +227,5 @@ class App(CTK.CTk):
 if __name__ == "__main__":
     app = App()
     app.after(0, lambda: app.state("zoomed"))
-    app.LoginWindow()
-    #app.RegistrationWindow()
+    app.WindowHandler(1)
     app.mainloop() 
