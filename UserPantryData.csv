@@ -1,23 +1,46 @@
-Letter sort value,Nutritional value,Quantity,Expiry date,Ingredient name
-65,599,3,43693,apple
-66,34,99,40795,beef
-66,34,99,77392,Bill's sister
-66,69,89,41110,breast milk
-66,600,1,58121,Bob
-66,69000,20,416886,blood
-67,600,1,49324,carrots
-67,200,12,49535,Cheese
-67,2390,23,52455,Coco Pops
-68,2093,3,77707,Diplo
-68,3,50000,40488,dandruff
-70,300,8,40424,finger
-75,34,99,40795,kesh
-77,300,5,49355,Mr Paul
-77,4444,332,77117,Macdonalds borger
-77,99,10000,3397,mushrooms
-79,34,99,40795,Olive oil
-79,90,3,49324,onions
-80,300,1000,2962371,pasta on crack
-84,34,23,40795,Tomato
-84,99000,90,77089,Apple
-66,999,9,49368,breast milk
+Letter sort value,Nutritional value,Quantity,Expiry date,Ingredient name
+
+65,599,3,43693,apple
+
+66,34,99,40795,beef
+
+66,34,99,77392,Bill's sister
+
+66,69,89,41110,breast milk
+
+66,600,1,58121,Bob
+
+66,69000,20,416886,blood
+
+67,600,1,49324,carrots
+
+67,200,12,49535,Cheese
+
+67,2390,23,52455,Coco Pops
+
+68,2093,3,77707,Diplo
+
+68,3,50000,40488,dandruff
+
+70,300,8,40424,finger
+
+75,34,99,40795,kesh
+
+77,300,5,49355,Mr Paul
+
+77,4444,332,77117,Macdonalds borger
+
+77,99,10000,3397,mushrooms
+
+79,34,99,40795,Olive oil
+
+79,90,3,49324,onions
+
+80,300,1000,2962371,pasta on crack
+
+84,34,23,40795,Tomato
+
+84,99000,90,77089,Apple
+
+66,999,9,49368,breast milk
+

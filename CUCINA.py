@@ -15,6 +15,7 @@ except ModuleNotFoundError:
 
 class CUCINA():
     def __init__(self):
+        self.dtList = ds.arr
         self.disableLogin = False
         self.admin = False
         self.errors = []
@@ -307,7 +308,7 @@ if __name__ == "__main__":
                                             for o in account[1].keys():
                                                 d = account[1][o]
                                                 print(f"{o}: {d}")
-                                            entry = input("Enter [r] to remove the account\nEnter [username, name] to edit values\nEnter [date] to view the account creation date: ")
+                                            entry = input("Enter [r] to remove the account\nEnter [username, name] to edit values\nEnter [date] to view the account creation date\nSelection: ")
                                             if entry == "r":
                                                 print(app.RemoveAccount(query))
                                             elif entry == "date":

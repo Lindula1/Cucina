@@ -1,7 +1,11 @@
 import math
 from mpmath import mp
+import string
+import random
+from timeit import repeat
 
 key = 58231
+seed = 161803398874989484820458683436563811772030917980576286213544862270526046281890
 mp.dps = key + 69
 pi = list(str(mp.pi).replace(".",""))
 
@@ -36,8 +40,53 @@ def HashingFunc(entry):
 
     return hashed
 
+def HashinFunc2(entry):
+    d = ""
+    for i in entry:
+        d += str(ord(i))
+    d = int(d)
+    pinum = pi[d % key:(d % key)+65]
+    s = int("".join(pinum))
+    print(s)
+    print(d)
+    print(s*d)
+    print(seed)
+    nums = int(d * s) % seed
+    digits = list(Digitize(nums, 52))
+    hashed = ""
+    for num in digits:
+        if num < 26:
+            hashed += chr(abs(num - 88))
+        elif num > 26:
+            hashed += chr(abs((num - 26) - 123))
+    return hashed
+
 if __name__ == "__main__":
-    tstWrds = ["password", "fortnite420", "green", "hotdog69", "hotdog23", "Diplo", "ho", "the sly fox jumped over the lazy dog", "the sly fox jumped over the lanky dog", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam posuere libero dolor, quis placerat lectus sagittis at. Fusce sed elit sem. Nunc in placerat velit. Vivamus eu ex rhoncus, sollicitudin odio ut, scelerisque arcu. Aliquam ornare blandit magna sed venenatis. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Suspendisse varius neque at erat vehicula, in malesuada sapien facilisis. Etiam cursus quam eget arcu tristique, ac ultricies elit fringilla. Aliquam quis tincidunt libero. Nulla eget efficitur odio. Sed congue dictum volutpat. Suspendisse potenti. Praesent pretium scelerisque euismod. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam posuere libero dolor, quis placerat lectus sagittis at. Fusce sed elit sem. Nunc in placerat velit. Vivamus eu ex rhoncus, sollicitudin odio ut, scelerisque arcu. Aliquam ornare blandit magna sed venenatis. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Suspendisse varius neque at erat vehicula, in malesuada sapien facilisis. Etiam cursus quam eget arcu tristique, ac ultricies elit fringilla. Aliquam quis tincidunt libero. Nulla eget efficitur odio. Sed congue dictum volutpat. Suspendisse potenti. Praesent pretium scelerisque euismod. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas"]
+    result = []
+    tstWrds = []
+    for i in range(2400):
+        tstWrds.append(''.join(random.choices(string.ascii_letters, k=random.randint(2,20))))
+    for i in tstWrds:
+            num = tstWrds.count(i)
+            result.append([i,num])
+            if num > 1:
+                print(f"{i} has {num} repeats.")
+    bank = []
+    c = 0
     for wrd in tstWrds:
-        h = HashingFunc(wrd)
+        h = HashinFunc2(wrd)
+        print(len(h))
+        bank.append(h)
+    for i in bank:
+        num = bank.count(i)
+        if num > 1:
+            for l in range(len(bank)):
+                if i == bank[l]:
+                    print(f"{tstWrds[l]} {i} has {num} repeats.")
+        result[c] = [result[c],["hashed",num]]
+        c += 1
+
+    tstWrds = ["password", "fortnite420", "green", "hotdog69", "hotdog23", "Diplo", "ho", "the sly fox jumped over the lazy dog", "the sly fox jumped over the lanky dog","l","m"]
+    for wrd in tstWrds:
+        h = HashinFunc2(wrd)
         print(f"'{wrd}' Hashed: {h}")
