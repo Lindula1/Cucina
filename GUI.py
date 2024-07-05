@@ -14,7 +14,7 @@ sys.path.insert(0, "../Cucina/Images")
 CTK.set_appearance_mode("light")
 CTK.set_default_color_theme("bisque-theme.json")
 
-#aWidth, aHeight = "1920", "1080" men
+#aWidth, aHeight = "1920", "1080"
 class App(CTK.CTk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -55,6 +55,10 @@ class App(CTK.CTk):
             self.after(0, self.RegistrationWindow())
         elif next == 3:
             self.after(0, self.HomePage())
+        elif next == 4:
+            self.after(0, self.PantryPage())
+        elif next == 5:
+            self.after(0, self.RecipePage())
 
     def UnmapFrames(self):
         if self.frA.winfo_ismapped():
@@ -102,9 +106,48 @@ class App(CTK.CTk):
         # Log In button
         self.btnB1 = CTK.CTkButton(self.frB, text=titles[5], font=BtnFont, command=lambda: self.Login(), corner_radius=30, height=80)
         self.btnB1.pack(padx=12, pady=30)
-        # Regist button
+        # Register button
         self.btnB2 = CTK.CTkButton(self.frB, text=titles[6], font=BtnFont, command=lambda: self.WindowHandler(2), corner_radius=30, height=80)
         self.btnB2.pack(padx=12, pady=10, anchor="n")
+    
+    def PantryPage(self):
+        TtlFont = CTK.CTkFont(family="Arial Black", size=80, weight=Font.BOLD)
+        LblFont = CTK.CTkFont(family="Arial Bold", size=54, weight=Font.BOLD)
+        BtnFont = CTK.CTkFont(family="Times Bold", size=32, weight=Font.BOLD)
+        BtnFont1 = CTK.CTkFont(family="Helvetica", size=12, weight=Font.NORMAL)
+        EtyFont = CTK.CTkFont(family="Helvetica", size=39, weight=Font.NORMAL) 
+        titles = ["YOUR PANTRY", "RECIPES", "HOME", "ADD AN ITEM", "ITEM COUNT"]
+        filters = ["FILTER A, FILTER B, FILTER C, FILTER D"]
+        self.frA.pack(fill="both", expand=True, side="top")
+        self.frB.configure(border_color="#cb9c44", border_width=7)
+        self.frB.pack(fill="y", expand=True, side="top")
+        self.sfrBA = CTK.CTkScrollableFrame(self.frB, bg_color="#eee9e1")
+        self.sfrBA.pack(fill="both", expand=True, side="left")
+        self.frBB.pack(fill="both", expand=True, side="right")
+        # Recipe finder button
+        self.btnB1 = CTK.CTkButton(self.frA, text=titles[1], font=BtnFont, width=280, command=lambda: self.WindowHandler(3), corner_radius=30, height=80)
+        self.btnB1.pack(padx=12, pady=12, anchor="nw", side='left')
+        # Title
+        self.lblB1 = CTK.CTkLabel(self.frA, text=titles[0], font=TtlFont, justify="center", width=780, text_color="#cc5308")
+        self.lblB1.pack(padx=266, pady=46, side="left", anchor="n")
+        # Home button
+        self.btnB2 = CTK.CTkButton(self.frA, text=titles[2], font=BtnFont, width=280, command=lambda: self.WindowHandler(5), corner_radius=30, height=80)
+        self.btnB2.pack(padx=12, pady=12, anchor="ne", side="left")
+        # Pantry
+        print(cucina.pantryList)
+        self.GridFormatList(self.frBA, BtnFont1, cucina.pantryList, 4)
+
+    def GridFormatList(self, window, font, arr, fields):
+        for ind in range(len(arr)):
+            title = ""
+            for field in range(fields,0,-1):
+                title += " [" + str(arr[ind][field]) + "] "
+            print(title)
+            cell = CTK.CTkButton(window, text=title, font=font, width=680, corner_radius=2, bg_color="#eee9e1", text_color="black")
+            cell.pack(side="top", padx=1, pady=2)
+            #cell.configure(text=title)
+
+
     
     def GridCell(self, win, entry, row, column, font):
         cell = CTK.CTkEntry(win, font=font, width=156, corner_radius=2)
@@ -201,11 +244,11 @@ class App(CTK.CTk):
         self.lblA1.pack(padx=12, pady=20, side="left", anchor="n", fill="x", expand=True)
         # Log Out button
         self.btnA1 = CTK.CTkButton(self.frA, text=titles[3], font=BtnFont, command=lambda: self.WindowHandler(1), corner_radius=30, height=80)
-        self.btnA1.pack(padx=12, pady=12, side="right", anchor="ne")
+        self.btnA1.pack(padx=12, pady=20, side="right", anchor="ne")
         # Navigation buttons
-        self.btnB2 = CTK.CTkButton(self.frB, text=titles[1], font=BtnFont, command=lambda: None, corner_radius=30, height=80)
+        self.btnB2 = CTK.CTkButton(self.frB, text=titles[1], font=BtnFont, corner_radius=30, height=80, command=lambda: self.WindowHandler(5))
         self.btnB2.pack(padx=12, pady=120)
-        self.btnC2 = CTK.CTkButton(self.frC, text=titles[2], font=BtnFont, command=lambda: None, corner_radius=30, height=80)
+        self.btnC2 = CTK.CTkButton(self.frC, text=titles[2], font=BtnFont, corner_radius=30, height=80, command=lambda: self.WindowHandler(4))
         self.btnC2.pack(padx=12, pady=120)
     
     def RegistrationWindow(self):

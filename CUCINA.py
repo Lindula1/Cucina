@@ -15,7 +15,6 @@ except ModuleNotFoundError:
 
 class CUCINA():
     def __init__(self):
-        self.dtList = ds.arr
         self.disableLogin = False
         self.admin = False
         self.errors = []
@@ -27,6 +26,8 @@ class CUCINA():
         if len(self.errors) > 0:
             for i in self.errors: print(i)
             print(f"\033[33mAn error was detected in dependancies.\nThe progam may not be able to run properley.\033[0m\n")
+        self.dtList = ds.arr
+        self.pantryList = Pantry.pantry.arr
 
     def RegisterAccount(self, usrm, pwrd, name):
         usLength = 0

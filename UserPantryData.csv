@@ -4,9 +4,9 @@ Letter sort value,Nutritional value,Quantity,Expiry date,Ingredient name
 
 66,34,99,40795,beef
 
-66,34,99,77392,Bill's sister
+66,34,99,77392,Bill
 
-66,69,89,41110,breast milk
+66,69,89,41110,bread
 
 66,600,1,58121,Bob
 
@@ -41,6 +41,4 @@ Letter sort value,Nutritional value,Quantity,Expiry date,Ingredient name
 84,34,23,40795,Tomato
 
 84,99000,90,77089,Apple
-
-66,999,9,49368,breast milk
 
