@@ -14,7 +14,7 @@ sys.path.insert(0, "../Cucina/Images")
 CTK.set_appearance_mode("light")
 CTK.set_default_color_theme("bisque-theme.json")
 
-#aWidth, aHeight = "1920", "1080"
+#aWidth, aHeight = "1920", "1080" men
 class App(CTK.CTk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
