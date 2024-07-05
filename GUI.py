@@ -23,7 +23,7 @@ class App(CTK.CTk):
         self.attributes("-fullscreen", "True") 
         self.LoadImages()
         self.lgnFailCount = 0
-        self.key = ""
+        self.key = 0
         self.frA = CTK.CTkFrame(self, bg_color= "transparent")
         self.frB = CTK.CTkFrame(self, bg_color= "transparent")
         self.frC = CTK.CTkFrame(self, bg_color= "transparent")
@@ -147,17 +147,19 @@ class App(CTK.CTk):
         self.ety1 = CTK.CTkEntry(self.newCtk, placeholder_text=txt[1], font=EtyFont1, width=320)
         self.ety1.grid(row=1, column=5, sticky="n", padx=5)
         self.ety1.bind("<Key>", self.Click)
-        self.ety1.bind("<BackSpace>", self.Click)
+        #self.ety1.bind("<BackSpace>", self.Click)
         btn1 = CTK.CTkButton(self.newCtk, text=txt[2], font=BtnFont, command=lambda: self.AccountSearch(self.ety1.get()))
         btn1.grid(row=1, column=6, sticky="n", padx=5)
         self.newCtk.mainloop()
     
     def Click(self, event):
         EtyFont = CTK.CTkFont(family="Helvetica", size=12, weight=Font.NORMAL)
-        entry = self.ety1.get()
-        if len(entry) > 0:
-            self.AccountSearch(entry)
-        elif len(entry) == 0:
+        c = event.char
+        if len(c) > 0:
+            entry = self.ety1.get()
+            if len(entry) > 0:
+                self.AccountSearch(entry)
+        elif len(c) == 0:
             for child in self.frD.winfo_children():
                 child.grid_forget()
             self.ListAccounts(self.frD, EtyFont, cucina.dtList)
