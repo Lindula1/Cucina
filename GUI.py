@@ -7,6 +7,7 @@ import sys
 import os
 import keyboard
 from DataStoreModel import run as dataBase
+from IngredientDataStore import pantry
 
 
 sys.path.insert(0, "../Cucina/Images")
@@ -64,29 +65,12 @@ class App(CTK.CTk):
             self.after(0, self.RecipePage())
 
     def UnmapFrames(self):
-        if self.sfrBA.winfo_ismapped():
-            for widget in self.sfrBA.winfo_children():
-                widget.pack_forget()
-            self.sfrBA.pack_forget()
-        if self.frBB.winfo_ismapped():
-            for widget in self.frBB.winfo_children():
-                widget.pack_forget()
-            self.frBB.pack_forget()
-        if self.frA.winfo_ismapped():
-            for widget in self.frA.winfo_children():
-                widget.pack_forget()
-            self.frA.pack_forget()
-        if self.frB.winfo_ismapped():
-            for widget in self.frB.winfo_children():
-                widget.pack_forget()
-            self.frB.pack_forget()
-        if self.frC.winfo_ismapped():
-            for widget in self.frC.winfo_children():
-                widget.pack_forget()
-            self.frC.pack_forget()
-        self.frA.configure(bg_color= "transparent", border_width=0)
-        self.frB.configure(bg_color= "transparent", border_width=0)
-        self.frC.configure(bg_color= "transparent", border_width=0)
+        frames = [self.sfrBA, self.frBB, self.frA, self.frB, self.frC]
+        for i in frames:
+            if self.UnpackWidgets(i):
+                i.pack_forget()
+                i.configure(bg_color= "transparent", border_width=0)
+        
     
     def LoginWindow(self):
         TtlFont = CTK.CTkFont(family="Arial Black", size=80, weight=Font.BOLD)
@@ -126,9 +110,21 @@ class App(CTK.CTk):
         # Register button
         self.btnB2 = CTK.CTkButton(self.frB, text=titles[6], font=BtnFont, command=lambda: self.WindowHandler(2), corner_radius=30, height=80)
         self.btnB2.pack(padx=12, pady=10, anchor="n")
-    
+
+    def UnpackWidgets(self, parent):
+        if parent.winfo_ismapped():
+            for widget in parent.winfo_children():
+                widget.pack_forget()
+            return True
+        else:
+            return False
+
     def Filter(self):
-        print(self.rdbBB1Var.get())
+        filter = int(self.rdbBB1Var.get())
+        print(filter)
+        self.UnpackWidgets(self.sfrBA)
+        arr = pantry.SortFunc(pantry.arr, filter)
+        self.after(0, self.GridFormatList(self.sfrBA, cucina.pantryList, ["Nutrition: ", "Quantity: ", "Expiry: ", "Name: "]))
     
     def PantryPage(self):
         TtlFont = CTK.CTkFont(family="Arial Black", size=80, weight=Font.BOLD)
@@ -138,7 +134,7 @@ class App(CTK.CTk):
         RdbFont = CTK.CTkFont(family="Helvetica", size=24, weight=Font.NORMAL)
         EtyFont = CTK.CTkFont(family="Helvetica", size=39, weight=Font.NORMAL) 
         titles = ["YOUR PANTRY", "RECIPES", "HOME", "ADD AN ITEM", "ITEM COUNT"]
-        filters = ["FILTER A", "FILTER B", "FILTER C", "FILTER D"]
+        filters = ["FILTER BY NAME", "FILTER BY NUTRITION", "FILTER BY QUANTITY", "FILTER EXPIRY"]
         self.frA.pack(fill="both", expand=True, side="top")
         self.frB.pack(fill="both", expand=True, side="top", padx=80)
         self.frB.configure(border_color="#cb9c44", border_width=7)
@@ -155,25 +151,24 @@ class App(CTK.CTk):
         self.btnB2.pack(padx=12, pady=12, anchor="ne", side="left")
         # Filters
         self.rdbBB1Var = CTK.StringVar(value="other")
-        for i in filters:
+        for i in range(len(filters)):
             #lblBB1 = CTK.CTkLabel(self.frBB, text=i, font=BtnFont, width=280, command=lambda x=i: self.Filter(x), corner_radius=30, height=80)
             #lblBB1.pack(padx=8, pady=12)
-            self.rdbBB1 = CTK.CTkRadioButton(self.frBB, text=i, font=RdbFont, value=i, variable=self.rdbBB1Var, command=self.Filter)
+            self.rdbBB1 = CTK.CTkRadioButton(self.frBB, text=filters[i], font=RdbFont, value=i, variable=self.rdbBB1Var, command=self.Filter)
             self.rdbBB1.pack(padx=8, pady=12)
         # Pantry
-        self.after(0,self.GridFormatList(self.sfrBA, BtnFont1, cucina.pantryList, 4))
+        self.after(0,self.GridFormatList(self.sfrBA, cucina.pantryList, ["Nutrition: ", "Quantity: ", "Expiry: ", "Name: "]))
 
-    def GridFormatList(self, window, font, arr, fields):
+    def GridFormatList(self, window, arr, fields):
+        BtnFont1 = CTK.CTkFont(family="Helvetica", size=22, weight=Font.NORMAL)
         for ind in range(len(arr)):
             title = ""
-            for field in range(fields,0,-1):
-                title += " [" + str(arr[ind][field]) + "] "
+            for field in range(len(fields)):
+                title += " [" + fields[field] + str(arr[ind][field+1]) + "] "
             #cell.grid(row=ind, column=0, padx=1, pady=2)
-            cell = CTK.CTkButton(master=window, text=title, font=font, width=680, corner_radius=2, fg_color="#eee9e1", text_color="black")
-            cell.pack(padx=1, pady=3)
+            cell = CTK.CTkButton(master=window, text=title, font=BtnFont1, width=680, corner_radius=2, fg_color="#eee9e1", text_color="black", anchor="w")
+            cell.pack(padx=1, pady=3, anchor="w")
             #cell.configure(text=title)
-
-
     
     def GridCell(self, win, entry, row, column, font):
         cell = CTK.CTkEntry(win, font=font, width=156, corner_radius=2)
@@ -181,21 +176,20 @@ class App(CTK.CTk):
         cell.insert("end", entry)
         cell.configure(state="disable")
     
-    def ListAccounts(self, win, font, accList):
+    def ListAccounts(self, win, accList):
+        EtyFont = CTK.CTkFont(family="Helvetica", size=12, weight=Font.NORMAL)
         arr = []
-        fields = []
-        for field in accList[0][1]:
-                    fields.append(field)
+        fields = ["uid", "username", "password", "name"]
         for acc in accList:
             if acc[1]["username"] == "Lindt":
                 pass
             else:
                 arr.append([acc[1][x] for x in acc[1]])
         for k in range(len(fields)):
-            self.GridCell(win, fields[k], 0, k, font)
+            self.GridCell(win, fields[k], 0, k, EtyFont)
         for r in range(len(arr)):
             for c in range(4):
-                self.GridCell(win, arr[r][c], r+1, c, font)
+                self.GridCell(win, arr[r][c], r+1, c, EtyFont)
     
     def AdminPage(self):
         self.WindowHandler(3)
@@ -210,7 +204,7 @@ class App(CTK.CTk):
         BtnFont = CTK.CTkFont(family="Times Bold", size=32, weight=Font.BOLD)
         EtyFont = CTK.CTkFont(family="Helvetica", size=12, weight=Font.NORMAL)
         EtyFont1 = CTK.CTkFont(family="Helvetica", size=32, weight=Font.NORMAL)
-        self.ListAccounts(self.frD, EtyFont, cucina.dtList)
+        self.ListAccounts(self.frD, dataBase.arr)
         lbl1 = CTK.CTkLabel(self.newCtk, text=txt[0], font=LblFont)
         lbl1.grid(row=0, column=5, sticky="n", columnspan=2)
         self.ety1 = CTK.CTkEntry(self.newCtk, placeholder_text=txt[1], font=EtyFont1, width=320)
@@ -220,7 +214,19 @@ class App(CTK.CTk):
         btn1 = CTK.CTkButton(self.newCtk, text=txt[2], font=BtnFont, command=lambda: self.AccountSearch(self.ety1.get()))
         btn1.grid(row=1, column=6, sticky="n", padx=5)
         self.newCtk.mainloop()
+
+    def Click(self, event):
+        for child in self.frD.winfo_children():
+            child.grid_forget()
+        input = self.ety1.get()
+        if not input == "":
+            arr, pos, ran = dataBase.BulkSearch(input)
+            self.ListAccounts(self.frD, arr)
+        else:
+            self.ListAccounts(self.frD, dataBase.arr)
+
     
+    '''
     def Click(self, event):
         EtyFont = CTK.CTkFont(family="Helvetica", size=12, weight=Font.NORMAL)
         c = event.char
@@ -232,6 +238,7 @@ class App(CTK.CTk):
             for child in self.frD.winfo_children():
                 child.grid_forget()
             self.ListAccounts(self.frD, EtyFont, cucina.dtList)
+    '''
 
     def AccountSearch(self, entry):
         accounts, pos, posRange = dataBase.BulkSearch(entry)
