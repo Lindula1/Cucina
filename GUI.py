@@ -121,7 +121,6 @@ class App(CTK.CTk):
 
     def Filter(self):
         filter = int(self.rdbBB1Var.get())
-        print(filter)
         self.UnpackWidgets(self.sfrBA)
         arr = pantry.SortFunc(pantry.arr, filter)
         self.after(0, self.GridFormatList(self.sfrBA, cucina.pantryList, ["Nutrition: ", "Quantity: ", "Expiry: ", "Name: "]))
@@ -160,7 +159,7 @@ class App(CTK.CTk):
         self.after(0,self.GridFormatList(self.sfrBA, cucina.pantryList, ["Nutrition: ", "Quantity: ", "Expiry: ", "Name: "]))
 
     def GridFormatList(self, window, arr, fields):
-        BtnFont1 = CTK.CTkFont(family="Helvetica", size=22, weight=Font.NORMAL)
+        BtnFont1 = CTK.CTkFont(family="Helvetica", size=16, weight=Font.NORMAL)
         for ind in range(len(arr)):
             title = ""
             for field in range(len(fields)):
