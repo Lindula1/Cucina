@@ -372,8 +372,7 @@ class App(CTK.CTk):
             self.ListAccounts(self.frD, arr)
         else:
             self.ListAccounts(self.frD, dataBase.arr)
-
-    
+            
     '''
     def Click(self, event):
         EtyFont = CTK.CTkFont(family="Helvetica", size=12, weight=Font.NORMAL)
@@ -462,15 +461,15 @@ class App(CTK.CTk):
         self.lblB2.pack(padx=12, pady=8)
         self.etyB1 = CTK.CTkEntry(self.frB, validate="all", validatecommand=(textVal, "%P"), placeholder_text=titles[2], font=EtyFont, width=620, justify="center", height=68, corner_radius=240)
         self.etyB1.pack(padx=12, pady=2)
-        self.lblB5 = CTK.CTkLabel(self.frB, text=prompts[0], font=LblFont1, justify="center", width=780)
-        self.lblB5.pack(padx=12, pady=2)
+        #self.lblB5 = CTK.CTkLabel(self.frB, text=prompts[0], font=LblFont1, justify="center", width=780)
+        #self.lblB5.pack(padx=12, pady=2)
         # Username Entry Field
         self.lblB3 = CTK.CTkLabel(self.frB, text=titles[3], font=LblFont, justify="center", width=780)
         self.lblB3.pack(padx=12, pady=8)
         self.etyB2 = CTK.CTkEntry(self.frB, validate="all", validatecommand=(textVal, "%P"), placeholder_text=titles[4], font=EtyFont, width=620, justify="center", height=68, corner_radius=240)
         self.etyB2.pack(padx=12, pady=2)
-        self.lblB6 = CTK.CTkLabel(self.frB, text=prompts[1], font=LblFont1, justify="center", width=780)
-        self.lblB6.pack(padx=12, pady=2)
+        #self.lblB6 = CTK.CTkLabel(self.frB, text=prompts[1], font=LblFont1, justify="center", width=780)
+        #self.lblB6.pack(padx=12, pady=2)
         # Password Entry Field
         self.lblB4 = CTK.CTkLabel(self.frB, text=titles[5], font=LblFont, justify="center", width=780)
         self.lblB4.pack(padx=12, pady=8)
