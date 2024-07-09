@@ -39,14 +39,14 @@ class Pantry():
             raw = []
         ilist = []
         for item in raw: ilist.append(item[4])
-        return ilist
+        return raw
 
     def AddItem(self, item):
         for i in range(len(item) - 1):
             if item[i] == 0:
                 return "Field {i} is empty"
         self.arr.append(self.FormatDate(self.LetterSort(item), ))
-        pantry.SaveToDevice()
+        self.SaveToDevice()
         return "Item Added Successfully"
 
     def LetterSort(self, item):
@@ -113,7 +113,7 @@ class Pantry():
         if len(self.arr) == 1:
             print("This is the last item in your pantry")
             self.arr.pop(0)
-            pantry.SaveToDevice()
+            self.SaveToDevice()
             return "Item Deleted"
         else:
             results, pos, ran = self.BulkSearch(query.lower())
@@ -134,7 +134,7 @@ class Pantry():
                             else:
                                 delIndex = pos
                             self.arr.pop(delIndex)
-                            pantry.SaveToDevice()
+                            self.SaveToDevice()
                     return "First instance of item deleted."
                 for i in range(len(results)):
                     if results[i][4].lower() == query.lower():
@@ -145,7 +145,7 @@ class Pantry():
                         else:
                             delIndex = pos
                         self.arr.pop(delIndex)
-                        pantry.SaveToDevice()
+                        self.SaveToDevice()
                         return "Item Deleted"
         return "Fatal Error"
         
@@ -166,7 +166,7 @@ class Pantry():
 
     def SaveToDevice(self):
         #Must be called when the list of items is updated
-        CS.Write(self.arr)
+        CS.Write(self.SortFunc(self.arr, 0))
         return "Write Completed Successfully"
     
     def Clear(self):

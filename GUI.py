@@ -9,6 +9,7 @@ import keyboard
 from DataStoreModel import run as dataBase
 from IngredientDataStore import pantry
 import ttkbootstrap as Tb
+import datetime
 
 
 sys.path.insert(0, "../Cucina/Images")
@@ -74,6 +75,7 @@ class App(CTK.CTk):
         
     
     def LoginWindow(self):
+        textVal = (self.register(self.TextCallback))
         TtlFont = CTK.CTkFont(family="Arial Black", size=80, weight=Font.BOLD)
         LblFont = CTK.CTkFont(family="Arial Bold", size=54, weight=Font.BOLD)
         BtnFont = CTK.CTkFont(family="Times Bold", size=32, weight=Font.BOLD)
@@ -83,7 +85,7 @@ class App(CTK.CTk):
         self.frA.pack(fill="both", expand=True, side="left")
         self.frB.pack(fill="both", expand=True, side="left")
         self.frC.pack(fill="both", expand=True, side="right")
-        # IMAGES
+        # Images
         self.btnA1 = CTK.CTkButton(self.frA, image=self.images[2], text=None, fg_color="transparent", hover_color="grey90", command=lambda: self.WindowHandler(1))
         self.btnA1.pack(padx=12, pady=32, side="top")
         self.btnA2 = CTK.CTkButton(self.frA, image=self.images[4], text=None, fg_color="transparent", hover_color="grey90")
@@ -98,7 +100,7 @@ class App(CTK.CTk):
         # Username Entry Field
         self.lblB2 = CTK.CTkLabel(self.frB, text=titles[1], font=LblFont, justify="center", width=780)
         self.lblB2.pack(padx=12, pady=10)
-        self.etyB1 = CTK.CTkEntry(self.frB, placeholder_text=titles[2], font=EtyFont, width=760, justify="center", height=78, corner_radius=240)
+        self.etyB1 = CTK.CTkEntry(self.frB, validate="all", validatecommand=(textVal, "%P"), placeholder_text=titles[2], font=EtyFont, width=760, justify="center", height=78, corner_radius=240)
         self.etyB1.pack(padx=12, pady=10)
         # Password Entry Field
         self.lblB3 = CTK.CTkLabel(self.frB, text=titles[3], font=LblFont, justify="center", width=780)
@@ -124,19 +126,55 @@ class App(CTK.CTk):
         filter = int(self.rdbBB1Var.get())
         self.UnpackWidgets(self.sfrBA)
         arr = pantry.SortFunc(pantry.arr, filter)
-        self.after(0, self.GridFormatList(self.sfrBA, cucina.pantryList, ["Nutrition: ", "Quantity: ", "Expiry: ", "Name: "]))
+        self.after(0, self.GridFormatList(self.sfrBA, arr, ["Nutrition: ", "Quantity: ", "Expiry: ", "Name: "]))
 
     def Select(self, item):
+        # Display Item Values
         self.item = item
         itemx = item[1:5]
         self.btnBB2.configure(text="UPDATE", command=self.Update)
         for value in range(len(itemx)):
-            self.entries[value].delete(0,"end")
-            self.entries[value].insert(0,itemx[value])
-        # Display Item Values
+            if value == 2:
+                date, days = pantry.DateRevert(item)
+                date = date.split("/")
+                x = self.entries[value]
+                for i in range(len(x)):
+                    x[i].delete(0,"end")
+                    x[i].insert(0,date[2-i])
+            else:
+                self.entries[value].delete(0,"end")
+                self.entries[value].insert(0,itemx[value])
+
+    def TextCallback(self, T):
+        if T == "":
+            return True
+        elif T[0].isdigit() or len(T) > 30:
+            return False
+        return True
+    
+    def NumCallback(self, X):
+        if (str.isdigit(X) or X == "") and len(X) < 7:
+            return True
+        else:
+            return False
         
+    def DMCallback(self, D):
+        if (str.isdigit(D) or D == "") and len(D) < 3:
+            return True
+        else:
+            return False
+
+    def YearCallback(self, Y):
+        if (str.isdigit(Y) or Y == "") and len(Y) < 5:
+            return True
+        else:
+            return False
     
     def PantryPage(self):
+        textVal = (self.register(self.TextCallback))
+        numVal = (self.register(self.NumCallback))
+        dMVal = (self.register(self.DMCallback))
+        yearVal = (self.register(self.YearCallback))
         TtlFont = CTK.CTkFont(family="Arial Black", size=80, weight=Font.BOLD)
         LblFont = CTK.CTkFont(family="Arial Bold", size=54, weight=Font.BOLD)
         LblFont1 = CTK.CTkFont(family="Arial Bold", size=38, weight=Font.BOLD)
@@ -163,20 +201,27 @@ class App(CTK.CTk):
         # Item View
         self.entries = []
         fields = ["NUTRITION", "ITEM COUNT", "EXPIRY DATE", "ITEM NAME"]
+        dateLbl = ["00", "00", "0000"]
         for i in range(4):
+            afr = CTK.CTkFrame(self.frBB, fg_color="transparent", width=680)
+            afr.pack(side="top", anchor="w", padx=20)
+            lbl = CTK.CTkLabel(afr, text=fields[i], font=LblFont1, width=200, justify="left")
+            lbl.pack(side="left", pady=10, padx=12, anchor="w")
             if i == 2:
-                afr = CTK.CTkFrame(self.frBB, fg_color="transparent", width=680)
-                afr.pack(side="top", anchor="w", padx=20)
-                lbl = CTK.CTkLabel(afr, text=fields[i], font=LblFont1, width=200, justify="left")
-                lbl.pack(side="left", pady=10, padx=12, anchor="w")
-                #dety = Tb.DateEntry(afr)
-                #dety.pack(side="right", pady=10, padx=12, anchor="e")
+                l = []
+                for j in range(3):
+                    dEty = CTK.CTkEntry(afr, placeholder_text=dateLbl[j], validate="all", validatecommand=(dMVal, "%P"), font=EtyFont, width=len(dateLbl[j])*50, justify="center")
+                    if j == 2:
+                        dEty.configure(validatecommand=(yearVal, "%P"))
+                    dEty.pack(side="left", pady=10, padx=12, anchor="w")
+                    l.append(dEty)
+                self.entries.append(l)
+            elif i == 3:
+                ety = CTK.CTkEntry(afr, validate="all", validatecommand=(textVal, "%P"), placeholder_text="ENTER NEW OR SELECT EXISTING", font=EtyFont, width=600, justify="center")
+                ety.pack(side="left", pady=10, padx=12, anchor="e")
+                self.entries.append(ety)
             else:
-                afr = CTK.CTkFrame(self.frBB, fg_color="transparent", width=680)
-                afr.pack(side="top", anchor="w", padx=20)
-                lbl = CTK.CTkLabel(afr, text=fields[i], font=LblFont1, width=200, justify="left")
-                lbl.pack(side="left", pady=10, padx=12, anchor="w")
-                ety = CTK.CTkEntry(afr, placeholder_text="ENTER NEW OR SELECT EXISTING", font=EtyFont, width=600, justify="center")
+                ety = CTK.CTkEntry(afr, placeholder_text="0000", validate="all", validatecommand=(numVal, "%P"), font=EtyFont, width=600, justify="center")
                 ety.pack(side="right", pady=10, padx=12, anchor="e")
                 self.entries.append(ety)
         self.btnBB2 = CTK.CTkButton(self.frBB, text=titles[5], font=BtnFont, width=280, command=self.Add, corner_radius=30, height=80)
@@ -191,28 +236,64 @@ class App(CTK.CTk):
             self.rdbBB1 = CTK.CTkRadioButton(self.frBB, text=filters[i], font=RdbFont, value=i, variable=self.rdbBB1Var, command=self.Filter)
             self.rdbBB1.pack(padx=8, pady=12, side="bottom")
         # Pantry
-        self.after(0,self.GridFormatList(self.sfrBA, cucina.pantryList, ["Nutrition: ", "Quantity: ", "Expiry: ", "Name: "]))
+        self.after(0,self.GridFormatList(self.sfrBA, pantry.PantryList(), ["Nutrition: ", "Quantity: ", "Expiry: ", "Name: "]))
     
     def Add(self):
+        s = True
         self.btnBB2.configure(state="disabled")
         item = []
-        for x in self.entries:
-            item.append(x.get())
-        cucina.AddToPantry(item)
+        for entry in range(len(self.entries)):
+            if entry == 2:
+                l = []
+                for i in range(len(self.entries[entry])):
+                    if not i:
+                        s = False
+                        break
+                    l.append(int(self.entries[entry][i].get()))
+                item.append(l[::-1])
+            else:
+                if not entry:
+                    s = False
+                    break
+                item.append(self.entries[entry].get())
+        if s:
+            cucina.AddToPantry(item)
         self.after(200, self.btnBB2.configure(state="normal"))
+        self.ClearItem()
 
     def Update(self):
+        s = True
         self.btnBB2.configure(state="disabled")
-        pantry.Remove(self.item[4])
+        print(pantry.Remove(self.item[4]))
         item = []
-        for x in self.entries:
-            item.append(x.get())
-        cucina.AddToPantry(item)
-        self.after(200, self.btnBB2.configure(state="normal"))
+        for entry in range(len(self.entries)):
+            if entry == 2:
+                l = []
+                for i in range(len(self.entries[entry])):
+                    if not i:
+                        s = False
+                        break
+                    l.append(int(self.entries[entry][i].get()))
+                item.append(l[::-1])
+            else:
+                if not entry:
+                    s = False
+                    break
+                item.append(self.entries[entry].get())
+        if s:
+            cucina.AddToPantry(item)
+            self.after(200, self.btnBB2.configure(state="normal"))
+            self.ClearItem()
 
     def ClearItem(self):
-        for entry in self.entries:
-            entry.delete(0,"end")
+        self.UnpackWidgets(self.sfrBA)
+        self.GridFormatList(self.sfrBA, pantry.PantryList(), ["Nutrition: ", "Quantity: ", "Expiry: ", "Name: "])
+        for entry in range(len(self.entries)):
+            if entry == 2:
+                for i in range(len(self.entries[entry])):
+                    self.entries[entry][i].delete(0,"end")
+            else:
+                self.entries[entry].delete(0,"end")
         self.btnBB2.configure(text="ADD ITEM", command=self.Add)
 
     def GridFormatList(self, window, arr, fields):
@@ -341,6 +422,7 @@ class App(CTK.CTk):
         self.btnC2.pack(padx=12, pady=120)
     
     def RegistrationWindow(self):
+        textVal = (self.register(self.TextCallback))
         TtlFont = CTK.CTkFont(family="Arial Black", size=54, weight=Font.BOLD)
         LblFont = CTK.CTkFont(family="Arial Bold", size=36, weight=Font.BOLD)
         LblFont1 = CTK.CTkFont(family="Arial Bold", size=14, weight=Font.NORMAL)
@@ -367,14 +449,14 @@ class App(CTK.CTk):
         # Name Entry Field
         self.lblB2 = CTK.CTkLabel(self.frB, text=titles[1], font=LblFont, justify="center", width=780)
         self.lblB2.pack(padx=12, pady=8)
-        self.etyB1 = CTK.CTkEntry(self.frB, placeholder_text=titles[2], font=EtyFont, width=620, justify="center", height=68, corner_radius=240)
+        self.etyB1 = CTK.CTkEntry(self.frB, validate="all", validatecommand=(textVal, "%P"), placeholder_text=titles[2], font=EtyFont, width=620, justify="center", height=68, corner_radius=240)
         self.etyB1.pack(padx=12, pady=2)
         self.lblB5 = CTK.CTkLabel(self.frB, text=prompts[0], font=LblFont1, justify="center", width=780)
         self.lblB5.pack(padx=12, pady=2)
         # Username Entry Field
         self.lblB3 = CTK.CTkLabel(self.frB, text=titles[3], font=LblFont, justify="center", width=780)
         self.lblB3.pack(padx=12, pady=8)
-        self.etyB2 = CTK.CTkEntry(self.frB, placeholder_text=titles[4], font=EtyFont, width=620, justify="center", height=68, corner_radius=240)
+        self.etyB2 = CTK.CTkEntry(self.frB, validate="all", validatecommand=(textVal, "%P"), placeholder_text=titles[4], font=EtyFont, width=620, justify="center", height=68, corner_radius=240)
         self.etyB2.pack(padx=12, pady=2)
         self.lblB6 = CTK.CTkLabel(self.frB, text=prompts[1], font=LblFont1, justify="center", width=780)
         self.lblB6.pack(padx=12, pady=2)
