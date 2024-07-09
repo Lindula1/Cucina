@@ -30,7 +30,7 @@ class App(CTK.CTk):
         self.frA = CTK.CTkFrame(self, bg_color= "transparent")
         self.frB = CTK.CTkFrame(self, bg_color= "transparent")
         self.frC = CTK.CTkFrame(self, bg_color= "transparent")
-        self.sfrBA = CTK.CTkScrollableFrame(self.frB, fg_color="#eee9e1", height=800, width=660)
+        self.sfrBA = CTK.CTkScrollableFrame(self.frB, fg_color="#eee9e1", height=700, width=660)
         self.frBB = CTK.CTkFrame(self.frB, bg_color= "transparent")
     
     def LoadImages(self):
@@ -140,7 +140,7 @@ class App(CTK.CTk):
                 x = self.entries[value]
                 for i in range(len(x)):
                     x[i].delete(0,"end")
-                    x[i].insert(0,date[2-i])
+                    x[i].insert(0,date[i])
             else:
                 self.entries[value].delete(0,"end")
                 self.entries[value].insert(0,itemx[value])
@@ -201,40 +201,51 @@ class App(CTK.CTk):
         # Item View
         self.entries = []
         fields = ["NUTRITION", "ITEM COUNT", "EXPIRY DATE", "ITEM NAME"]
-        dateLbl = ["00", "00", "0000"]
+        dateLbl = ["0000", "00", "00"]
         for i in range(4):
             afr = CTK.CTkFrame(self.frBB, fg_color="transparent", width=680)
-            afr.pack(side="top", anchor="w", padx=20)
+            afr.pack(side="top", anchor="w", padx=20, fill="x")
             lbl = CTK.CTkLabel(afr, text=fields[i], font=LblFont1, width=200, justify="left")
             lbl.pack(side="left", pady=10, padx=12, anchor="w")
             if i == 2:
                 l = []
                 for j in range(3):
-                    dEty = CTK.CTkEntry(afr, placeholder_text=dateLbl[j], validate="all", validatecommand=(dMVal, "%P"), font=EtyFont, width=len(dateLbl[j])*50, justify="center")
-                    if j == 2:
+                    dEty = CTK.CTkEntry(afr, placeholder_text=dateLbl[j], validate="all", validatecommand=(dMVal, "%P"), font=EtyFont, width=len(dateLbl[j])*69, justify="center")
+                    if j == 0:
                         dEty.configure(validatecommand=(yearVal, "%P"))
-                    dEty.pack(side="left", pady=10, padx=12, anchor="w")
+                    dEty.pack(side="right", pady=10, padx=12, anchor="e")
                     l.append(dEty)
                 self.entries.append(l)
             elif i == 3:
                 ety = CTK.CTkEntry(afr, validate="all", validatecommand=(textVal, "%P"), placeholder_text="ENTER NEW OR SELECT EXISTING", font=EtyFont, width=600, justify="center")
-                ety.pack(side="left", pady=10, padx=12, anchor="e")
+                ety.pack(side="right", pady=10, padx=12, anchor="e")
                 self.entries.append(ety)
             else:
                 ety = CTK.CTkEntry(afr, placeholder_text="0000", validate="all", validatecommand=(numVal, "%P"), font=EtyFont, width=600, justify="center")
                 ety.pack(side="right", pady=10, padx=12, anchor="e")
                 self.entries.append(ety)
-        self.btnBB2 = CTK.CTkButton(self.frBB, text=titles[5], font=BtnFont, width=280, command=self.Add, corner_radius=30, height=80)
+        afr0 = CTK.CTkFrame(self.frBB, fg_color="transparent", width=300)
+        afr0.pack(side="top", padx=20, fill="x", expand=True)
+        self.btnBB2 = CTK.CTkButton(afr0, text=titles[5], font=BtnFont, width=280, command=self.Add, corner_radius=30, height=80)
         self.btnBB2.pack(padx=24, pady=12, anchor="n", side="left")
-        self.btnBB3 = CTK.CTkButton(self.frBB, text=titles[6], font=BtnFont, width=280, command=self.ClearItem, corner_radius=30, height=80)
+        self.btnBB3 = CTK.CTkButton(afr0, text=titles[6], font=BtnFont, width=280, command=self.ClearItem, corner_radius=30, height=80)
         self.btnBB3.pack(padx=24, pady=12, anchor="n", side="right")
         # Filters
         self.rdbBB1Var = CTK.StringVar(value="other")
+        afrL = CTK.CTkFrame(self.frBB, fg_color="transparent", width=300)
+        afrL.pack(side="left", padx=40, pady=40, fill="y", expand=True)
+        afrR = CTK.CTkFrame(self.frBB, fg_color="transparent", width=300)
+        afrR.pack(side="right", padx=40, pady=40, fill="y", expand=True)
         for i in range(len(filters)):
             #lblBB1 = CTK.CTkLabel(self.frBB, text=i, font=BtnFont, width=280, command=lambda x=i: self.Filter(x), corner_radius=30, height=80)
             #lblBB1.pack(padx=8, pady=12)
-            self.rdbBB1 = CTK.CTkRadioButton(self.frBB, text=filters[i], font=RdbFont, value=i, variable=self.rdbBB1Var, command=self.Filter)
-            self.rdbBB1.pack(padx=8, pady=12, side="bottom")
+            if i == 0 or i == 2:
+                print("men")
+                self.rdbBB1 = CTK.CTkRadioButton(afrL, text=filters[i], font=RdbFont, value=i, variable=self.rdbBB1Var, command=self.Filter)
+                self.rdbBB1.pack(padx=8, pady=12, side="top", anchor="w")
+            else:
+                self.rdbBB1 = CTK.CTkRadioButton(afrR, text=filters[i], font=RdbFont, value=i, variable=self.rdbBB1Var, command=self.Filter)
+                self.rdbBB1.pack(padx=8, pady=12, side="top", anchor="w")
         # Pantry
         self.after(0,self.GridFormatList(self.sfrBA, pantry.PantryList(), ["Nutrition: ", "Quantity: ", "Expiry: ", "Name: "]))
     
@@ -246,13 +257,13 @@ class App(CTK.CTk):
             if entry == 2:
                 l = []
                 for i in range(len(self.entries[entry])):
-                    if not i:
+                    if str(self.entries[entry][i].get()) == "":
                         s = False
                         break
                     l.append(int(self.entries[entry][i].get()))
-                item.append(l[::-1])
+                item.append(l)
             else:
-                if not entry:
+                if str(self.entries[entry].get()) == "":
                     s = False
                     break
                 item.append(self.entries[entry].get())
@@ -264,26 +275,26 @@ class App(CTK.CTk):
     def Update(self):
         s = True
         self.btnBB2.configure(state="disabled")
-        print(pantry.Remove(self.item[4]))
         item = []
         for entry in range(len(self.entries)):
             if entry == 2:
                 l = []
                 for i in range(len(self.entries[entry])):
-                    if not i:
+                    if str(self.entries[entry][i].get()) == "":
                         s = False
                         break
                     l.append(int(self.entries[entry][i].get()))
-                item.append(l[::-1])
+                item.append(l)
             else:
-                if not entry:
+                if str(self.entries[entry].get()) == "":
                     s = False
                     break
                 item.append(self.entries[entry].get())
         if s:
+            pantry.Remove(self.item[4])
             cucina.AddToPantry(item)
-            self.after(200, self.btnBB2.configure(state="normal"))
-            self.ClearItem()
+        self.after(200, self.btnBB2.configure(state="normal"))
+        self.ClearItem()
 
     def ClearItem(self):
         self.UnpackWidgets(self.sfrBA)
