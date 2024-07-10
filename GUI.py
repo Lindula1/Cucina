@@ -87,7 +87,7 @@ class App(CTK.CTk):
         self.frC.pack(fill="both", expand=True, side="right")
         # Images
         self.btnA1 = CTK.CTkButton(self.frA, image=self.images[2], text=None, fg_color="transparent", hover_color="grey90", command=lambda: self.WindowHandler(1))
-        self.btnA1.pack(padx=12, pady=32, side="top")
+        self.btnA1.pack(padx=12, pady=32, side="top", anchor="nw")
         self.btnA2 = CTK.CTkButton(self.frA, image=self.images[4], text=None, fg_color="transparent", hover_color="grey90")
         self.btnA2.pack(padx=12, pady=160)
         self.btnC3 = CTK.CTkButton(self.frC, text="SECURITY INFORMATION\n\nTERMS OF SERVICE", fg_color="transparent", hover_color="grey90", text_color="grey4",anchor="e")
@@ -171,10 +171,12 @@ class App(CTK.CTk):
             return False
     
     def PantryPage(self):
+        # Entry Box Validation
         textVal = (self.register(self.TextCallback))
         numVal = (self.register(self.NumCallback))
         dMVal = (self.register(self.DMCallback))
         yearVal = (self.register(self.YearCallback))
+        
         TtlFont = CTK.CTkFont(family="Arial Black", size=80, weight=Font.BOLD)
         LblFont = CTK.CTkFont(family="Arial Bold", size=54, weight=Font.BOLD)
         LblFont1 = CTK.CTkFont(family="Arial Bold", size=38, weight=Font.BOLD)
@@ -184,8 +186,8 @@ class App(CTK.CTk):
         EtyFont = CTK.CTkFont(family="Helvetica", size=34, weight=Font.NORMAL) 
         titles = ["YOUR PANTRY", "RECIPES", "HOME", "ADD AN ITEM", "ITEM COUNT", "ADD NEW", "CANCEL"]
         filters = ["FILTER BY NAME", "FILTER BY NUTRITION", "FILTER BY QUANTITY", "FILTER EXPIRY"]
-        self.frA.pack(fill="both", expand=True, side="top")
-        self.frB.pack(fill="both", expand=True, side="top", padx=80)
+        self.frA.pack(fill="both", side="top")
+        self.frB.pack(fill="both", expand=True, side="top", padx=80, pady=80)
         self.frB.configure(border_color="#cb9c44", border_width=7)
         self.sfrBA.pack(fill="both", expand=True, side="left", padx=10, pady=10)
         self.frBB.pack(fill="both", expand=True, side="right", padx=10, pady=10)
@@ -225,22 +227,21 @@ class App(CTK.CTk):
                 ety.pack(side="right", pady=10, padx=12, anchor="e")
                 self.entries.append(ety)
         afr0 = CTK.CTkFrame(self.frBB, fg_color="transparent", width=300)
-        afr0.pack(side="top", padx=20, fill="x", expand=True)
+        afr0.pack(side="top", padx=20, fill="x", expand=True, anchor="n")
         self.btnBB2 = CTK.CTkButton(afr0, text=titles[5], font=BtnFont, width=280, command=self.Add, corner_radius=30, height=80)
-        self.btnBB2.pack(padx=24, pady=12, anchor="n", side="left")
+        self.btnBB2.pack(pady=12, anchor="n", side="left")
         self.btnBB3 = CTK.CTkButton(afr0, text=titles[6], font=BtnFont, width=280, command=self.ClearItem, corner_radius=30, height=80)
-        self.btnBB3.pack(padx=24, pady=12, anchor="n", side="right")
+        self.btnBB3.pack(pady=12, anchor="n", side="right")
         # Filters
-        self.rdbBB1Var = CTK.StringVar(value="other")
+        self.rdbBB1Var = CTK.StringVar(value=4)
         afrL = CTK.CTkFrame(self.frBB, fg_color="transparent", width=300)
-        afrL.pack(side="left", padx=40, pady=40, fill="y", expand=True)
+        afrL.pack(side="left", pady=40, expand=True, anchor="n")
         afrR = CTK.CTkFrame(self.frBB, fg_color="transparent", width=300)
-        afrR.pack(side="right", padx=40, pady=40, fill="y", expand=True)
+        afrR.pack(side="right", pady=40, expand=True, anchor="n")
         for i in range(len(filters)):
             #lblBB1 = CTK.CTkLabel(self.frBB, text=i, font=BtnFont, width=280, command=lambda x=i: self.Filter(x), corner_radius=30, height=80)
             #lblBB1.pack(padx=8, pady=12)
             if i == 0 or i == 2:
-                print("men")
                 self.rdbBB1 = CTK.CTkRadioButton(afrL, text=filters[i], font=RdbFont, value=i, variable=self.rdbBB1Var, command=self.Filter)
                 self.rdbBB1.pack(padx=8, pady=12, side="top", anchor="w")
             else:
@@ -446,7 +447,7 @@ class App(CTK.CTk):
         self.frC.pack(fill="both", expand=True, side="right")
         # IMAGES
         self.btnA1 = CTK.CTkButton(self.frA, image=self.images[2], text=None, fg_color="transparent", hover_color="grey90", command=lambda: self.WindowHandler(1))
-        self.btnA1.pack(padx=12, pady=32, side="top")
+        self.btnA1.pack(padx=12, pady=32, side="top", anchor="nw")
         self.btnA2 = CTK.CTkButton(self.frA, image=self.images[4], text=None, fg_color="transparent", hover_color="grey90")
         self.btnA2.pack(padx=12, pady=160)
         self.btnC3 = CTK.CTkButton(self.frC, text="SECURITY INFORMATION\n\nTERMS OF SERVICE", fg_color="transparent", hover_color="grey90", text_color="grey4",anchor="e")
