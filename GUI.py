@@ -431,6 +431,35 @@ class App(CTK.CTk):
         self.btnB2.pack(padx=12, pady=120)
         self.btnC2 = CTK.CTkButton(self.frC, text=titles[2], font=BtnFont, corner_radius=30, height=80, command=lambda: self.WindowHandler(4))
         self.btnC2.pack(padx=12, pady=120)
+
+    def RecipePage(self):
+        TtlFont = CTK.CTkFont(family="Arial Black", size=80, weight=Font.BOLD)
+        LblFont = CTK.CTkFont(family="Arial Bold", size=54, weight=Font.BOLD)
+        BtnFont = CTK.CTkFont(family="Times Bold", size=32, weight=Font.BOLD)
+        EtyFont = CTK.CTkFont(family="Helvetica", size=39, weight=Font.NORMAL) 
+        # Titles
+        titles = ["RECIPE FINDER", "RECIPE FOCUS", "HOME", "CLEAR"]
+        # Frames
+        self.frA.pack(fill="both", expand=True, side="top")
+        frAA = CTK.CTkFrame(self.frA, fg_color= "transparent")
+        frAA.pack(side="left", fill="both", expand=True)
+        frAB = CTK.CTkFrame(self.frA, fg_color= "transparent")
+        frAB.pack(side="right", fill="both", expand=True)
+        # Titles
+        self.lblAA1 = CTK.CTkLabel(frAA, text=titles[0], font=TtlFont, justify="center", text_color="#cc5308")
+        self.lblAA1.pack(padx=12, side="top", anchor="s")
+        self.lblAB1 = CTK.CTkLabel(frAB, text=titles[1], font=TtlFont, justify="center", text_color="#cc5308")
+        self.lblAB1.pack(padx=12, side="top", anchor="s")
+        # Scrollable frames
+        sfrAAA = CTK.CTkScrollableFrame(frAA, fg_color="#eee9e1", height=820, width=820)
+        sfrAAA.pack(side="top", expand=True, pady=10, padx=12)
+        sfrABA = CTK.CTkScrollableFrame(frAB, fg_color="#eee9e1", height=720, width=820)
+        sfrABA.pack(side="top", expand=True, pady=10, padx=12)
+        # Navigation buttons
+        self.btnAA1 = CTK.CTkButton(frAB, text=titles[2], font=BtnFont, command=lambda: self.WindowHandler(3), corner_radius=30, height=80, width=180)
+        self.btnAA1.pack(padx=84, pady=24, side="left", anchor="ne")
+        self.btnAA2 = CTK.CTkButton(frAB, text=titles[3], font=BtnFont, command=lambda: self.WindowHandler(4), corner_radius=30, height=80, width=180)
+        self.btnAA2.pack(padx=84, pady=24, side="right", anchor="nw")
     
     def RegistrationWindow(self):
         textVal = (self.register(self.TextCallback))
