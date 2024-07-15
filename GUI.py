@@ -20,8 +20,11 @@ from DataStoreModel import run as dataBase
 from IngredientDataStore import pantry
 import ttkbootstrap as Tb
 import datetime
+import PDFHandler as PDF
+from CTkPDFViewer import *
 
 sys.path.insert(0, "../Cucina/Images")
+sys.path.insert(0, "../Cucina/PDFs")
 
 CTK.set_appearance_mode("light")
 CTK.set_default_color_theme("bisque-theme.json")
@@ -287,6 +290,11 @@ class App(CTK.CTk):
         self.btnBB2.configure(state="disabled")
         item = []
         for entry in range(len(self.entries)):
+            if entry == 1:
+                int(self.entries[entry].get()) == 0
+                s = False
+                pantry.Remove(self.item[4])
+                break
             if entry == 2:
                 l = []
                 for i in range(len(self.entries[entry])):
@@ -462,13 +470,31 @@ class App(CTK.CTk):
         # Scrollable frames
         sfrAAA = CTK.CTkScrollableFrame(frAA, fg_color="#eee9e1", height=820, width=820)
         sfrAAA.pack(side="top", expand=True, pady=10, padx=12)
-        sfrABA = CTK.CTkScrollableFrame(frAB, fg_color="#eee9e1", height=720, width=820)
-        sfrABA.pack(side="top", expand=True, pady=10, padx=12)
+        self.frABA = CTK.CTkFrame(frAB, fg_color="#eee9e1", height=720, width=820)
+        self.frABA.pack(side="top", expand=True, pady=10, padx=12)
         # Navigation buttons
         self.btnAA1 = CTK.CTkButton(frAB, text=titles[2], font=BtnFont, command=lambda: self.WindowHandler(3), corner_radius=30, height=80, width=180)
         self.btnAA1.pack(padx=84, pady=24, side="left", anchor="ne")
         self.btnAA2 = CTK.CTkButton(frAB, text=titles[3], font=BtnFont, command=lambda: self.WindowHandler(4), corner_radius=30, height=80, width=180)
         self.btnAA2.pack(padx=84, pady=24, side="right", anchor="nw")
+
+        self.ListRecipes(sfrAAA, PDF.ListPDFs())
+
+    def ListRecipes(self, window, arr):
+        BtnFont1 = CTK.CTkFont(family="Helvetica", size=32, weight=Font.NORMAL)
+        for i in arr:
+            title = i.removesuffix(".pdf").replace("_"," ")
+            cell = CTK.CTkButton(master=window, text=title, font=BtnFont1, width=800, corner_radius=2, fg_color="#eee9e1", text_color="black", anchor="w", command=lambda x = i: self.FocusPDF(x))
+            cell.pack(padx=1, pady=3, anchor="w")
+    
+    def FocusPDF(self, item):
+        try:
+            if self.pdfFr.winfo_ismapped():
+                self.pdfFr.pack_forget()
+        except AttributeError:
+            pass
+        self.pdfFr = CTkPDFViewer(self.frABA, file=f"../Cucina/PDFs/{item}", height=710, width=810)
+        self.pdfFr.pack()
     
     def RegistrationWindow(self):
         textVal = (self.register(self.TextCallback))

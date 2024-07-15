@@ -96,15 +96,17 @@ INPUTS: None
 
 PROCESS:
 The function scans the directory "../Cucina/Pdfs/" using the os.scandir() method to retrieve a list of files in that directory.
-For each item (file) in the directory, the name of the item is extracted and added to a list (items).
+For each item (file) in the directory, the name of the item is extracted and added to a list (items). The function indirectly 
+calls the SavePDFData() function with the 'items' list as an argument to save the PDF data.
 
-OUTPUT: The function indirectly calls the SavePDFData() function with the 'items' list as an argument to save the PDF data.
+OUTPUT: items - A list of all recipe names
 """
 def ListPDFs():
     items = []
     with os.scandir("../Cucina/Pdfs/") as files:
         for item in files: items.append(item.name)
     SavePDFData(items)
+    return items
 
 """
 INPUTS: arr - A list of PDF file names.
@@ -117,7 +119,7 @@ Finally, it opens the file at the constructed path in write mode and writes the 
 OUTPUT: The function saves the JSON-formatted data to a file.
 """
 def SavePDFData(arr):
-    path = os.path.join("../Cucina/PDFs","PdfInformation.json")
+    path = os.path.join("../Cucina","PdfInformation.json")
     dumped = json.dumps(arr, indent=4)
     with open(path, "w") as jsn:
         jsn.write(dumped)
