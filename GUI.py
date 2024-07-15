@@ -1,3 +1,13 @@
+"""
+===CUCINA APPLICATION GUI===
+Author: Lindula Pallawela Appuhamilage
+Contributors: -
+Date Created: 09/07/2024
+Last Edited: 15/07/2024 
+Description:
+**PLEASE USE DISPLAY SCALE OF 100% TO ENSURE BEST RESULTS**
+
+"""
 import customtkinter as CTK
 import tkinter as TK
 from CUCINA import app as cucina
@@ -10,7 +20,6 @@ from DataStoreModel import run as dataBase
 from IngredientDataStore import pantry
 import ttkbootstrap as Tb
 import datetime
-
 
 sys.path.insert(0, "../Cucina/Images")
 

@@ -1,14 +1,29 @@
+"""
+===CUCINA APPLICATION GUI===
+Author: Lindula Pallawela Appuhamilage
+Contributors: -
+Date Created: 07/06/2024
+Last Edited: 12/06/2024
+Description:
+This python file holds the functions used to hash the 
+"""
 import math
 from mpmath import mp
 import string
 import random
-from timeit import repeat
 
 key = 58231
 seed = 161803398874989484820458683436563811772030917980576286213544862270526046281890
 mp.dps = key + 69
 pi = list(str(mp.pi).replace(".",""))
 
+"""
+INPUTS: n (array of integers) - The array of values to be digitize, base (integer) - The base to be modulous divisioned to
+PROCESS: 
+The function uses the python built in divmod function to divide
+all values in the array by the base.
+OUTPUT: d (array) collection of modulous results
+"""
 def Digitize(n, base=10):
     if n == 0:
         yield 0
@@ -16,6 +31,14 @@ def Digitize(n, base=10):
         n, d = divmod(n, base)
         yield d
 
+"""
+INPUTS: entry (string) - The entry to be hashed.
+PROCESS: 
+The function encodes the entry string into hexadecimal representation, 
+calculates a hash value based on the encoded string, extracts a substring 
+from a predefined pi string, converts it to an integer, performs digit 
+conversion, and generates a hashed value by transforming the digits.
+OUTPUTS: hashed (string) - The encrypted entry"""
 def HashingFunc(entry):
     s = entry.encode("utf-8").hex()
     d = ""
@@ -40,6 +63,15 @@ def HashingFunc(entry):
 
     return hashed
 
+"""
+INPUTS: entry (string) - The entry to be hashed.
+PROCESS: 
+The function converts the entry string to an integer, calculates
+a hash value based on the modulo operation with a predefined key,
+extracts a substring from a predefined pi string, converts it to an
+integer, performs digit conversion, and generates a hashed value by
+transforming the digits.
+OUTPUTS: hashed (string) - The encrypted entry"""
 def HashinFunc2(entry):
     d = ""
     for i in entry:

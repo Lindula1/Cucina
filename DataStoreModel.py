@@ -1,3 +1,12 @@
+"""
+===CUCINA USER DATA STORE MODULE===
+Author: Lindula Pallawela Appuhamilage
+Contributors: -
+Date Created: 17/05/2024
+Last Edited: 06/07/2024
+Description:
+
+"""
 import random
 import json
 import datetime

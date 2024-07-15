@@ -1,3 +1,13 @@
+"""
+===CUCINA INGREDIENT DATA STORAGE MODULE===
+Author: Lindula Pallawela Appuhamilage
+Contributors: -
+Date Created: 18/05/2024
+Last Edited: 06/07/2024
+Description:
+This python file holds all functions for transforming
+and transferring any and all ingredient data.
+"""
 import random
 import string
 import pwinput
@@ -13,7 +23,15 @@ class Pantry():
             self.checks = True
         except FileNotFoundError:
             self.arr = []
-        
+    """   
+    INPUTS: item - A list representing an item, where item[3] is a date in the format [year, month, day].
+    PROCESS:
+    The function takes the date, converts it to a datetime.date object,
+    initializes a datetime.date object representing the date April 20, 1889,
+    calculates the difference between the objects,
+    and returns the modified item.
+    OUTPUT: item[3] - The number of days between the original date and April 20, 1889.
+    """
     def FormatDate(self, item):
         d0 = datetime.date(item[3][0], item[3][1], item[3][2])
         self.d1 = datetime.date(1889, 4, 20)
@@ -21,6 +39,18 @@ class Pantry():
         item[3] = delta.days
         return item
     
+    """
+    INPUTS: self - Reference to the current instance of the class, item - A list containing the item information, including the number of days until the expiry date.
+
+    PROCESS:
+    The function calculates the expiry date by adding the number of days (item[3]) to a fixed reference date.
+    It then converts the expiry date to a formatted string representation ("%Y/%m/%d").
+    The function splits the formatted date string into year, month, and day components.
+    It calculates the number of days left until the expiry date by subtracting the current date from the expiry date.
+    The result is returned as the expiry date string and the number of days left.
+
+    OUTPUT: expDate - The expiry date in the format "YYYY/MM/DD", daysLeft - The number of days left until the expiry date.
+    """
     def DateRevert(self, item):
         d0 = datetime.timedelta(item[3])
         d1 = datetime.datetime(1889,4,20,0,0)

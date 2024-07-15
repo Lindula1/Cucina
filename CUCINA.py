@@ -1,3 +1,12 @@
+"""
+===CUCINA APPLICATION===
+Author: Lindula Pallawela Appuhamilage
+Contributors: -
+Date Created: 17/05/2024
+Last Edited: 28/05/2024
+Description:
+
+"""
 try:
     import random
     import string
