@@ -74,10 +74,17 @@ class Pantry():
     def AddItem(self, item):
         for i in range(len(item) - 1):
             if item[i] == 0:
-                return "Field {i} is empty"
-        self.arr.append(self.FormatDate(self.LetterSort(item), ))
+                return "Field {i} is empty. HOW?"
+        self.arr.append(self.FormatDate(self.LetterSort(item)))
         self.SaveToDevice()
         return "Item Added Successfully"
+
+    def AddRaw(self, item):
+        for i in range(len(item)):
+            if item[i].isdigit():
+                item[i] = int(item[i])
+        self.arr.append(item)
+        self.SaveToDevice()
 
     def LetterSort(self, item):
         item.insert(0, ord(item[3][0].upper()))

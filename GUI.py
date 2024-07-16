@@ -38,6 +38,7 @@ class App(CTK.CTk):
         self.attributes("-fullscreen", "True") 
         self.LoadImages()
         self.lgnFailCount = 0
+        self.item = [0,0,0,0]
         self.key = 0
         self.frA = CTK.CTkFrame(self, bg_color= "transparent")
         self.frB = CTK.CTkFrame(self, bg_color= "transparent")
@@ -138,7 +139,7 @@ class App(CTK.CTk):
         filter = int(self.rdbBB1Var.get())
         self.UnpackWidgets(self.sfrBA)
         arr = pantry.SortFunc(pantry.arr, filter)
-        self.after(0, self.GridFormatList(self.sfrBA, arr, ["Nutrition: ", "Quantity: ", "Expiry: ", "Name: "]))
+        self.after(0, self.GridFormatList(self.sfrBA, arr, [" KJ", "g", "Expiry: ", "Name: "]))
 
     def Select(self, item):
         # Display Item Values
@@ -238,7 +239,7 @@ class App(CTK.CTk):
                     l.append(dEty)
                 self.entries.append(l)
             elif i == 3:
-                ety = CTK.CTkEntry(afr, validate="all", validatecommand=(textVal, "%P"), placeholder_text="ENTER NEW OR SELECT EXISTING", font=EtyFont, width=600, justify="center")
+                ety = CTK.CTkEntry(afr, validate="all", validatecommand=(textVal, "%P"), placeholder_text="SELECT OR ADD", font=EtyFont, width=600, justify="center")
                 ety.pack(side="right", pady=10, padx=12, anchor="e")
                 self.entries.append(ety)
             else:
@@ -266,7 +267,7 @@ class App(CTK.CTk):
                 self.rdbBB1 = CTK.CTkRadioButton(aFr3, text="", font=RdbFont, value=x+z, variable=self.rdbBB1Var, command=self.Filter)
                 self.rdbBB1.pack(pady=12, side=horiz[x], anchor=snap[x])
         # Pantry
-        self.after(0,self.GridFormatList(self.sfrBA, pantry.PantryList(), [" KJ", " Left", "Expiry: ", "Name: "]))
+        self.after(0,self.GridFormatList(self.sfrBA, pantry.PantryList(), [" KJ", "g", "Expiry: ", "Name: "]))
     
     def Add(self):
         s = True
@@ -280,56 +281,46 @@ class App(CTK.CTk):
                         s = False
                         break
                     l.append(int(self.entries[entry][i].get()))
+                try: datetime.date(int(l[0]), int(l[1]), int(l[2]))
+                except ValueError:
+                    s = False
+                    break
                 item.append(l)
             else:
                 if str(self.entries[entry].get()) == "":
                     s = False
                     break
                 item.append(self.entries[entry].get())
+        self.btnBB2.configure(state="normal", command=None)
         if s:
+            self.btnBB2.configure(text="SUCESS")
             cucina.AddToPantry(item)
-        self.after(200, self.btnBB2.configure(state="normal"))
-        self.ClearItem()
+            self.item = [0,0,0,0]
+        else:
+            self.btnBB2.configure(text="FAILED")
+            pantry.AddRaw(self.item)
+        self.after(320, self.ClearItem)
 
     def Update(self):
-        s = True
-        self.btnBB2.configure(state="disabled")
-        item = []
-        for entry in range(len(self.entries)):
-            if entry == 1:
-                if int(self.entries[entry].get()) == 0:
-                    s = False
-                    pantry.Remove(self.item[4])
-                    break
-            if entry == 2:
-                l = []
-                for i in range(len(self.entries[entry])):
-                    if str(self.entries[entry][i].get()) == "":
-                        s = False
-                        break
-                    l.append(int(self.entries[entry][i].get()))
-                item.append(l)
-            else:
-                if str(self.entries[entry].get()) == "":
-                    s = False
-                    break
-                item.append(self.entries[entry].get())
-        if s:
+        if int(self.entries[1].get()) == 0:
+            self.btnBB2.configure(state="disabled")
             pantry.Remove(self.item[4])
-            cucina.AddToPantry(item)
-        self.after(200, self.btnBB2.configure(state="normal"))
-        self.ClearItem()
+            self.btnBB2.configure(state="normal", command=None)
+            self.after(320, self.ClearItem)
+        else:
+            pantry.Remove(self.item[4])
+            self.Add()
 
     def ClearItem(self):
         self.UnpackWidgets(self.sfrBA)
-        self.GridFormatList(self.sfrBA, pantry.PantryList(), [" KJ", " Left", "Expiry: ", "Name: "])
+        self.GridFormatList(self.sfrBA, pantry.PantryList(), [" KJ", "g", "Expiry: ", "Name: "])
         for entry in range(len(self.entries)):
             if entry == 2:
                 for i in range(len(self.entries[entry])):
                     self.entries[entry][i].delete(0,"end")
             else:
                 self.entries[entry].delete(0,"end")
-        self.btnBB2.configure(text="ADD ITEM", command=self.Add)
+        self.btnBB2.configure(text="ADD NEW", command=self.Add)
 
     def GridFormatList(self, window, arr, fields):
         BtnFont1 = CTK.CTkFont(family="Helvetica", size=16, weight=Font.NORMAL)
@@ -339,7 +330,8 @@ class App(CTK.CTk):
             for field in range(len(fields)):
                 if field == 2:
                     d, ds = pantry.DateRevert(arr[ind])
-                    title += "[ " + fields[field] + d + "] "
+                    date = "/".join(d.split("/")[::-1])
+                    title += "[ " + fields[field] + date + "] "
                 elif field == 3:
                     btnTitle = str(arr[ind][field+1])
                 else:
@@ -494,7 +486,7 @@ class App(CTK.CTk):
         self.btnAA2 = CTK.CTkButton(frAB, text=titles[3], font=BtnFont, command=self.ClearRecipe, corner_radius=30, height=80, width=180)
         self.btnAA2.pack(padx=84, pady=24, side="right", anchor="nw")
 
-        self.pdfFr = CTkPDFViewer(self.frABA, file=f"../Cucina/CTkPDFViewer/0.pdf", height=620, width=720)
+        self.pdfFr = CTkPDFViewer(self.frABA, file=f"../Cucina/CTkPDFViewer/0.pdf", page_width=820)
         self.pdfFr.pack()
         self.ListRecipes(sfrAAA, PDF.ListPDFs())
 
@@ -511,7 +503,7 @@ class App(CTK.CTk):
 
     def FocusPDF(self, item):
         self.ClearRecipe()
-        self.pdfFr = CTkPDFViewer(self.frABA, file=f"../Cucina/PDFs/{item}", height=620, width=720)
+        self.pdfFr = CTkPDFViewer(self.frABA, file=f"../Cucina/PDFs/{item}", page_height=620, page_width=720)
         self.pdfFr.pack()
     
     def RegistrationWindow(self):
