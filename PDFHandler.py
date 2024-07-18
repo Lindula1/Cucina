@@ -137,7 +137,7 @@ The modified 'raw' list is returned as the output.
 OUTPUT: raw (list) - The modified list obtained from the JSON file.
 """
 def ReadPDFData():
-    path = os.path.join("../Cucina/PDFs","PdfInformation.json")
+    path = os.path.join("../Cucina","PdfInformation.json")
     with open(path, "r") as jsn:
         raw = json.load(jsn)
         for i in range(len(raw)):

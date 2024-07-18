@@ -4,9 +4,9 @@ Author: Lindula Pallawela Appuhamilage
 Contributors: -
 Date Created: 09/07/2024
 Last Edited: 15/07/2024 
+Version: 0.0.2.3
 Description:
 **PLEASE USE DISPLAY SCALE OF 100% TO ENSURE BEST RESULTS**
-
 """
 import customtkinter as CTK
 import tkinter as TK
@@ -37,7 +37,6 @@ class App(CTK.CTk):
         #self.geometry(f"{aWidth}x{aHeight}")
         self.attributes("-fullscreen", "True") 
         self.LoadImages()
-        self.lgnFailCount = 0
         self.item = [0,0,0,0]
         self.key = 0
         self.frA = CTK.CTkFrame(self, bg_color= "transparent")
@@ -474,7 +473,7 @@ class App(CTK.CTk):
         LblFont = CTK.CTkFont(family="Arial Bold", size=54, weight=Font.BOLD)
         BtnFont = CTK.CTkFont(family="Times Bold", size=32, weight=Font.BOLD)
         EtyFont = CTK.CTkFont(family="Helvetica", size=39, weight=Font.NORMAL) 
-        # Titles
+        # Text
         titles = ["RECIPE FINDER", "RECIPE PREVIEW", "FOCUS", "CLEAR"]
         # Frames
         self.frA.pack(fill="both", expand=True, side="top")
@@ -484,14 +483,14 @@ class App(CTK.CTk):
         frAB.pack(side="right", fill="both", expand=True)
         # Titles
         self.lblAA1 = CTK.CTkLabel(frAA, text=titles[0], font=TtlFont, justify="center", text_color="#cc5308")
-        self.lblAA1.pack(padx=12, side="top", anchor="s")
+        self.lblAA1.pack(padx=12, side="top", anchor="n")
         self.lblAB1 = CTK.CTkLabel(frAB, text=titles[1], font=TtlFont, justify="center", text_color="#cc5308")
-        self.lblAB1.pack(padx=12, side="top", anchor="s")
+        self.lblAB1.pack(padx=12, side="top", anchor="n")
         # Scrollable frames
         sfrAAA = CTK.CTkScrollableFrame(frAA, fg_color="#eee9e1", height=820, width=820)
-        sfrAAA.pack(side="top", expand=True, pady=10, padx=12)
+        sfrAAA.pack(side="top", anchor="n", pady=10, padx=6)
         self.frABA = CTK.CTkFrame(frAB, fg_color="#eee9e1", height=720, width=820)
-        self.frABA.pack(side="top", pady=10, padx=12)
+        self.frABA.pack(side="top", pady=10, padx=6)
         # Navigation buttons
         self.btnAA1 = CTK.CTkButton(frAB, text=titles[2], font=BtnFont, corner_radius=30, height=80, width=180)
         self.btnAA1.pack(padx=84, pady=24, side="left", anchor="ne")
@@ -520,19 +519,38 @@ class App(CTK.CTk):
         self.pdfFr.pack(pady=10, padx=10)
         self.loadedPdf = item
 
+    # A unique page that parses a value
+    """
+    INPUT: item (str) - Name of the pdf that is currently loaded
+    PROCESS: Displays the pdf the user selected.
+    """
     def FocusPDF(self, item):
         self.UnmapFrames()
-        TtlFont = CTK.CTkFont(family="Arial Black", size=74, weight=Font.BOLD)
+        TtlFont = CTK.CTkFont(family="Arial Black", size=62, weight=Font.BOLD)
         BtnFont = CTK.CTkFont(family="Times Bold", size=56, weight=Font.BOLD)
         self.frA.pack(fill="both", expand=True, side="left")
         self.frB.pack(fill="both", expand=True, side="right")
-        title = ["RECIPE FOCUS", "BACK"]
+        title = ["RECIPE FOCUS", "BACK", "PANTRY MATCH"]
         self.lblA1 = CTK.CTkLabel(self.frA, text=title[0], width=1280, font=TtlFont)
         self.lblA1.pack(side="top", pady=10, padx=10)
-        self.pdfFr = CTkPDFViewer(self.frA, file=f"../Cucina/PDFs/{item}", height=760, page_height=1683, page_width=1191, width=1280, fg_color="#eee9e1")
+        self.pdfFr = CTkPDFViewer(self.frA, file=f"../Cucina/PDFs/{item}", height=820, page_height=1683, page_width=1191, width=1220, fg_color="#eee9e1")
         self.pdfFr.pack(side="top", padx=10)
-        self.btnA1 = CTK.CTkButton(self.frA, text=title[1], width=280, font=BtnFont, height=60, corner_radius=30, command=lambda: self.WindowHandler(5))
-        self.btnA1.pack(side="top", pady=10, padx=10)
+        self.btnA1 = CTK.CTkButton(self.frA, text=title[1], width=240, font=BtnFont, height=60, corner_radius=25, command=lambda: self.WindowHandler(5))
+        self.btnA1.pack(side="top", pady=12, padx=46, anchor="w")
+        self.lblB1 = CTK.CTkLabel(self.frB, text=title[2], width=680, font=TtlFont)
+        self.lblB1.pack(side="top", pady=10, padx=10)
+        self.sfrBA = CTK.CTkScrollableFrame(self.frB, fg_color="#eee9e1", width=680, height=820)
+        self.sfrBA.pack(side="top")
+        self.ListMatches(self.sfrBA, item)
+
+    def ListMatches(self, window, item):
+        BtnFont1 = CTK.CTkFont(family="Helvetica", size=32, weight=Font.NORMAL)
+        recipe = item.removesuffix(".pdf")
+        arr, match = cucina.RecipeCompare(recipe)
+        for i in arr:
+            title = i
+            cell = CTK.CTkButton(master=window, text=title, font=BtnFont1, width=675, corner_radius=2, fg_color="#cf9a41", text_color="black", anchor="w", command=lambda x = i: self.LoadPDF(x))
+            cell.pack(padx=1, pady=3, anchor="w")
     
     def RegistrationWindow(self):
         # Entry validation
@@ -544,7 +562,7 @@ class App(CTK.CTk):
         BtnFont = CTK.CTkFont(family="Times Bold", size=24, weight=Font.BOLD)
         EtyFont = CTK.CTkFont(family="Helvetica", size=28, weight=Font.NORMAL) 
         titles = [ "ACCOUNT REGISTRATION","ENTER YOUR OWN NAME BELOW" ,"NAME", "ENTER A UNIQUE USERNAME BELOW", "USERNAME", "ENTER A SECURE PASSWORD BELOW", "PASSWORD", "          REGISTER          ", "          LOGIN          "]
-        prompts = ["• Do not enter numbers", "*Cannot lead with a number\n• Must be longer than 3 letters", "• Must contain atleast one non-alaphabetical character\n• Must be longer than 3 letters"]
+        prompts = ["• Do not enter numbers", "• Must be longer than 3 letters", "• Must contain atleast one non-alaphabetical character\n• Must be longer than 3 letters"]
         # Frames
         self.frA.pack(fill="both", expand=True, side="left")
         self.frB.pack(fill="both", expand=True, side="left")
@@ -571,6 +589,8 @@ class App(CTK.CTk):
         self.lblB3.pack(padx=12, pady=8)
         self.etyB2 = CTK.CTkEntry(self.frB, validate="all", validatecommand=(textVal, "%P"), placeholder_text=titles[4], font=EtyFont, width=620, justify="center", height=68, corner_radius=240)
         self.etyB2.pack(padx=12, pady=2)
+        self.lblB6 = CTK.CTkLabel(self.frB, text=prompts[1], font=LblFont1, justify="center", width=780)
+        self.lblB6.pack(padx=12, pady=2)
         # Password Entry Field
         self.lblB4 = CTK.CTkLabel(self.frB, text=titles[5], font=LblFont, justify="center", width=780)
         self.lblB4.pack(padx=12, pady=8)
@@ -596,7 +616,6 @@ class App(CTK.CTk):
             if result == "Success":
                 self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="cornflower blue")
                 self.after(640, lambda: self.btnB1.configure(True, text="LOG IN TO YOUR NEW ACCOUNT", state="normal", text_color="#fbf4ed", command=lambda: self.WindowHandler(1)))
-                #self.btnB2.pack(padx=12, pady=10)
             else:
                 self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="cornflower blue")
                 self.after(640, lambda: self.btnB1.configure(True, text="REGISTER", state="normal", text_color="#fbf4ed"))
@@ -614,12 +633,7 @@ class App(CTK.CTk):
                 self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="cornflower blue")
                 self.account = cucina.Search(usrm)
                 self.WindowHandler(3)
-            elif self.lgnFailCount > 0:
-                self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="cornflower blue")
-                self.after(640, lambda: self.btnB1.configure(True, text="          LOG IN          ", state="normal", text_color="#fbf4ed"))
-                #self.btnB2.pack(padx=12, pady=10)
             else:
-                self.lgnFailCount += 1
                 self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="cornflower blue")
                 self.after(640, lambda: self.btnB1.configure(True, text="          LOG IN          ", state="normal", text_color="#fbf4ed"))
             
