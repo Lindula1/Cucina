@@ -80,11 +80,9 @@ class Pantry():
         return "Item Added Successfully"
 
     def AddRaw(self, item):
-        for i in range(len(item)):
-            if item[i].isdigit():
-                item[i] = int(item[i])
         self.arr.append(item)
         self.SaveToDevice()
+        
 
     def LetterSort(self, item):
         item.insert(0, ord(item[3][0].upper()))
@@ -194,7 +192,7 @@ class Pantry():
         for i in range(n):
             sorted = True
             for j in range(n - i - 1):
-                if array[j][sortIndex] > array[j + 1][sortIndex]:
+                if int(array[j][sortIndex]) > int(array[j + 1][sortIndex]):
                     array[j], array[j + 1] = array[j + 1], array[j]
                     sorted = False
             if sorted == True:
