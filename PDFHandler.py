@@ -71,8 +71,9 @@ def Read(pdf):
                             line.replace(j, "")
                         ingredients.append(j.strip())
                 else:
-                    ingredients.append(line.strip())
-                    itm, qty = Quantity(line)
+                    if len(line) > 1:
+                        ingredients.append(line.strip())
+                        itm, qty = Quantity(line)
                     #print(f"Item: {itm}, The quantity: {qty}")
                 # ingredients.append(' '.join([print(word.strip()) or 'a' for word in line.split(' ')]))
                 # for word in line.split(' '):
@@ -85,10 +86,15 @@ def Read(pdf):
                 #ingredients.append(new_line)
             if stepLine:
                 #print(line)
-                steps.append(line.strip())
+                if len(line) > 1:
+                    steps.append(line.strip())
             else:
-                #print(line)
-                text.append(line.strip())
+                if len(line) > 1:
+                    text.append(line.strip())
+
+        ingredients = ingredients[1:-1]
+        steps = steps[1:-1]
+        text = text[1:-1]
 
     return ingredients, steps, text
 """

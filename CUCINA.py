@@ -115,14 +115,18 @@ class CUCINA():
     def DishSearch(self, recipe):
         ingredients, text, steps = PDF.Read(recipe)
         pantryItems = Pantry.pantry.PantryList()
+        opposite = []
         matches = []
-        for i in pantryItems:
-            d = i[4]
-            for x in range(len(d)):
-                if d[x].isdigit(): 
-            for j in ingredients:
-                if d.lower() in j.lower(): matches.append(j)
-        return recipe, matches
+        for item in pantryItems:
+            d = item[4]
+            userIngredient = "".join(c for c in d if c.isalpha())
+            for ingredient in ingredients:
+                if (userIngredient.lower() in ingredient.lower()) and (userIngredient not in matches):
+                    matches.append(ingredient)
+        for ing in ingredients:
+            if ing not in matches:
+                opposite.append(ing)
+        return opposite, matches
     
     def RecipeCompare(self, dishName):
         recipes = []
