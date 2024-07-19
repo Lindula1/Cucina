@@ -12,13 +12,11 @@ import customtkinter as CTK
 import tkinter as TK
 from CUCINA import app as cucina
 import tkinter.font as Font
-from PIL import Image, ImageTk
+from PIL import Image
 import sys
 import os
-import keyboard
 from DataStoreModel import run as dataBase
 from IngredientDataStore import pantry
-import ttkbootstrap as Tb
 import datetime
 import PDFHandler as PDF
 from CTkPDFViewer import *
@@ -146,7 +144,7 @@ class App(CTK.CTk):
         filter = int(self.rdbBB1Var.get())
         self.UnpackWidgets(self.sfrBA)
         arr = pantry.SortFunc(pantry.arr, filter)
-        self.after(0, self.GridFormatList(self.sfrBA, arr, [" KJ", "g", "Expiry: ", "Name: "]))
+        self.after(0, self.GridFormatList(self.sfrBA, arr, [" KJ", "g", " Days to use", "Name: "]))
 
     def Select(self, item):
         # Display Item Values
@@ -213,7 +211,7 @@ class App(CTK.CTk):
         yearVal = (self.register(self.YearCallback))
         # Fonts
         TtlFont = CTK.CTkFont(family="Arial Black", size=80, weight=Font.BOLD)
-        LblFont = CTK.CTkFont(family="Arial Bold", size=54, weight=Font.BOLD)
+        LblFont = CTK.CTkFont(family="Arial Bold", size=28, weight=Font.BOLD)
         LblFont1 = CTK.CTkFont(family="Arial Bold", size=38, weight=Font.BOLD)
         BtnFont = CTK.CTkFont(family="Times Bold", size=32, weight=Font.BOLD)
         BtnFont1 = CTK.CTkFont(family="Helvetica", size=24, weight=Font.NORMAL)
@@ -221,7 +219,7 @@ class App(CTK.CTk):
         EtyFont = CTK.CTkFont(family="Helvetica", size=34, weight=Font.NORMAL) 
         # Text
         titles = ["YOUR PANTRY", "RECIPES", "HOME", "ADD AN ITEM", "ITEM COUNT", "ADD NEW", "CANCEL"]
-        filters = ["FILTER BY NAME", "FILTER BY NUTRITION", "FILTER BY QUANTITY", "FILTER EXPIRY"]
+        filters = ["SORT BY NAME", "SORT EXPIRY", "SORT BY NUTRITION", "SORT BY QUANTITY"]
         # Frame mapping
         self.frA.pack(fill="both", side="top")
         self.frB.pack(fill="both", expand=True, side="top", padx=80, pady=80)
@@ -237,12 +235,19 @@ class App(CTK.CTk):
         # Home button
         self.btnA2 = CTK.CTkButton(self.frA, text=titles[2], font=BtnFont, width=280, command=lambda: self.WindowHandler(3), corner_radius=30, height=80)
         self.btnA2.pack(padx=12, pady=12, anchor="ne", side="left")
+        # User Information
+        afr1 = CTK.CTkFrame(self.frBB, fg_color="#eee9e1", width=680, height=300)
+        afr1.pack(side="top", padx=20, fill="x", pady=12)
+        usrInfo = "This is the pantry view of the Cucina software.\nTo use this feature effectively please read the prompts."
+        lblafr1 = CTK.CTkLabel(afr1, text=usrInfo, font=LblFont)
+        lblafr1.pack(side="top", fill="x", pady=12)
         # Item View
         self.entries = []
         fields = ["NUTRITION", "ITEM COUNT", "EXPIRY DATE", "ITEM NAME"]
         dateLbl = ["0000", "00", "00"]
+        units = ["KJ", "g"]
         for i in range(4):
-            afr = CTK.CTkFrame(self.frBB, fg_color="transparent", width=680)
+            afr = CTK.CTkFrame(self.frBB, fg_color="#eee9e1", width=680)
             afr.pack(side="top", anchor="w", padx=20, fill="x")
             lbl = CTK.CTkLabel(afr, text=fields[i], font=LblFont1, width=200, justify="left")
             lbl.pack(side="left", pady=10, padx=12, anchor="w")
@@ -260,8 +265,10 @@ class App(CTK.CTk):
                 ety.pack(side="right", pady=10, padx=12, anchor="e")
                 self.entries.append(ety)
             else:
-                ety = CTK.CTkEntry(afr, placeholder_text="0000", validate="all", validatecommand=(numVal, "%P"), font=EtyFont, width=600, justify="center")
-                ety.pack(side="right", pady=10, padx=12, anchor="e")
+                unt = CTK.CTkLabel(afr, font=EtyFont, anchor="w", text=units[i], width=52, fg_color="#d9d9d9", height=46, corner_radius=6)
+                unt.pack(side="right", pady=10, anchor="w", padx=12)
+                ety = CTK.CTkEntry(afr, placeholder_text="000000", validate="all", validatecommand=(numVal, "%P"), font=EtyFont, width=536, justify="center")
+                ety.pack(side="right", pady=10, anchor="e")
                 self.entries.append(ety)
         # Special frame
         afr0 = CTK.CTkFrame(self.frBB, fg_color="transparent", width=300)
@@ -274,20 +281,22 @@ class App(CTK.CTk):
         self.btnBB3.pack(pady=12, anchor="n", side="right")
         # Filters
         self.rdbBB1Var = CTK.StringVar(value=4)
+        cnt = 0
         for x in range(2):
-            horiz = ["left", "right"]
+            horiz = ["right", "left"]
             aFr2 = CTK.CTkFrame(self.frBB, fg_color="transparent", width=400)
-            aFr2.pack(side=horiz[x], pady=40, padx=20)
+            aFr2.pack(side=horiz[x], pady=40, padx=80)
             for z in range(2):
-                snap = ["e", "w"]
+                snap = ["w", "e"]
                 aFr3 = CTK.CTkFrame(aFr2, fg_color="transparent", width=400)
-                aFr3.pack(side="top")
-                lblBB1 = CTK.CTkLabel(aFr3, text=filters[x+z], font=RdbFont, width=300, height=40)
-                lblBB1.pack(padx=48, pady=12, side=horiz[x], anchor=snap[x])
-                self.rdbBB1 = CTK.CTkRadioButton(aFr3, text="", font=RdbFont, value=x+z, variable=self.rdbBB1Var, command=self.Filter)
+                aFr3.pack(side="top", anchor=snap[x])
+                #lblBB1 = CTK.CTkLabel(aFr3, text=filters[cnt], font=RdbFont, width=300, height=40)
+                #lblBB1.pack(padx=48, pady=12, side=horiz[x], anchor=snap[x])
+                self.rdbBB1 = CTK.CTkRadioButton(aFr3, text=filters[cnt], font=RdbFont, value=x+z, variable=self.rdbBB1Var, command=self.Filter)
                 self.rdbBB1.pack(pady=12, side=horiz[x], anchor=snap[x])
+                cnt += 1
         # Load Pantry
-        self.after(0,self.GridFormatList(self.sfrBA, pantry.PantryList(), [" KJ", "g", "Expiry: ", "Name: "]))
+        self.after(0,self.GridFormatList(self.sfrBA, pantry.PantryList(), [" KJ", "g", " Days to use", "Name: "]))
     
     def Add(self):
         s = True
@@ -336,7 +345,7 @@ class App(CTK.CTk):
 
     def ClearItem(self):
         self.UnpackWidgets(self.sfrBA)
-        self.GridFormatList(self.sfrBA, pantry.PantryList(), [" KJ", "g", "Expiry: ", "Name: "])
+        self.GridFormatList(self.sfrBA, pantry.PantryList(), [" KJ", "g", " Days to use", "Name: "])
         for entry in range(len(self.entries)):
             if entry == 2:
                 for i in range(len(self.entries[entry])):
@@ -353,18 +362,21 @@ class App(CTK.CTk):
             for field in range(len(fields)):
                 if field == 2:
                     d, ds = pantry.DateRevert(arr[ind])
-                    date = "/".join(d.split("/")[::-1])
-                    title += "[ " + fields[field] + date + "] "
+                    if ds > 0:
+                        title += str(ds) + fields[field]
+                    else:
+                        days = str(abs(ds))
+                        title += f"{days} Days past expiry"
                 elif field == 3:
                     btnTitle = str(arr[ind][field+1])
                 else:
-                    title += " [" + str(arr[ind][field+1]) + fields[field] +  "] "
-            bracket = CTK.CTkFrame(master=window, fg_color="transparent", width=680)
+                    title += str(arr[ind][field+1]) + fields[field] +  ",  "
+            bracket = CTK.CTkFrame(master=window, fg_color="#d9d9d9", width=680, corner_radius=6)
             bracket.pack(side="top", pady=12, padx=1, anchor="w")
-            cell1 = CTK.CTkButton(master=bracket, text=btnTitle, font=BtnFont1, width=260, corner_radius=5, fg_color="#cd9b45", text_color="black", command=lambda x = arr[ind]: self.Select(x))
-            cell1.pack(anchor="w", side="left")
-            cell0 = CTK.CTkLabel(master=bracket, text=title, font=BtnFont1, width=400, corner_radius=2, fg_color="#eee9e1", text_color="black", anchor="w")
-            cell0.pack(anchor="w", side="left")
+            cell1 = CTK.CTkButton(master=bracket, text=btnTitle, font=BtnFont1, width=260, corner_radius=6, fg_color="#cd9b45", text_color="black", command=lambda x = arr[ind]: self.Select(x))
+            cell1.pack(anchor="w", side="left", pady=4, padx=4)
+            cell0 = CTK.CTkLabel(master=bracket, text=title, font=BtnFont1, width=400, corner_radius=6, fg_color="#eee9e1", text_color="black", anchor="w")
+            cell0.pack(anchor="w", side="left", padx=4, pady=6)
             
     
     def GridCell(self, win, entry, row, column, font):
@@ -481,45 +493,56 @@ class App(CTK.CTk):
         frAA.pack(side="left", fill="both", expand=True)
         frAB = CTK.CTkFrame(self.frA, fg_color= "transparent")
         frAB.pack(side="right", fill="both", expand=True)
+        # Navigation buttons
+        frABA = CTK.CTkFrame(frAB, fg_color= "transparent")
+        frABA.pack(side="top", fill="x", anchor="n")
+        self.btnAA2 = CTK.CTkButton(frABA, text=titles[3], font=BtnFont, command=self.ClearRecipe, corner_radius=30, height=80, width=180)
+        self.btnAA2.pack(padx=24, pady=24, side="right", anchor="ne")
+        self.btnAA3 = CTK.CTkButton(frAA, text=titles[4], font=BtnFont, corner_radius=30, height=80, width=180, command=lambda: self.WindowHandler(3))
+        self.btnAA3.pack(padx=24, pady=24, side="top", anchor="nw")
         # Titles
         self.lblAA1 = CTK.CTkLabel(frAA, text=titles[0], font=TtlFont, justify="center", text_color="#cc5308")
         self.lblAA1.pack(padx=12, side="top", anchor="n")
         self.lblAB1 = CTK.CTkLabel(frAB, text=titles[1], font=TtlFont, justify="center", text_color="#cc5308")
         self.lblAB1.pack(padx=12, side="top", anchor="n")
         # Scrollable frames
-        sfrAAA = CTK.CTkScrollableFrame(frAA, fg_color="#eee9e1", height=720, width=820)
+        sfrAAA = CTK.CTkScrollableFrame(frAA, fg_color="#eee9e1", height=720, width=680)
         sfrAAA.pack(side="top", anchor="n", pady=10, padx=6)
         self.frABA = CTK.CTkFrame(frAB, fg_color="#eee9e1", height=720, width=820)
         self.frABA.pack(side="top", pady=10, padx=6)
-        # Navigation buttons
-        self.btnAA1 = CTK.CTkButton(frAB, text=titles[2], font=BtnFont, corner_radius=30, height=80, width=180)
-        self.btnAA1.pack(padx=84, pady=24, side="left", anchor="ne")
-        self.btnAA2 = CTK.CTkButton(frAB, text=titles[3], font=BtnFont, command=self.ClearRecipe, corner_radius=30, height=80, width=180)
-        self.btnAA2.pack(padx=84, pady=24, side="right", anchor="nw")
-        self.btnAA3 = CTK.CTkButton(frAA, text=titles[4], font=BtnFont, corner_radius=30, height=80, width=180, command=lambda: self.WindowHandler(3))
-        self.btnAA3.pack(padx=84, pady=24, side="top", anchor="n")
         # PDF display
-        self.pdfFr = CTkPDFViewer(self.frABA, file=f"../Cucina/CTkPDFViewer/0.pdf", height=700, page_height=1122, page_width=794, width=800, fg_color="transparent")
+        self.pdfFr = CTkPDFViewer(self.frABA, file=f"../Cucina/CTkPDFViewer/0.pdf", height=620, page_height=1122, page_width=794, width=800, fg_color="transparent")
         self.pdfFr.pack(pady=10, padx=10)
         self.ListRecipes(sfrAAA, PDF.ListPDFs())
+        self.btnAA1 = CTK.CTkButton(self.frABA, text=titles[2], font=BtnFont, corner_radius=30, height=60, width=720)
+        self.btnAA1.pack(padx=4, pady=4, side="top", anchor="n")
 
     def ListRecipes(self, window, arr):
         BtnFont1 = CTK.CTkFont(family="Helvetica", size=32, weight=Font.NORMAL)
         for i in arr:
             title = i.removesuffix(".pdf").replace("_"," ")
-            cell = CTK.CTkButton(master=window, text=title, font=BtnFont1, width=800, height=80, corner_radius=8, fg_color="#cf9a41", text_color="#f9f2eb", command=lambda x = i: self.LoadPDF(x))
-            cell.pack(padx=1, pady=32, anchor="w")
+            cell = CTK.CTkButton(master=window, text=title, font=BtnFont1, width=680, height=80, corner_radius=8, fg_color="#cf9a41", text_color="#f9f2eb", command=lambda x = i: self.LoadPDF(x))
+            cell.pack(padx=1, pady=16, anchor="w")
     
     def ClearRecipe(self):
         if self.pdfFr.winfo_ismapped():
             self.pdfFr.pack_forget()
+            self.pdfFr = CTkPDFViewer(self.frABA, file=f"../Cucina/CTkPDFViewer/0.pdf", height=620, page_height=1122, page_width=794, width=800, fg_color="transparent")
+            self.pdfFr.pack(pady=10, padx=10)
+            if self.btnAA1.winfo_ismapped():
+                self.btnAA1.pack_forget()
+                self.btnAA1.pack(padx=4, pady=4, side="top", anchor="n")
 
     def LoadPDF(self, item):
-        self.ClearRecipe()
+        if self.pdfFr.winfo_ismapped():
+            self.pdfFr.pack_forget()
         self.btnAA1.configure(command=lambda x = item: self.FocusPDF(x))
-        self.pdfFr = CTkPDFViewer(self.frABA, file=f"../Cucina/PDFs/{item}", height=700, page_height=1122, page_width=794, width=800, fg_color="transparent")
+        self.pdfFr = CTkPDFViewer(self.frABA, file=f"../Cucina/PDFs/{item}", height=620, page_height=1122, page_width=794, width=800, fg_color="transparent")
         self.pdfFr.pack(pady=10, padx=10)
         self.loadedPdf = item
+        if self.btnAA1.winfo_ismapped():
+            self.btnAA1.pack_forget()
+            self.btnAA1.pack(padx=4, pady=4, side="top", anchor="n")
 
     # A unique page that parses a value
     """
@@ -529,41 +552,44 @@ class App(CTK.CTk):
     def FocusPDF(self, item):
         self.UnmapFrames()
         TtlFont = CTK.CTkFont(family="Arial Black", size=62, weight=Font.BOLD)
-        BtnFont = CTK.CTkFont(family="Times Bold", size=56, weight=Font.BOLD)
+        BtnFont = CTK.CTkFont(family="Times Bold", size=28, weight=Font.BOLD)
         self.frA.pack(fill="both", expand=True, side="left")
         self.frB.pack(fill="both", expand=True, side="right")
-        title = ["RECIPE FOCUS", "BACK", "PANTRY MATCH"]
+        title = ["RECIPE FOCUS", "BACK", "PANTRY MATCH", "REFRESH"]
+        self.btnA1 = CTK.CTkButton(self.frA, text=title[1], width=200, font=BtnFont, height=60, corner_radius=12, command=lambda: self.WindowHandler(5))
+        self.btnA1.pack(side="top", pady=12, padx=12, anchor="nw")
+        self.btnA2 = CTK.CTkButton(self.frB, text=title[3], width=200, font=BtnFont, height=60, corner_radius=12)
+        self.btnA2.pack(side="top", pady=12, padx=12, anchor="ne")
         self.lblA1 = CTK.CTkLabel(self.frA, text=title[0], width=1280, font=TtlFont)
         self.lblA1.pack(side="top", pady=10, padx=10)
         self.pdfFr = CTkPDFViewer(self.frA, file=f"../Cucina/PDFs/{item}", height=820, page_height=1683, page_width=1191, width=1220, fg_color="#eee9e1")
-        self.pdfFr.pack(side="top", padx=10)
-        self.btnA1 = CTK.CTkButton(self.frA, text=title[1], width=240, font=BtnFont, height=60, corner_radius=12, command=lambda: self.WindowHandler(5))
-        self.btnA1.pack(side="top", pady=12, padx=46, anchor="w")
-        self.lblB1 = CTK.CTkLabel(self.frB, text=title[2], width=680, font=TtlFont)
-        self.lblB1.pack(side="top", pady=10, padx=10)
-        self.sfrBA = CTK.CTkScrollableFrame(self.frB, fg_color="#eee9e1", width=680, height=820)
-        self.sfrBA.pack(side="top")
+        self.pdfFr.pack(side="top", padx=6)
+        self.lblB1 = CTK.CTkLabel(self.frB, text=title[2], width=640, font=TtlFont)
+        self.lblB1.pack(side="top", pady=10, padx=6)
+        self.sfrBA = CTK.CTkScrollableFrame(self.frB, fg_color="#eee9e1", width=640, height=820)
+        self.sfrBA.pack(side="top", padx=6)
         self.ListMatches(self.sfrBA, item)
 
     def ListMatches(self, window, item):
-        BtnFont1 = CTK.CTkFont(family="Helvetica", size=32, weight=Font.NORMAL)
+        BtnFont1 = CTK.CTkFont(family="Helvetica", size=22, weight=Font.NORMAL)
+        TtlFont = CTK.CTkFont(family="Helvetica", size=30, weight=Font.BOLD)
         recipe = item.removesuffix(".pdf")
         opposite, match = cucina.DishSearch(recipe)
         title = f"Ingredients you may have for your\n{recipe}:"
-        ttl = CTK.CTkLabel(master=window, text=title, font=BtnFont1, width=675, corner_radius=2, fg_color="#eee9e1", text_color="black")
+        ttl = CTK.CTkLabel(master=window, text=title, font=TtlFont, width=675, corner_radius=2, fg_color="#747474", text_color="#eee9e1")
         ttl.pack(padx=1, pady=3, anchor="n")
         if len(match) < 1:
-            cell = CTK.CTkButton(master=window, text="No Items in your pantry match", font=BtnFont1, width=675, corner_radius=2, fg_color="#cf9a41", text_color="black")
+            cell = CTK.CTkLabel(master=window, text="No Items in your pantry match", font=BtnFont1, width=675, corner_radius=2, fg_color="#747474", text_color="black")
             cell.pack(padx=1, pady=3, anchor="w")
         for i in match:
             title = i
             cell = CTK.CTkButton(master=window, text=title, font=BtnFont1, width=675, corner_radius=2, fg_color="#cf9a41", text_color="black")
             cell.pack(padx=1, pady=3, anchor="w")
         title = f"Ingredients you may need to get:"
-        ttl = CTK.CTkLabel(master=window, text=title, font=BtnFont1, width=675, corner_radius=2, fg_color="#eee9e1", text_color="black")
+        ttl = CTK.CTkLabel(master=window, text=title, font=TtlFont, width=675, corner_radius=2, fg_color="#747474", text_color="#eee9e1")
         ttl.pack(padx=1, pady=3, anchor="n")
         if len(opposite) < 1:
-            cell = CTK.CTkButton(master=window, text="Looks like you have everything you need :)", font=BtnFont1, width=675, corner_radius=2, fg_color="#cf9a41", text_color="black")
+            cell = CTK.CTkLabel(master=window, text="Looks like you have everything you need :)", font=BtnFont1, width=675, corner_radius=2, fg_color="#747474", text_color="black")
             cell.pack(padx=1, pady=3, anchor="w")
         for i in opposite:
             title = i

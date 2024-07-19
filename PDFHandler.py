@@ -55,6 +55,9 @@ def Read(pdf):
                 #print("Random stuff")
                 ingLine = False
                 stepLine = False
+            elif "equipment" in line.lower():
+                ingLine = False
+                stepLine = False
             else:
                 pass
 
