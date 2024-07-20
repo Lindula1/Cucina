@@ -5,7 +5,8 @@ Contributors: -
 Date Created: 17/05/2024
 Last Edited: 28/05/2024
 Description:
-
+*RUNNING THIS FILE WILL DO NOTHING*
+This python file contains all functions of the Cucina App.
 """
 try:
     import random
