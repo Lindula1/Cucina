@@ -37,9 +37,9 @@ class App(CTK.CTk):
         self.LoadImages()
         self.item = [0,0,0,0]
         self.key = 0
-        self.frA = CTK.CTkFrame(self, bg_color= "transparent")
-        self.frB = CTK.CTkFrame(self, bg_color= "transparent")
-        self.frC = CTK.CTkFrame(self, bg_color= "transparent")
+        self.frA = CTK.CTkFrame(self, fg_color= "transparent")
+        self.frB = CTK.CTkFrame(self, fg_color= "transparent")
+        self.frC = CTK.CTkFrame(self, fg_color= "transparent")
         self.sfrBA = CTK.CTkScrollableFrame(self.frB, fg_color="#eee9e1", height=700, width=660)
         self.frBB = CTK.CTkFrame(self.frB, bg_color= "transparent")
     
@@ -56,10 +56,7 @@ class App(CTK.CTk):
         for i in range(len(items)):
             img = Image.open(f"../Cucina/Images/{i}.png")
             w, h = img.size
-            if i == 4:
-                self.images.append(CTK.CTkImage(Image.open(f"../Cucina/Images/{i}.png"), size=(w*0.5,h*0.5)))
-            else:
-                self.images.append(CTK.CTkImage(Image.open(f"../Cucina/Images/{i}.png"), size=(w*0.2,h*0.2)))
+            self.images.append(CTK.CTkImage(Image.open(f"../Cucina/Images/{i}.png"), size=(w,h)))
     
     """
     INPUTS: next (int) - 
@@ -106,12 +103,12 @@ class App(CTK.CTk):
         # Images
         self.btnA1 = CTK.CTkButton(self.frA, image=self.images[2], text=None, fg_color="transparent", hover_color="grey90", command=lambda: self.WindowHandler(1))
         self.btnA1.pack(padx=12, pady=32, side="top", anchor="nw")
-        self.btnA2 = CTK.CTkButton(self.frA, image=self.images[4], text=None, fg_color="transparent", hover_color="grey90")
+        self.btnA2 = CTK.CTkButton(self.frA, image=self.images[4], text=None, fg_color="transparent", width=420, hover=False)
         self.btnA2.pack(padx=12, pady=160)
         self.btnC3 = CTK.CTkButton(self.frC, text="SECURITY INFORMATION\n\nTERMS OF SERVICE", fg_color="transparent", hover_color="grey90", text_color="grey4",anchor="e")
         self.btnC3.pack(padx=12, pady=12, side="top", anchor="ne")
-        self.btnC4 = CTK.CTkButton(self.frC, image=self.images[4], text=None, fg_color="transparent", hover_color="grey90")
-        self.btnC4.pack(padx=12, pady=198)
+        self.btnC4 = CTK.CTkButton(self.frC, image=self.images[5], text=None, fg_color="transparent", width=420, hover=False)
+        self.btnC4.pack(padx=12, pady=267)
         # Title
         self.lblB1 = CTK.CTkLabel(self.frB, text=titles[0], font=TtlFont, justify="center", width=780, text_color="#cc5308")
         self.lblB1.pack(padx=12, pady=46)
@@ -211,7 +208,7 @@ class App(CTK.CTk):
         yearVal = (self.register(self.YearCallback))
         # Fonts
         TtlFont = CTK.CTkFont(family="Arial Black", size=80, weight=Font.BOLD)
-        LblFont = CTK.CTkFont(family="Arial Bold", size=28, weight=Font.BOLD)
+        LblFont = CTK.CTkFont(family="Arial Bold", size=16, weight=Font.BOLD)
         LblFont1 = CTK.CTkFont(family="Arial Bold", size=38, weight=Font.BOLD)
         BtnFont = CTK.CTkFont(family="Times Bold", size=32, weight=Font.BOLD)
         BtnFont1 = CTK.CTkFont(family="Helvetica", size=24, weight=Font.NORMAL)
@@ -228,19 +225,13 @@ class App(CTK.CTk):
         self.frBB.pack(fill="both", expand=True, side="right", padx=7, pady=7)
         # Recipe finder button
         self.btnA1 = CTK.CTkButton(self.frA, text=titles[1], font=BtnFont, width=280, command=lambda: self.WindowHandler(5), corner_radius=30, height=80)
-        self.btnA1.pack(padx=12, pady=12, anchor="nw", side='left')
+        self.btnA1.pack(padx=20, pady=20, anchor="nw", side='left')
         # Title
         self.lblA1 = CTK.CTkLabel(self.frA, text=titles[0], font=TtlFont, justify="center", width=780, text_color="#cc5308")
         self.lblA1.pack(padx=266, pady=10, side="left", anchor="n")
         # Home button
         self.btnA2 = CTK.CTkButton(self.frA, text=titles[2], font=BtnFont, width=280, command=lambda: self.WindowHandler(3), corner_radius=30, height=80)
-        self.btnA2.pack(padx=12, pady=12, anchor="ne", side="left")
-        # User Information
-        afr1 = CTK.CTkFrame(self.frBB, fg_color="#eee9e1", width=680, height=300)
-        afr1.pack(side="top", padx=20, fill="x", pady=12)
-        usrInfo = "This is the pantry view of the Cucina software.\nTo use this feature effectively please read the prompts."
-        lblafr1 = CTK.CTkLabel(afr1, text=usrInfo, font=LblFont)
-        lblafr1.pack(side="top", fill="x", pady=12)
+        self.btnA2.pack(padx=20, pady=20, anchor="ne", side="left")
         # Item View
         self.entries = []
         fields = ["NUTRITION", "ITEM COUNT", "EXPIRY DATE", "ITEM NAME"]
@@ -248,7 +239,7 @@ class App(CTK.CTk):
         units = ["KJ", "g"]
         for i in range(4):
             afr = CTK.CTkFrame(self.frBB, fg_color="#eee9e1", width=680)
-            afr.pack(side="top", anchor="w", padx=20, fill="x")
+            afr.pack(side="top", anchor="n", padx=20, fill="x", pady=4)
             lbl = CTK.CTkLabel(afr, text=fields[i], font=LblFont1, width=200, justify="left")
             lbl.pack(side="left", pady=10, padx=12, anchor="w")
             if i == 2:
@@ -271,21 +262,28 @@ class App(CTK.CTk):
                 ety.pack(side="right", pady=10, anchor="e")
                 self.entries.append(ety)
         # Special frame
-        afr0 = CTK.CTkFrame(self.frBB, fg_color="transparent", width=300)
+        afr0 = CTK.CTkFrame(self.frBB, fg_color="transparent")
         afr0.pack(side="top", padx=20, fill="x", expand=True, anchor="n")
         # Add/Update button
         self.btnBB2 = CTK.CTkButton(afr0, text=titles[5], font=BtnFont, width=280, command=self.Add, corner_radius=30, height=80)
         self.btnBB2.pack(pady=12, anchor="n", side="left")
+        # User Information
+        usrInfo = "This is the pantry view of the Cucina software\nTo use this feature effectively please read the prompts"
+        lblafr1 = CTK.CTkLabel(afr0, text=usrInfo, font=LblFont)
+        lblafr1.pack(side="left", fill="x", padx=12)
         # Clear button
         self.btnBB3 = CTK.CTkButton(afr0, text=titles[6], font=BtnFont, width=280, command=self.ClearItem, corner_radius=30, height=80)
         self.btnBB3.pack(pady=12, anchor="n", side="right")
+        # Image
+        #self.lblBB1 = CTK.CTkLabel(self.frBB, text="", image=self.images[10])
+        #self.lblBB1.pack(side="top", fill="x", padx=12)
         # Filters
         self.rdbBB1Var = CTK.StringVar(value=4)
         cnt = 0
         for x in range(2):
             horiz = ["right", "left"]
             aFr2 = CTK.CTkFrame(self.frBB, fg_color="transparent", width=400)
-            aFr2.pack(side=horiz[x], pady=40, padx=80)
+            aFr2.pack(side=horiz[x], pady=20, padx=80)
             for z in range(2):
                 snap = ["w", "e"]
                 aFr3 = CTK.CTkFrame(aFr2, fg_color="transparent", width=400)
@@ -461,23 +459,23 @@ class App(CTK.CTk):
         self.frB.pack(fill="both", expand=True, side="left")
         self.frC.pack(fill="both", expand=True, side="right")
         # IMAGES
-        self.btnB1 = CTK.CTkButton(self.frB, image=self.images[4], text=None, fg_color="transparent", hover_color="grey90")
+        self.btnB1 = CTK.CTkButton(self.frB, image=self.images[8], text=None, fg_color="transparent", hover=False, width=650)
         self.btnB1.pack(padx=12, pady=10, side="top", fill="y")
-        self.btnC2 = CTK.CTkButton(self.frC, image=self.images[4], text=None, fg_color="transparent", hover_color="grey90")
+        self.btnC2 = CTK.CTkButton(self.frC, image=self.images[9], text=None, fg_color="transparent", hover=False, width=650)
         self.btnC2.pack(padx=12, pady=10, side="top", fill="y")
         # Alignment button
-        self.btnA0.pack(padx=12, pady=20, side="left", anchor="ne")
+        self.btnA0.pack(padx=20, pady=20, side="left", anchor="ne")
         # Title
         self.lblA1 = CTK.CTkLabel(self.frA, text=titles[0], font=TtlFont, justify="center", text_color="#cc5308")
         self.lblA1.pack(padx=12, pady=20, side="left", anchor="n", fill="x", expand=True)
         # Log Out button
         self.btnA1 = CTK.CTkButton(self.frA, text=titles[3], font=BtnFont, command=lambda: self.WindowHandler(1), corner_radius=30, height=80)
-        self.btnA1.pack(padx=12, pady=20, side="right", anchor="ne")
+        self.btnA1.pack(padx=20, pady=20, side="right", anchor="ne")
         # Navigation buttons
         self.btnB2 = CTK.CTkButton(self.frB, text=titles[1], font=BtnFont, corner_radius=30, height=80, command=lambda: self.WindowHandler(5))
-        self.btnB2.pack(padx=12, pady=120)
+        self.btnB2.pack(padx=12, pady=80)
         self.btnC2 = CTK.CTkButton(self.frC, text=titles[2], font=BtnFont, corner_radius=30, height=80, command=lambda: self.WindowHandler(4))
-        self.btnC2.pack(padx=12, pady=120)
+        self.btnC2.pack(padx=12, pady=80)
 
     def RecipePage(self):
         # Fonts
@@ -600,12 +598,12 @@ class App(CTK.CTk):
         # Entry validation
         textVal = (self.register(self.TextCallback))
         # Fonts
-        TtlFont = CTK.CTkFont(family="Arial Black", size=54, weight=Font.BOLD)
-        LblFont = CTK.CTkFont(family="Arial Bold", size=36, weight=Font.BOLD)
+        TtlFont = CTK.CTkFont(family="Arial Black", size=68, weight=Font.BOLD)
+        LblFont = CTK.CTkFont(family="Arial Bold", size=42, weight=Font.BOLD)
         LblFont1 = CTK.CTkFont(family="Arial Bold", size=14, weight=Font.NORMAL)
-        BtnFont = CTK.CTkFont(family="Times Bold", size=24, weight=Font.BOLD)
-        EtyFont = CTK.CTkFont(family="Helvetica", size=28, weight=Font.NORMAL) 
-        titles = [ "ACCOUNT REGISTRATION","ENTER YOUR OWN NAME BELOW" ,"NAME", "ENTER A UNIQUE USERNAME BELOW", "USERNAME", "ENTER A SECURE PASSWORD BELOW", "PASSWORD", "          REGISTER          ", "          LOGIN          "]
+        BtnFont = CTK.CTkFont(family="Times Bold", size=32, weight=Font.BOLD)
+        EtyFont = CTK.CTkFont(family="Helvetica", size=34, weight=Font.NORMAL) 
+        titles = [ "ACCOUNTREGISTRATION","ENTER YOUR OWN NAME BELOW" ,"NAME", "ENTER A UNIQUE USERNAME BELOW", "USERNAME", "ENTER A SECURE PASSWORD BELOW", "PASSWORD", "          REGISTER          ", "          LOGIN          "]
         prompts = ["• Do not enter numbers", "• Must be longer than 3 letters", "• Must contain atleast one non-alaphabetical character\n• Must be longer than 3 letters"]
         # Frames
         self.frA.pack(fill="both", expand=True, side="left")
@@ -614,36 +612,36 @@ class App(CTK.CTk):
         # IMAGES
         self.btnA1 = CTK.CTkButton(self.frA, image=self.images[2], text=None, fg_color="transparent", hover_color="grey90", command=lambda: self.WindowHandler(1))
         self.btnA1.pack(padx=12, pady=32, side="top", anchor="nw")
-        self.btnA2 = CTK.CTkButton(self.frA, image=self.images[4], text=None, fg_color="transparent", hover_color="grey90")
-        self.btnA2.pack(padx=12, pady=160)
+        self.btnA2 = CTK.CTkButton(self.frA, image=self.images[6], text=None, fg_color="transparent", hover=False, width=420)
+        self.btnA2.pack(padx=20, pady=144)
         self.btnC3 = CTK.CTkButton(self.frC, text="SECURITY INFORMATION\n\nTERMS OF SERVICE", fg_color="transparent", hover_color="grey90", text_color="grey4",anchor="e")
         self.btnC3.pack(padx=30, pady=32, side="top", anchor="ne")
-        self.btnC4 = CTK.CTkButton(self.frC, image=self.images[4], text=None, fg_color="transparent", hover_color="grey90")
-        self.btnC4.pack(padx=12, pady=198)
+        self.btnC4 = CTK.CTkButton(self.frC, image=self.images[7], text=None, fg_color="transparent", hover=False, width=420)
+        self.btnC4.pack(padx=20, pady=177)
         # Title
         self.lblB1 = CTK.CTkLabel(self.frB, text=titles[0], font=TtlFont, justify="center", width=780, text_color="#cc5308")
         self.lblB1.pack(padx=12, pady=40)
         # Name Entry Field
         self.lblB2 = CTK.CTkLabel(self.frB, text=titles[1], font=LblFont, justify="center", width=780)
-        self.lblB2.pack(padx=12, pady=8)
+        self.lblB2.pack(padx=12, pady=12)
         self.etyB1 = CTK.CTkEntry(self.frB, validate="all", validatecommand=(textVal, "%P"), placeholder_text=titles[2], font=EtyFont, width=620, justify="center", height=68, corner_radius=240)
         self.etyB1.pack(padx=12, pady=2)
         # Username Entry Field
         self.lblB3 = CTK.CTkLabel(self.frB, text=titles[3], font=LblFont, justify="center", width=780)
-        self.lblB3.pack(padx=12, pady=8)
+        self.lblB3.pack(padx=12, pady=12)
         self.etyB2 = CTK.CTkEntry(self.frB, validate="all", validatecommand=(textVal, "%P"), placeholder_text=titles[4], font=EtyFont, width=620, justify="center", height=68, corner_radius=240)
         self.etyB2.pack(padx=12, pady=2)
         self.lblB6 = CTK.CTkLabel(self.frB, text=prompts[1], font=LblFont1, justify="center", width=780)
         self.lblB6.pack(padx=12, pady=2)
         # Password Entry Field
         self.lblB4 = CTK.CTkLabel(self.frB, text=titles[5], font=LblFont, justify="center", width=780)
-        self.lblB4.pack(padx=12, pady=8)
+        self.lblB4.pack(padx=12, pady=12)
         self.etyB3 = CTK.CTkEntry(self.frB, placeholder_text=titles[6], font=EtyFont, show="*", width=620, justify="center", height=68, corner_radius=240)
         self.etyB3.pack(padx=12, pady=2)
         self.lblB7 = CTK.CTkLabel(self.frB, text=prompts[2], font=LblFont1, justify="center", width=780)
         self.lblB7.pack(padx=12, pady=2)
         # Register button
-        self.btnB1 = CTK.CTkButton(self.frB, text=titles[7], font=BtnFont, command=lambda: self.Register(), corner_radius=30, height=58)
+        self.btnB1 = CTK.CTkButton(self.frB, text=titles[7], font=BtnFont, command=lambda: self.Register(), corner_radius=30, height=80)
         self.btnB1.pack(padx=12, pady=60)
        
     def Register(self, event=None):
