@@ -24,7 +24,7 @@ try:
 
 except ModuleNotFoundError as missing:
     print("\033[31mFATAL ERROR. Dependenant modules missing.\nThe software must terminate\033[0m")
-    print(f"You're missing: {missing}")
+    print(f"You're missing: {missing.name}\n Try running: pip install -r requirements.txt")
     exit()
 
 # A unique validation check to prevent entry of Chinese characters

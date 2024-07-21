@@ -8,21 +8,16 @@ Description:
 *RUNNING THIS FILE WILL DO NOTHING*
 This python file contains all functions of the Cucina App.
 """
-try:
-    import random
-    import string
-    from DataStoreModel import DataBase
-    import PDFHandler as PDF
-    import IngredientDataStore as Pantry
-    import datetime
-    from Hashing import HashingFunc
-    ds = DataBase()
-    al = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-except ModuleNotFoundError as missing:
-    print("\033[31mFATAL ERROR. Dependenant modules missing.\nThe software must terminate\033[0m")
-    print(f"You're missing: {missing}")
-    exit()
+import random
+import string
+from DataStoreModel import DataBase
+import PDFHandler as PDF
+import IngredientDataStore as Pantry
+import datetime
+from Hashing import HashingFunc
+ds = DataBase()
+al = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 class CUCINA():
     def __init__(self):
