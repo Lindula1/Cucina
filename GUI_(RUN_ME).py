@@ -687,7 +687,7 @@ class App(CTK.CTk):
                 self.WindowHandler(3)
             else:
                 self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="black")
-                self.after(1080, lambda: self.btnB1.configure(True, text="          LOG IN          ", state="normal", text_color="#fbf4ed"))
+                self.after(800, lambda: self.btnB1.configure(True, text="          LOG IN          ", state="normal", text_color="#fbf4ed"))
             
 if __name__ == "__main__":
     app = App()
