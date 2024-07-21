@@ -4,22 +4,31 @@ Author: Lindula Pallawela Appuhamilage
 Contributors: -
 Date Created: 09/07/2024
 Last Edited: 15/07/2024 
-Version: 0.0.2.6 (Beta)
+Version: 0.0.2.7 (Beta)
 Description:
 **PLEASE USE DISPLAY SCALE OF 100% TO ENSURE THAT THE UI ALIGNS PROPERLY**
 """
-import customtkinter as CTK
-import tkinter as TK
-from CUCINA import app as cucina
-import tkinter.font as Font
-from PIL import Image
-import sys
-import os
-from DataStoreModel import run as dataBase
-from IngredientDataStore import pantry
-import datetime
-import PDFHandler as PDF
-from CTkPDFViewer import *
+try:
+    import customtkinter as CTK
+    import tkinter as TK
+    from CUCINA import app as cucina
+    import tkinter.font as Font
+    from PIL import Image
+    import sys
+    import os
+    from DataStoreModel import run as dataBase
+    from IngredientDataStore import pantry
+    import datetime
+    import PDFHandler as PDF
+    from CTkPDFViewer import *
+
+except ModuleNotFoundError as missing:
+    print("\033[31mFATAL ERROR. Dependenant modules missing.\nThe software must terminate\033[0m")
+    print(f"You're missing: {missing}")
+    exit()
+
+# A unique validation check to prevent entry of Chinese characters
+alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 sys.path.insert(0, "../Cucina/Images")
 sys.path.insert(0, "../Cucina/PDFs")
@@ -166,7 +175,7 @@ class App(CTK.CTk):
         if T == "":
             return True
         # Type and Range checks
-        elif T[0].isdigit() or len(T) > 34:
+        elif (T[0].upper() not in alpha) or len(T) > 28:
             return False
         return True
     
@@ -573,6 +582,7 @@ class App(CTK.CTk):
         TtlFont = CTK.CTkFont(family="Helvetica", size=30, weight=Font.BOLD)
         recipe = item.removesuffix(".pdf")
         opposite, match = cucina.DishSearch(recipe)
+        recipe = recipe.replace("_"," ")
         title = f"Ingredients you may have for your\n{recipe}:"
         ttl = CTK.CTkLabel(master=window, text=title, font=TtlFont, width=675, corner_radius=2, fg_color="#747474", text_color="#eee9e1")
         ttl.pack(padx=1, pady=3, anchor="n")
@@ -617,7 +627,7 @@ class App(CTK.CTk):
         self.btnC3 = CTK.CTkButton(self.frC, text="SECURITY INFORMATION\n\nTERMS OF SERVICE", fg_color="transparent", hover_color="grey90", text_color="grey4",anchor="e")
         self.btnC3.pack(padx=30, pady=32, side="top", anchor="ne")
         self.btnC4 = CTK.CTkButton(self.frC, image=self.images[7], text=None, fg_color="transparent", hover=False, width=420)
-        self.btnC4.pack(padx=20, pady=177)
+        self.btnC4.pack(padx=20, pady=166)
         # Title
         self.lblB1 = CTK.CTkLabel(self.frB, text=titles[0], font=TtlFont, justify="center", width=780, text_color="#cc5308")
         self.lblB1.pack(padx=12, pady=40)

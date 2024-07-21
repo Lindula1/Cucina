@@ -19,8 +19,9 @@ try:
     ds = DataBase()
     al = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-except ModuleNotFoundError:
+except ModuleNotFoundError as missing:
     print("\033[31mFATAL ERROR. Dependenant modules missing.\nThe software must terminate\033[0m")
+    print(f"You're missing: {missing}")
     exit()
 
 class CUCINA():

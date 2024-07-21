@@ -14,6 +14,16 @@ import json
 sys.path.insert(0, "../Cucina/PDFs")
 
 """
+[A-Z] Look for one uppercase letter.
+[A-Z]{3} Look for three consecutive uppercase letters.
+[0-9]{5} Look for five consecutive digits.
+[0-9]+ Look for one or more digits.
+[^a-z] Look for everything except lowercase a to z.
+\s (Lowercase s) Look for one whitespace character (space, tab, etc).
+\S (Uppercase S) Look for any character not whitespace.
+"""
+
+"""
 INPUTS: pdf - The name of the PDF file to be read.
 
 PROCESS:
@@ -27,6 +37,88 @@ ingredients - A list of ingredient lines extracted from the PDF,
 steps - A list of step lines extracted from the PDF,
 text - A list containing all text lines from the PDF.
 """
+
+import pdfplumber
+import re
+
+def Read1(pdf):
+    extraText = []
+    ingredients = []
+    steps = []
+    with pdfplumber.open(f"../Cucina/PDFs/{pdf}.pdf") as read:
+        for page in read.pages:
+            text = page.extract_text()
+            extraText.append(text)
+            potentialIngredients = re.findall(r'\d+(?:\s+\d+/\d+)?\s+(?:cup|tablespoon|teaspoon|ounce|pound|g|ml|L|lb|oz|tbsp|tsp)s?\s+.+', text, re.IGNORECASE)
+    ingredients.extend(potentialIngredients)
+    return ingredients, steps, extraText
+
+def Read2(pdf_path):
+    ingredients = []
+    ingredient_section_found = False
+    
+    with pdfplumber.open(f"../Cucina/PDFs/{pdf_path}.pdf") as pdf:
+        full_text = ""
+        for page in pdf.pages:
+            full_text += page.extract_text() + "\n"
+        
+        # Look for common ingredient section headers
+        ingredient_headers = ["ingredients:", "you will need:", "you'll need:", "shopping list:"]
+        start_index = -1
+        for header in ingredient_headers:
+            start_index = full_text.lower().find(header)
+            if start_index != -1:
+                ingredient_section_found = True
+                full_text = full_text[start_index:]
+                break
+        
+        if not ingredient_section_found:
+            print("balls")
+            # If no header found, try to identify ingredient patterns
+            print(full_text)
+            regex = r'\n[\d½¼¾⅓⅔⅛⅜⅝⅞]+\s*(?:cup|g|kg|ml|l|tsp|tbsp|oz|pound|lb)s?\s+\w+'
+            out = re.findall(r'\•.*|\uf0b7.*', full_text)
+            potential_ingredients = re.findall(r'(\d+g.*)|(\d+\s{1}\S+)', full_text)
+            out.extend(potential_ingredients)
+            ingredientList = []
+            for ingredient in out:
+                ingredient = re.sub(r'\([^)]*\)*\s', '', ingredient).strip()
+                ingredient = re.sub(r'^(of|and)\s', '', ingredient, flags=re.IGNORECASE)
+                ingredient = re.sub(r'•\s|\uf0b7\s', '', ingredient, flags=re.IGNORECASE)
+                ingredient = re.sub(r'\,.*\s', '', ingredient, flags=re.IGNORECASE)
+                ingredientList.append(ingredient)
+            return [], ingredientList
+            if potential_ingredients:
+                ingredient_section_found = True
+                full_text = "\n".join(potential_ingredients)
+        
+        if ingredient_section_found:
+            # Split text into lines
+            lines = full_text.split('\n')
+            
+            for line in lines:
+                line = line.strip()
+                
+                # Skip empty lines and common non-ingredient lines
+                if not line or any(header in line.lower() for header in ingredient_headers) or \
+                   line.lower().startswith(("method:", "instructions:", "directions:", "to make")):
+                    continue
+                
+                # Remove quantities and units
+                #ingredient = re.sub(r'^[\d½¼¾⅓⅔⅛⅜⅝⅞/\-\s]+(?:[a-zA-Z]+\s)?', '', line)
+                
+                # Remove additional descriptions in parentheses
+                ingredient = re.sub(r'\([^)]*\)', '', ingredient).strip()
+                
+                # Remove common prefixes
+                ingredient = re.sub(r'^(of|and)\s', '', ingredient, flags=re.IGNORECASE)
+                
+                # Add ingredient if it's not empty, not too short, and not already in the list
+                if ingredient and len(ingredient) > 1 and ingredient.lower() not in [i.lower() for i in ingredients]:
+                    ingredients.append(ingredient)
+    
+    return ingredients, potential_ingredients
+
 def Read(pdf):
     try:
         reader = PdfReader(f"../Cucina/PDFs/{pdf}.pdf")
@@ -178,8 +270,11 @@ def Quantity(entry):
     return item, quantity
 
 if __name__ == "__main__":
-    ingredients, steps, text = Read("beef_stroganoff")
-    print(ReadPDFData())
+    recipes = ReadPDFData()
+    #ingredients, steps, text = Read("Lasagne")
+    ingredients, t, text = Read(recipes[1])
+    print(ingredients)
+    print(text)
 
 '''
     print("***********STEPS***********")
