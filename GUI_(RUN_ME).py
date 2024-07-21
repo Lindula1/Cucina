@@ -666,11 +666,11 @@ class App(CTK.CTk):
         else:
             result = cucina.RegisterAccount(usrm, pwrd, name)
             if result == "Success":
-                self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="cornflower blue")
-                self.after(640, lambda: self.btnB1.configure(True, text="LOG IN TO YOUR NEW ACCOUNT", state="normal", text_color="#fbf4ed", command=lambda: self.WindowHandler(1)))
+                self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="black")
+                self.after(750, lambda: self.btnB1.configure(True, text="LOG IN TO YOUR NEW ACCOUNT", state="normal", text_color="#fbf4ed", command=lambda: self.WindowHandler(1)))
             else:
-                self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="cornflower blue")
-                self.after(640, lambda: self.btnB1.configure(True, text="REGISTER", state="normal", text_color="#fbf4ed"))
+                self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="black")
+                self.after(1200, lambda: self.btnB1.configure(True, text="REGISTER", state="normal", text_color="#fbf4ed"))
 
     def Login(self, event=None):
         usrm = self.etyB1.get()
@@ -682,12 +682,12 @@ class App(CTK.CTk):
         else:
             result = cucina.LogIn(usrm, pwrd)
             if result == "Logged in as Admin" or result == "Login successful":
-                self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="cornflower blue")
+                self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="black")
                 self.account = cucina.Search(usrm)
                 self.WindowHandler(3)
             else:
-                self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="cornflower blue")
-                self.after(640, lambda: self.btnB1.configure(True, text="          LOG IN          ", state="normal", text_color="#fbf4ed"))
+                self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="black")
+                self.after(1080, lambda: self.btnB1.configure(True, text="          LOG IN          ", state="normal", text_color="#fbf4ed"))
             
 if __name__ == "__main__":
     app = App()
