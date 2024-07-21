@@ -272,7 +272,7 @@ def Quantity(entry):
 if __name__ == "__main__":
     recipes = ReadPDFData()
     #ingredients, steps, text = Read("Lasagne")
-    ingredients, t, text = Read(recipes[1])
+    ingredients, text = Read2(recipes[1])
     print(ingredients)
     print(text)
 

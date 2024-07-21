@@ -3,8 +3,8 @@
 Author: Lindula Pallawela Appuhamilage
 Contributors: -
 Date Created: 09/07/2024
-Last Edited: 15/07/2024 
-Version: 0.0.2.7 (Beta)
+Last Edited: 21/07/2024 
+Version: 0.0.3.1 (Beta)
 Description:
 **PLEASE USE DISPLAY SCALE OF 100% TO ENSURE THAT THE UI ALIGNS PROPERLY**
 """
