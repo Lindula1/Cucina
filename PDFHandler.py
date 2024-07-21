@@ -204,7 +204,7 @@ OUTPUT: items - A list of all recipe names
 """
 def ListPDFs():
     items = []
-    with os.scandir("../Cucina/Pdfs/") as files:
+    with os.scandir("../Cucina/PDFs/") as files:
         for item in files: items.append(item.name)
     SavePDFData(items)
     return items
