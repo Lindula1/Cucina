@@ -27,7 +27,7 @@ def UpdateGist(data):
     gist.edit("", {"Accounts.json": github.InputFileContent(data)})
 
 def LoadGist():
-    gist = git.get_gist("f08ed4ef55b029514b988ef53c4506af")
+    gist = git.get_gist(gistKey)
     raw = requests.get(gist.url)
     data = json.loads(raw.text)
     return data["files"]["Accounts.json"]["content"]
