@@ -9,6 +9,11 @@ Description:
 **PLEASE USE DISPLAY SCALE OF 100% TO ENSURE THAT THE UI ALIGNS PROPERLY**
 pyinstaller Cucina_App.py --onefile –noconsole 
 """
+
+cucina = None
+dataBase = None
+pantry = None
+
 try:
     import customtkinter as CTK
     import tkinter as TK 
@@ -19,9 +24,7 @@ try:
     import datetime
     from CTkPDFViewer import *
     import ctypes
-    from CUCINA import app as cucina
-    from DataStoreModel import run as dataBase
-    from IngredientDataStore import pantry
+    
     import PDFHandler as PDF
 
 except ModuleNotFoundError as missing:
@@ -117,6 +120,12 @@ class App(CTK.CTk):
         self.after(200, self.Load)
                 
     def Load(self):
+        global cucina
+        from CUCINA import app as cucina
+        global dataBase
+        from DataStoreModel import run as dataBase
+        global pantry
+        from IngredientDataStore import pantry
         from GitCommunication import ErrorCheck
         progressBar = CTK.CTkProgressBar(self.afr0, orientation="horizontal", width=1680, height=45, determinate_speed=4)
         progressBar.pack(side="top")
@@ -722,6 +731,7 @@ class App(CTK.CTk):
         self.btnB1.pack(padx=12, pady=60)
        
     def Register(self, event=None):
+        self.after(0, lambda: self.btnB1.configure(state="disabled"))
         name = self.etyB1.get()
         usrm = self.etyB2.get()
         pwrd = self.etyB3.get()
