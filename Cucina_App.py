@@ -3,8 +3,8 @@
 Author: Lindula Pallawela Appuhamilage
 Contributors: -
 Date Created: 09/07/2024
-Last Edited: 21/07/2024 
-Version: 0.0.3.1 (Beta)
+Last Edited: 22/07/2024 
+Version: 0.0.3.4 (Beta)
 Description:
 **PLEASE USE DISPLAY SCALE OF 100% TO ENSURE THAT THE UI ALIGNS PROPERLY**
 """
@@ -24,13 +24,13 @@ try:
     import ctypes
 
 except ModuleNotFoundError as missing:
-    print("\033[31mFATAL ERROR. Dependenant modules missing.\nThe software must terminate\033[0m")
+    print("\033[31mERROR. Dependenant modules missing.\nThe software must terminate\033[0m")
     print(f"You're missing: {missing.name}\nTry running: pip install -r requirements.txt")
     exit()
 
 scaleFactor = ctypes.windll.shcore.GetScaleFactorForDevice(0) / 100
 if scaleFactor != 1.0:
-    print("\033[31mFATAL ERROR. User screen scale is not 100%\nThe software must terminate\033[0m")
+    print("\033[31mFATAL ERROR. User resolution scale is not 100%\nThe software must terminate\033[0m")
     exit()
 # A unique validation check to prevent entry of Chinese characters
 alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -120,8 +120,8 @@ class App(CTK.CTk):
         self.btnA1.pack(padx=12, pady=32, side="top", anchor="nw")
         self.btnA2 = CTK.CTkButton(self.frA, image=self.images[4], text=None, fg_color="transparent", width=420, hover=False)
         self.btnA2.pack(padx=12, pady=160)
-        self.btnC3 = CTK.CTkButton(self.frC, text="SECURITY INFORMATION\n\nTERMS OF SERVICE", fg_color="transparent", hover_color="grey90", text_color="grey4",anchor="e")
-        self.btnC3.pack(padx=12, pady=12, side="top", anchor="ne")
+        self.btnC3 = CTK.CTkButton(self.frC, text="CLOSE APP", font=BtnFont, command=self.destroy, height=80, width=200, corner_radius=30)
+        self.btnC3.pack(padx=24, pady=24, side="top", anchor="ne")
         self.btnC4 = CTK.CTkButton(self.frC, image=self.images[5], text=None, fg_color="transparent", width=420, hover=False)
         self.btnC4.pack(padx=12, pady=267)
         # Title
@@ -383,24 +383,35 @@ class App(CTK.CTk):
 
     def GridFormatList(self, window, arr, fields):
         BtnFont1 = CTK.CTkFont(family="Helvetica", size=15, weight=Font.NORMAL)
-        for ind in range(len(arr)):
-            btnTitle = ""
-            title = ""
-            for field in range(len(fields)):
-                if field == 3:
-                    d, ds = pantry.DateRevert(arr[ind])
-                    if ds > 0:
-                        title += str(ds) + fields[field]
+        arrayLength = len(arr)
+        if arrayLength > 0:
+            for ind in range(arrayLength):
+                btnTitle = ""
+                title = ""
+                for field in range(len(fields)):
+                    if field == 3:
+                        d, ds = pantry.DateRevert(arr[ind])
+                        if ds > 0:
+                            title += str(ds) + fields[field]
+                        else:
+                            days = str(abs(ds))
+                            title += f"{days} Days past expiry"
+                    elif field == 4:
+                        btnTitle = str(arr[ind][field+1])
                     else:
-                        days = str(abs(ds))
-                        title += f"{days} Days past expiry"
-                elif field == 4:
-                    btnTitle = str(arr[ind][field+1])
-                else:
-                    title += str(arr[ind][field+1]) + fields[field] +  ",  "
+                        title += str(arr[ind][field+1]) + fields[field] +  ",  "
+                bracket = CTK.CTkFrame(master=window, fg_color="#d9d9d9", width=680, corner_radius=6)
+                bracket.pack(side="top", pady=12, padx=1, anchor="w")
+                cell1 = CTK.CTkButton(master=bracket, text=btnTitle, font=BtnFont1, width=260, corner_radius=6, fg_color="#cd9b45", text_color="black", command=lambda x = arr[ind]: self.Select(x))
+                cell1.pack(anchor="w", side="left", pady=4, padx=4)
+                cell0 = CTK.CTkLabel(master=bracket, text=title, font=BtnFont1, width=400, corner_radius=6, fg_color="#eee9e1", text_color="black", anchor="w")
+                cell0.pack(anchor="w", side="left", padx=4, pady=6)
+        else:
+            btnTitle = "Pantry is Empty"
+            title = "Enter some items into your pantry to get started"
             bracket = CTK.CTkFrame(master=window, fg_color="#d9d9d9", width=680, corner_radius=6)
             bracket.pack(side="top", pady=12, padx=1, anchor="w")
-            cell1 = CTK.CTkButton(master=bracket, text=btnTitle, font=BtnFont1, width=260, corner_radius=6, fg_color="#cd9b45", text_color="black", command=lambda x = arr[ind]: self.Select(x))
+            cell1 = CTK.CTkButton(master=bracket, text=btnTitle, font=BtnFont1, width=260, corner_radius=6, fg_color="#cd9b45", text_color="black")
             cell1.pack(anchor="w", side="left", pady=4, padx=4)
             cell0 = CTK.CTkLabel(master=bracket, text=title, font=BtnFont1, width=400, corner_radius=6, fg_color="#eee9e1", text_color="black", anchor="w")
             cell0.pack(anchor="w", side="left", padx=4, pady=6)
@@ -678,33 +689,51 @@ class App(CTK.CTk):
         name = self.etyB1.get()
         usrm = self.etyB2.get()
         pwrd = self.etyB3.get()
-        self.etyB1.delete(0, CTK.END)
-        self.etyB2.delete(0, CTK.END)
-        self.etyB3.delete(0, CTK.END)
+       
         if name == "" or usrm == "" or pwrd == "":
             pass
         else:
             result = cucina.RegisterAccount(usrm, pwrd, name)
             if result == "Success":
+                self.etyB1.delete(0, CTK.END)
+                self.etyB3.delete(0, CTK.END)
+                self.etyB2.delete(0, CTK.END)
                 self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="black")
                 self.after(750, lambda: self.btnB1.configure(True, text="LOG IN TO YOUR NEW ACCOUNT", state="normal", text_color="#fbf4ed", command=lambda: self.WindowHandler(1)))
-            else:
+            elif "username" in result.lower():
+                self.etyB2.configure(text_color="red")
                 self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="black")
+                self.after(3200, lambda: self.etyB2.configure(text_color="#0d0c0a"))
+                self.after(1200, lambda: self.btnB1.configure(True, text="REGISTER", state="normal", text_color="#fbf4ed"))
+            elif "password" in result.lower():
+                self.etyB3.configure(text_color="red")
+                self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="black")
+                self.after(3200, lambda: self.etyB3.configure(text_color="#0d0c0a"))
                 self.after(1200, lambda: self.btnB1.configure(True, text="REGISTER", state="normal", text_color="#fbf4ed"))
 
     def Login(self, event=None):
         usrm = self.etyB1.get()
         pwrd = self.etyB2.get()
-        self.etyB1.delete(0, CTK.END)
-        self.etyB2.delete(0, CTK.END)
         if usrm == "" or pwrd == "":
             pass
         else:
             result = cucina.LogIn(usrm, pwrd)
             if result == "Logged in as Admin" or result == "Login successful":
+                self.etyB1.delete(0, CTK.END)
+                self.etyB2.delete(0, CTK.END)
                 self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="black")
                 self.account = cucina.Search(usrm)
                 self.WindowHandler(3)
+            elif "password" in result.lower():
+                self.etyB2.configure(text_color="red")
+                self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="black")
+                self.after(800, lambda: self.btnB1.configure(True, text="          LOG IN          ", state="normal", text_color="#fbf4ed"))
+                self.after(3200, lambda: self.etyB2.configure(text_color="#0d0c0a"))
+            elif "username" in result.lower():
+                self.etyB1.configure(text_color="red")
+                self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="black")
+                self.after(800, lambda: self.btnB1.configure(True, text="          LOG IN          ", state="normal", text_color="#fbf4ed"))
+                self.after(3200, lambda: self.etyB1.configure(text_color="#0d0c0a"))
             else:
                 self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="black")
                 self.after(800, lambda: self.btnB1.configure(True, text="          LOG IN          ", state="normal", text_color="#fbf4ed"))

@@ -25,13 +25,12 @@ class CUCINA():
         self.admin = False
         self.errors = []
         if ds.checks == False:
-            print(f"\033[33mAn error was detected in dependancies.\nThe progam may not be able to run properley.\033[0m\n")
+            print(f"\033[33mAn Fatal Error was detected in dependancies.\nThe progam may not be able to run properley.\033[0m\n")
             self.errors.append("\033[31mFATAL ERROR DATABSE EMPTY\033[0m")
             print("\033[31mFATAL ERROR DATABSE EMPTY\033[0m")
             self.disableLogin = True
         if Pantry.pantry.checks == False:
-            print(f"\033[33mAn error was detected in dependancies.\nThe progam may not be able to run properley.\033[0m\n")
-            self.errors.append("\033[31mPANTRY IS EMPTY\033[0m")
+            self.errors.append("\033[31mPANTRY IS EMPTY\nThe program will continue\033[0m")
             print("\033[31mPANTRY IS EMPTY\033[0m")
         self.dtList = ds.arr
         self.pantryList = Pantry.pantry.arr
@@ -67,7 +66,6 @@ class CUCINA():
     def LogIn(self, usrm, pwrd):
         if self.disableLogin:
             return "Login feature is disabled"
-        if usrm[0].upper() not in al: return "username has an invalid leader"
         account = self.Search(usrm.lower())
         if account == None: return "Username doesn't exist"
         if HashingFunc(pwrd) == account[1]["password"]: 
@@ -77,7 +75,7 @@ class CUCINA():
             self.admin = False
             return "Login successful"
         else:
-            return "Login unsuccessful"
+            return "Password is Incorrect"
 
     def RemoveAccount(self, query):
         if len(ds.arr) == 1:
