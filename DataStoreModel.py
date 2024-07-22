@@ -12,6 +12,7 @@ import random
 import json
 import datetime
 from cryptography.fernet import Fernet
+from CUCINA import app
 
 class DataBase():
     def __init__(self):
@@ -25,6 +26,7 @@ class DataBase():
         except GitCommunication.github.GithubException:
             self.arr = []
         if self.arr == []:
+            app.disableLogin == True
             return True
     
     def EncryptJson(self, data):

@@ -23,7 +23,6 @@ class CUCINA():
     def __init__(self):
         self.disableLogin = False
         self.admin = False
-        self.disableLogin = True
 
     def RegisterAccount(self, usrm, pwrd, name):
         usLength = 0

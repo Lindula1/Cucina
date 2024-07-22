@@ -7,6 +7,7 @@ Last Edited: 22/07/2024
 Version: 1.0.3.5 (Release)
 Description:
 **PLEASE USE DISPLAY SCALE OF 100% TO ENSURE THAT THE UI ALIGNS PROPERLY**
+pyinstaller Cucina_App.py --onefile –noconsole 
 """
 try:
     import customtkinter as CTK
