@@ -94,6 +94,8 @@ def HashinFunc2(entry):
     return hashed
 
 if __name__ == "__main__":
+    print(HashinFunc2("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"))
+    """
     result = []
     tstWrds = []
     for i in range(2400):
@@ -119,6 +121,9 @@ if __name__ == "__main__":
         c += 1
 
     tstWrds = ["password", "fortnite420", "green", "hotdog69", "hotdog23", "Diplo", "ho", "the sly fox jumped over the lazy dog", "the sly fox jumped over the lanky dog","l","m"]
+    
+    
     for wrd in tstWrds:
         h = HashinFunc2(wrd)
         print(f"'{wrd}' Hashed: {h}")
+    """

@@ -3,8 +3,14 @@ import github.InputFileContent
 import requests
 import re
 import json
+from cryptography.fernet import Fernet
 
-token = "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"
+with open('keyFile.key', 'rb') as filekey:
+    key = filekey.read()
+    fernet = Fernet(key)
+bytekey = b'gAAAAABmnkj_NUTQ3HzZsvc-VFYRuXVhci_yvM-IBSsCx_isEh3jI8AhhcxKZms84KHfsjcKqU7r-NUghxV1YvVY_0z_EZg904LditoRTW31orrBdf4ok3QWWLeWvj4HU9ZOlY663Qjs'
+
+token = str(fernet.decrypt(bytekey).decode("utf-8"))
 git = Github(token)
 
 def ErrorCheck():
