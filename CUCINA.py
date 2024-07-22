@@ -23,17 +23,7 @@ class CUCINA():
     def __init__(self):
         self.disableLogin = False
         self.admin = False
-        self.errors = []
-        if ds.checks == False:
-            print(f"\033[33mAn Fatal Error was detected in dependancies.\nThe progam may not be able to run properley.\033[0m\n")
-            self.errors.append("\033[31mFATAL ERROR DATABSE EMPTY\033[0m")
-            print("\033[31mFATAL ERROR DATABSE EMPTY\033[0m")
-            self.disableLogin = True
-        if Pantry.pantry.checks == False:
-            self.errors.append("\033[31mPANTRY IS EMPTY\nThe program will continue\033[0m")
-            print("\033[31mPANTRY IS EMPTY\033[0m")
-        self.dtList = ds.arr
-        self.pantryList = Pantry.pantry.arr
+        self.disableLogin = True
 
     def RegisterAccount(self, usrm, pwrd, name):
         usLength = 0
@@ -93,7 +83,7 @@ class CUCINA():
                     else:
                         delIndex = pos
                     ds.arr.pop(delIndex)
-                    ds.SaveLocally()
+                    ds.SaveOnline()
                     return "Item Deleted"
         return "Item Not Found"
     

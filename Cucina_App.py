@@ -4,24 +4,24 @@ Author: Lindula Pallawela Appuhamilage
 Contributors: -
 Date Created: 09/07/2024
 Last Edited: 22/07/2024 
-Version: 0.0.3.4 (Beta)
+Version: 1.0.3.5 (Release)
 Description:
 **PLEASE USE DISPLAY SCALE OF 100% TO ENSURE THAT THE UI ALIGNS PROPERLY**
 """
 try:
     import customtkinter as CTK
-    import tkinter as TK
-    from CUCINA import app as cucina
+    import tkinter as TK 
     import tkinter.font as Font
     from PIL import Image
     import sys
     import os
-    from DataStoreModel import run as dataBase
-    from IngredientDataStore import pantry
     import datetime
-    import PDFHandler as PDF
     from CTkPDFViewer import *
     import ctypes
+    from CUCINA import app as cucina
+    from DataStoreModel import run as dataBase
+    from IngredientDataStore import pantry
+    import PDFHandler as PDF
 
 except ModuleNotFoundError as missing:
     print("\033[31mERROR. Dependenant modules missing.\nThe software must terminate\033[0m")
@@ -30,8 +30,7 @@ except ModuleNotFoundError as missing:
 
 scaleFactor = ctypes.windll.shcore.GetScaleFactorForDevice(0) / 100
 if scaleFactor != 1.0:
-    print("\033[31mFATAL ERROR. User resolution scale is not 100%\nThe software must terminate\033[0m")
-    exit()
+    print("\033[31mFATAL ERROR. User resolution scale is not 100%\nThe software should be terminate\033[0m")
 # A unique validation check to prevent entry of Chinese characters
 alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
@@ -48,9 +47,8 @@ class App(CTK.CTk):
         self.title("CUCINA")
         #self.geometry(f"{aWidth}x{aHeight}")
         self.attributes("-fullscreen", "True") 
-        self.LoadImages()
         self.item = [0,0,0,0,0]
-        self.itemNames = [" J", "g", " Left", " Days to use", "Name: "]
+        self.itemNames = [" KJ", "g", " Left", " Days to use", "Name: "]
         self.key = 0
         self.frA = CTK.CTkFrame(self, fg_color= "transparent")
         self.frB = CTK.CTkFrame(self, fg_color= "transparent")
@@ -66,12 +64,15 @@ class App(CTK.CTk):
     def LoadImages(self):
         self.images = []
         items = []
-        with os.scandir("../Cucina/Images/") as files:
-            for item in files: items.append(item.name)
-        for i in range(len(items)):
-            img = Image.open(f"../Cucina/Images/{i}.png")
-            w, h = img.size
-            self.images.append(CTK.CTkImage(Image.open(f"../Cucina/Images/{i}.png"), size=(w,h)))
+        try:
+            with os.scandir("../Cucina/Images/") as files:
+                for item in files: items.append(item.name)
+            for i in range(len(items)):
+                img = Image.open(f"../Cucina/Images/{i}.png")
+                w, h = img.size
+                self.images.append(CTK.CTkImage(Image.open(f"../Cucina/Images/{i}.png"), size=(w,h)))
+        except FileNotFoundError:
+            return True
     
     """
     INPUTS: next (int) - 
@@ -95,6 +96,40 @@ class App(CTK.CTk):
             self.after(0, self.PantryPage())
         elif next == 5:
             self.after(0, self.RecipePage())
+        else:
+            self.after(0, self.LoadingScreen())
+
+    def LoadingScreen(self):
+        TtlFont = CTK.CTkFont(family="Arial Black", size=80, weight=Font.BOLD)
+        LblFont = CTK.CTkFont(family="Arial Bold", size=54, weight=Font.BOLD)
+        BtnFont = CTK.CTkFont(family="Times Bold", size=32, weight=Font.BOLD)
+        EtyFont = CTK.CTkFont(family="Helvetica", size=39, weight=Font.NORMAL) 
+        titles = ["CONNECTING TO SERVER"]
+        # Frames
+        self.frA.pack(fill="both", side="top")
+        self.afr0 = CTK.CTkFrame(self.frA, fg_color= "transparent")
+        self.afr0.pack(fill="x", side="top", pady=200)
+        self.lblA1 = CTK.CTkLabel(self.afr0, text=titles[0], font=LblFont, justify="center", width=780)
+        self.lblA1.pack(side="top")
+        self.loaded = CTK.StringVar()
+        self.after(200, self.Load)
+                
+    def Load(self):
+        from GitCommunication import ErrorCheck
+        progressBar = CTK.CTkProgressBar(self.afr0, orientation="horizontal", width=1680, height=45, determinate_speed=4)
+        progressBar.pack(side="top")
+        checks = [ErrorCheck, dataBase.Load, self.LoadImages, pantry.Load]
+        results = ["Database", "Accounts", "Images", "Pantry"]
+        errors = ["FATAL ERROR. Git Connection Lost\nThe software should be terminated", "FATAL ERROR. Database not laoded\nThe software should be terminated", "ERROR. Images did not laod\nThe software should be terminated", "Making a new pantry"]
+        for i in range(4):
+            result = checks[i]()
+            if result:
+                self.after(0, lambda: self.lblA1.configure(text=errors[i]))
+            else:
+                self.lblA1.configure(text=f"Loaded {results[i]}")
+                self.after(40, lambda: progressBar.step())
+        self.loaded = "Complete"
+        self.after(20, lambda: self.WindowHandler(1))
 
     def UnmapFrames(self):
         frames = [self.sfrBA, self.frBB, self.frA, self.frB, self.frC]
@@ -102,7 +137,6 @@ class App(CTK.CTk):
             if self.UnpackWidgets(i):
                 i.pack_forget()
                 i.configure(bg_color= "transparent", border_width=0)
-        
     
     def LoginWindow(self):
         textVal = (self.register(self.TextCallback))
@@ -123,7 +157,7 @@ class App(CTK.CTk):
         self.btnC3 = CTK.CTkButton(self.frC, text="CLOSE APP", font=BtnFont, command=self.destroy, height=80, width=200, corner_radius=30)
         self.btnC3.pack(padx=24, pady=24, side="top", anchor="ne")
         self.btnC4 = CTK.CTkButton(self.frC, image=self.images[5], text=None, fg_color="transparent", width=420, hover=False)
-        self.btnC4.pack(padx=12, pady=267)
+        self.btnC4.pack(padx=12, pady=200)
         # Title
         self.lblB1 = CTK.CTkLabel(self.frB, text=titles[0], font=TtlFont, justify="center", width=780, text_color="#cc5308")
         self.lblB1.pack(padx=12, pady=46)
@@ -741,5 +775,5 @@ class App(CTK.CTk):
 if __name__ == "__main__":
     app = App()
     app.after(0, lambda: app.state("zoomed"))
-    app.WindowHandler(1)
+    app.WindowHandler(-1)
     app.mainloop() 

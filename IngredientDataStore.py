@@ -17,12 +17,15 @@ import datetime
 
 class Pantry():
     def __init__(self):
-        self.checks = False
+        if __name__ == "__main__":
+            self.Load()
+    
+    def Load(self):
         try:
             self.arr = CS.Reader()
-            self.checks = True
         except FileNotFoundError:
             self.arr = []
+            return True
     """   
     INPUTS: item - A list representing an item, where item[4] is a date in the format [year, month, day].
     PROCESS:

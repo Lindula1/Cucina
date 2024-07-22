@@ -7,24 +7,61 @@ Last Edited: 06/07/2024
 Description:
 
 """
+import GitCommunication
 import random
 import json
 import datetime
+from cryptography.fernet import Fernet
 
 class DataBase():
     def __init__(self):
+        if __name__ == "__main__":
+            self.Load()
+    
+    def Load(self):
         try:
             self.arr = self.ReadJson()
             self.checks = True
-        except FileNotFoundError:
+        except GitCommunication.github.GithubException:
             self.arr = []
         if self.arr == []:
-            self.checks = False
+            return True
+    
+    def EncryptJson(self, data):
+        with open('keyFile.key', 'rb') as filekey:
+            key = filekey.read()
+        fernet = Fernet(key)
+        encrypted = fernet.encrypt(data)
+        with open("Accounts.json", "wb") as jsonFile:
+            jsonFile.write(encrypted)
+        return encrypted
+
+    def GenEncryptionKey(self):
+        key = Fernet.generate_key()
+        with open('keyFile.key', 'wb') as filekey:
+            filekey.write(key)
+        fernet = Fernet(key)
+        with open("Accounts.json", 'rb') as file:
+            original = file.read()
+        self.arr = fernet.encrypt(original)
+    
+    def DecryptJson(self):
+        with open('keyFile.key', 'rb') as filekey:
+            key = filekey.read()
+        fernet = Fernet(key)
+        encrypted = GitCommunication.LoadGist()
+        '''
+        with open("Accounts.json", 'rb') as encFile:
+            encrypted = encFile.read()
+        '''
+        if encrypted:
+            raw = json.loads(fernet.decrypt(encrypted))
+            return raw
     
     def AddTo(self, account):
         self.arr.append(self.AddUserID(account))
         self.arr = self.Sort(self.arr)
-        self.SaveLocally()
+        self.SaveOnline()
 
     def AddUserID(self, account):
         usrnmIL = account["username"][0].upper()
@@ -68,13 +105,21 @@ class DataBase():
     
     def SaveLocally(self):
         dumped = json.dumps(self.arr, indent=4)
+        self.EncryptJson(bytes(dumped.encode("utf-8")))
+        '''
+        dumped = json.dumps(self.arr, indent=4)
         with open("Accounts.json", "w") as file:
             file.write(dumped)
+        '''
+    def SaveOnline(self):
+        print(self.arr)
+        dumped = json.dumps(self.arr, indent=4)
+        print(dumped)
+        GitCommunication.UpdateGist(self.EncryptJson(bytes(dumped.encode("utf-8"))))
 
     def ReadJson(self):
-        with open("Accounts.json", "r") as file:
-            raw = json.load(file)
-            return raw
+        return self.DecryptJson()
+        
     
     def BulkSearch(self, query):
         self.arr = self.Sort(self.arr)
@@ -119,4 +164,8 @@ class DataBase():
 run = DataBase()
 
 if __name__ == "__main__":
-    run.RevertId(run.AddUserID({"uid":None, "username": "lindt", "password": "2039", "name": "Admin"}))
+    #run.GenEncryptionKey()
+    #print(run.arr)
+    #run.SaveLocally()
+    #run.SaveOnline()
+    print(run.DecryptJson())
