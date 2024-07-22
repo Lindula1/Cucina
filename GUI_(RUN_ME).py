@@ -316,6 +316,16 @@ class App(CTK.CTk):
         self.btnBB2.configure(state="disabled")
         item = []
         for entry in range(len(self.entries)):
+            for e in self.entries:
+                try:
+                    if e.get() == "":
+                        s = False 
+                        break
+                except AttributeError:
+                    for l in e:
+                        if l.get() == "":
+                            s = False
+                        break
             if entry == 3:
                 l = []
                 for i in range(len(self.entries[entry])):
@@ -329,9 +339,6 @@ class App(CTK.CTk):
                         s = False
                         break
                     item.append(l)
-            elif int(self.entries[2].get()) == 0:
-                s = False
-                break
             else:
                 if str(self.entries[entry].get()) == "":
                     s = False
@@ -350,14 +357,18 @@ class App(CTK.CTk):
         self.after(320, self.ClearItem)
 
     def Update(self):
-        if int(self.entries[2].get()) == 0:
-            self.btnBB2.configure(state="disabled")
-            pantry.Remove(self.item[5])
-            self.btnBB2.configure(state="normal", command=None)
-            self.after(320, self.ClearItem)
+        if self.entries[2].get() != "":
+            if int(self.entries[2].get()) == 0:
+                self.btnBB2.configure(state="disabled")
+                pantry.Remove(self.item[5])
+                self.btnBB2.configure(state="normal", command=None)
+                self.after(320, self.ClearItem)
+            else:
+                pantry.Remove(self.item[5])
+                self.Add()                
         else:
-            pantry.Remove(self.item[5])
-            self.Add()
+            self.btnBB2.configure(text="FAILED")
+            self.after(320, self.ClearItem)
 
     def ClearItem(self):
         self.UnpackWidgets(self.sfrBA)
@@ -479,7 +490,7 @@ class App(CTK.CTk):
         # IMAGES
         self.btnB1 = CTK.CTkButton(self.frB, image=self.images[8], text=None, fg_color="transparent", hover=False, width=650, command=lambda: self.WindowHandler(5))
         self.btnB1.pack(padx=12, pady=10, side="top", fill="y")
-        self.btnC2 = CTK.CTkButton(self.frC, image=self.images[9], text=None, fg_color="transparent", hover=False, width=650, command=lambda: self.WindowHandler(5))
+        self.btnC2 = CTK.CTkButton(self.frC, image=self.images[9], text=None, fg_color="transparent", hover=False, width=650, command=lambda: self.WindowHandler(4))
         self.btnC2.pack(padx=12, pady=10, side="top", fill="y")
         # Alignment button
         self.btnA0.pack(padx=20, pady=20, side="left", anchor="ne")
