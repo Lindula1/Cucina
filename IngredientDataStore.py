@@ -13,7 +13,7 @@ import string
 import pwinput
 import CSVHandler as CS
 import datetime
-#item = ["letter sort value (left empty)", "nutritional value", "quantity", "expiry date" "ingredient name"]
+#item = ["letter sort value (left empty)", "nutritional value", "item weight", "item count", "expiry date" "ingredient name"]
 
 class Pantry():
     def __init__(self):
@@ -24,26 +24,26 @@ class Pantry():
         except FileNotFoundError:
             self.arr = []
     """   
-    INPUTS: item - A list representing an item, where item[3] is a date in the format [year, month, day].
+    INPUTS: item - A list representing an item, where item[4] is a date in the format [year, month, day].
     PROCESS:
     The function takes the date, converts it to a datetime.date object,
     initializes a datetime.date object representing the date April 20, 1889,
     calculates the difference between the objects,
     and returns the modified item.
-    OUTPUT: item[3] - The number of days between the original date and April 20, 1889.
+    OUTPUT: item[4] - The number of days between the original date and April 20, 1889.
     """
     def FormatDate(self, item):
-        d0 = datetime.date(item[3][0], item[3][1], item[3][2])
+        d0 = datetime.date(item[4][0], item[4][1], item[4][2])
         self.d1 = datetime.date(1889, 4, 20)
         delta = d0 - self.d1
-        item[3] = delta.days
+        item[4] = delta.days
         return item
     
     """
     INPUTS: self - Reference to the current instance of the class, item - A list containing the item information, including the number of days until the expiry date.
 
     PROCESS:
-    The function calculates the expiry date by adding the number of days (item[3]) to a fixed reference date.
+    The function calculates the expiry date by adding the number of days (item[4]) to a fixed reference date.
     It then converts the expiry date to a formatted string representation ("%Y/%m/%d").
     The function splits the formatted date string into year, month, and day components.
     It calculates the number of days left until the expiry date by subtracting the current date from the expiry date.
@@ -52,7 +52,7 @@ class Pantry():
     OUTPUT: expDate - The expiry date in the format "YYYY/MM/DD", daysLeft - The number of days left until the expiry date.
     """
     def DateRevert(self, item):
-        d0 = datetime.timedelta(item[3])
+        d0 = datetime.timedelta(item[4])
         d1 = datetime.datetime(1889,4,20,0,0)
         d2 = datetime.date.today()
         expDate = (d1 + d0).strftime("%Y/%m/%d")
@@ -68,7 +68,7 @@ class Pantry():
             print("Fatal Error. No items in pantry. Creating empty list")
             raw = []
         ilist = []
-        for item in raw: ilist.append(item[4])
+        for item in raw: ilist.append(item[5])
         return raw
 
     def AddItem(self, item):
@@ -85,7 +85,7 @@ class Pantry():
         
 
     def LetterSort(self, item):
-        item.insert(0, ord(item[3][0].upper()))
+        item.insert(0, ord(item[4][0].upper()))
         return item
     
     def BulkSearch(self, query):
@@ -157,7 +157,7 @@ class Pantry():
             else:
                 count = 0
                 for item in results:
-                    if item[4].lower() == query.lower():
+                    if item[5].lower() == query.lower():
                         count += 1
                 if count > 1:
                     for i in range(len(results)):
@@ -172,7 +172,7 @@ class Pantry():
                             self.SaveToDevice()
                     return "First instance of item deleted."
                 for i in range(len(results)):
-                    if results[i][4].lower() == query.lower():
+                    if results[i][5].lower() == query.lower():
                         if (i - ran[0]) < 0:
                             delIndex = pos - i
                         elif (i - ran[0]) > 0:

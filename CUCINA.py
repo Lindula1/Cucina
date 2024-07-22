@@ -25,13 +25,14 @@ class CUCINA():
         self.admin = False
         self.errors = []
         if ds.checks == False:
-            self.errors.append("\033[31mFATAL ERROR DATABSE EMPTY\033[0m")
-        if Pantry.pantry.checks == False:
-            self.errors.append("\033[31mPANTRY IS EMPTY\033[0m")
-            self.disableLogin = True
-        if len(self.errors) > 0:
-            for i in self.errors: print(i)
             print(f"\033[33mAn error was detected in dependancies.\nThe progam may not be able to run properley.\033[0m\n")
+            self.errors.append("\033[31mFATAL ERROR DATABSE EMPTY\033[0m")
+            print("\033[31mFATAL ERROR DATABSE EMPTY\033[0m")
+            self.disableLogin = True
+        if Pantry.pantry.checks == False:
+            print(f"\033[33mAn error was detected in dependancies.\nThe progam may not be able to run properley.\033[0m\n")
+            self.errors.append("\033[31mPANTRY IS EMPTY\033[0m")
+            print("\033[31mPANTRY IS EMPTY\033[0m")
         self.dtList = ds.arr
         self.pantryList = Pantry.pantry.arr
 
@@ -115,7 +116,7 @@ class CUCINA():
         opposite = []
         matches = []
         for item in pantryItems:
-            d = item[4]
+            d = item[5]
             userIngredient = "".join(c for c in d if c.isalpha())
             for ingredient in ingredients:
                 if (userIngredient.lower() in ingredient.lower()) and (userIngredient not in matches):

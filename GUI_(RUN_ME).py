@@ -21,12 +21,17 @@ try:
     import datetime
     import PDFHandler as PDF
     from CTkPDFViewer import *
+    import ctypes
 
 except ModuleNotFoundError as missing:
     print("\033[31mFATAL ERROR. Dependenant modules missing.\nThe software must terminate\033[0m")
-    print(f"You're missing: {missing.name}\n Try running: pip install -r requirements.txt")
+    print(f"You're missing: {missing.name}\nTry running: pip install -r requirements.txt")
     exit()
 
+scaleFactor = ctypes.windll.shcore.GetScaleFactorForDevice(0) / 100
+if scaleFactor != 1.0:
+    print("\033[31mFATAL ERROR. User screen scale is not 100%\nThe software must terminate\033[0m")
+    exit()
 # A unique validation check to prevent entry of Chinese characters
 alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
@@ -44,7 +49,8 @@ class App(CTK.CTk):
         #self.geometry(f"{aWidth}x{aHeight}")
         self.attributes("-fullscreen", "True") 
         self.LoadImages()
-        self.item = [0,0,0,0]
+        self.item = [0,0,0,0,0]
+        self.itemNames = [" J", "g", " Left", " Days to use", "Name: "]
         self.key = 0
         self.frA = CTK.CTkFrame(self, fg_color= "transparent")
         self.frB = CTK.CTkFrame(self, fg_color= "transparent")
@@ -79,10 +85,10 @@ class App(CTK.CTk):
             self.after(0, self.AdminPage())
         elif next == 1:
             self.after(0, self.LoginWindow())
-            self.after(0, self.bind('<Return>', self.Login))
+            self.bind('<Return>', self.Login)
         elif next == 2:
             self.after(0, self.RegistrationWindow())
-            self.after(0, self.bind('<Return>', self.Register))
+            self.bind('<Return>', self.Register)
         elif next == 3:
             self.after(0, self.HomePage())
         elif next == 4:
@@ -150,15 +156,15 @@ class App(CTK.CTk):
         filter = int(self.rdbBB1Var.get())
         self.UnpackWidgets(self.sfrBA)
         arr = pantry.SortFunc(pantry.arr, filter)
-        self.after(0, self.GridFormatList(self.sfrBA, arr, [" KJ", "g", " Days to use", "Name: "]))
+        self.after(0, self.GridFormatList(self.sfrBA, arr, self.itemNames))
 
     def Select(self, item):
         # Display Item Values
         self.item = item
-        itemx = item[1:5]
+        itemx = item[1:6]
         self.btnBB2.configure(text="UPDATE", command=self.Update)
         for value in range(len(itemx)):
-            if value == 2:
+            if value == 3:
                 date, days = pantry.DateRevert(item)
                 date = date.split("/")
                 x = self.entries[value]
@@ -243,15 +249,15 @@ class App(CTK.CTk):
         self.btnA2.pack(padx=20, pady=20, anchor="ne", side="left")
         # Item View
         self.entries = []
-        fields = ["NUTRITION", "ITEM COUNT", "EXPIRY DATE", "ITEM NAME"]
+        fields = ["NUTRITION", "ITEM WEIGHT", "ITEM COUNT", "EXPIRY DATE", "ITEM NAME"]
         dateLbl = ["0000", "00", "00"]
-        units = ["KJ", "g"]
-        for i in range(4):
+        units = ["J", "g", "x"]
+        for i in range(5):
             afr = CTK.CTkFrame(self.frBB, fg_color="#eee9e1", width=680)
             afr.pack(side="top", anchor="n", padx=20, fill="x", pady=4)
             lbl = CTK.CTkLabel(afr, text=fields[i], font=LblFont1, width=200, justify="left")
             lbl.pack(side="left", pady=10, padx=12, anchor="w")
-            if i == 2:
+            if i == 3:
                 l = []
                 for j in range(3):
                     dEty = CTK.CTkEntry(afr, placeholder_text=dateLbl[j], validate="all", validatecommand=(dMVal, "%P"), font=EtyFont, width=len(dateLbl[j])*69, justify="center")
@@ -260,7 +266,7 @@ class App(CTK.CTk):
                     dEty.pack(side="right", pady=10, padx=12, anchor="e")
                     l.append(dEty)
                 self.entries.append(l)
-            elif i == 3:
+            elif i == 4:
                 ety = CTK.CTkEntry(afr, validate="all", validatecommand=(textVal, "%P"), placeholder_text="SELECT OR ADD", font=EtyFont, width=600, justify="center")
                 ety.pack(side="right", pady=10, padx=12, anchor="e")
                 self.entries.append(ety)
@@ -303,14 +309,14 @@ class App(CTK.CTk):
                 self.rdbBB1.pack(pady=12, side=horiz[x], anchor=snap[x])
                 cnt += 1
         # Load Pantry
-        self.after(0,self.GridFormatList(self.sfrBA, pantry.PantryList(), [" KJ", "g", " Days to use", "Name: "]))
+        self.after(0,self.GridFormatList(self.sfrBA, pantry.PantryList(), self.itemNames))
     
     def Add(self):
         s = True
         self.btnBB2.configure(state="disabled")
         item = []
         for entry in range(len(self.entries)):
-            if entry == 2:
+            if entry == 3:
                 l = []
                 for i in range(len(self.entries[entry])):
                     if str(self.entries[entry][i].get()) == "" or len(self.entries[entry][i].get()) < 1:
@@ -323,6 +329,9 @@ class App(CTK.CTk):
                         s = False
                         break
                     item.append(l)
+            elif int(self.entries[2].get()) == 0:
+                s = False
+                break
             else:
                 if str(self.entries[entry].get()) == "":
                     s = False
@@ -332,29 +341,29 @@ class App(CTK.CTk):
         if s:
             self.btnBB2.configure(text="SUCESS")
             cucina.AddToPantry(item)
-            self.item = [0,0,0,0]
+            self.item = [0,0,0,0,0]
         else:
             self.btnBB2.configure(text="FAILED")
-            if self.item != [0,0,0,0]: 
+            if self.item != [0,0,0,0,0]: 
                 print("men")
                 pantry.AddRaw(self.item)
         self.after(320, self.ClearItem)
 
     def Update(self):
-        if int(self.entries[1].get()) == 0:
+        if int(self.entries[2].get()) == 0:
             self.btnBB2.configure(state="disabled")
-            pantry.Remove(self.item[4])
+            pantry.Remove(self.item[5])
             self.btnBB2.configure(state="normal", command=None)
             self.after(320, self.ClearItem)
         else:
-            pantry.Remove(self.item[4])
+            pantry.Remove(self.item[5])
             self.Add()
 
     def ClearItem(self):
         self.UnpackWidgets(self.sfrBA)
-        self.GridFormatList(self.sfrBA, pantry.PantryList(), [" KJ", "g", " Days to use", "Name: "])
+        self.GridFormatList(self.sfrBA, pantry.PantryList(), self.itemNames)
         for entry in range(len(self.entries)):
-            if entry == 2:
+            if entry == 3:
                 for i in range(len(self.entries[entry])):
                     self.entries[entry][i].delete(0,"end")
             else:
@@ -362,19 +371,19 @@ class App(CTK.CTk):
         self.btnBB2.configure(text="ADD NEW", command=self.Add)
 
     def GridFormatList(self, window, arr, fields):
-        BtnFont1 = CTK.CTkFont(family="Helvetica", size=16, weight=Font.NORMAL)
+        BtnFont1 = CTK.CTkFont(family="Helvetica", size=15, weight=Font.NORMAL)
         for ind in range(len(arr)):
             btnTitle = ""
             title = ""
             for field in range(len(fields)):
-                if field == 2:
+                if field == 3:
                     d, ds = pantry.DateRevert(arr[ind])
                     if ds > 0:
                         title += str(ds) + fields[field]
                     else:
                         days = str(abs(ds))
                         title += f"{days} Days past expiry"
-                elif field == 3:
+                elif field == 4:
                     btnTitle = str(arr[ind][field+1])
                 else:
                     title += str(arr[ind][field+1]) + fields[field] +  ",  "
@@ -468,9 +477,9 @@ class App(CTK.CTk):
         self.frB.pack(fill="both", expand=True, side="left")
         self.frC.pack(fill="both", expand=True, side="right")
         # IMAGES
-        self.btnB1 = CTK.CTkButton(self.frB, image=self.images[8], text=None, fg_color="transparent", hover=False, width=650)
+        self.btnB1 = CTK.CTkButton(self.frB, image=self.images[8], text=None, fg_color="transparent", hover=False, width=650, command=lambda: self.WindowHandler(5))
         self.btnB1.pack(padx=12, pady=10, side="top", fill="y")
-        self.btnC2 = CTK.CTkButton(self.frC, image=self.images[9], text=None, fg_color="transparent", hover=False, width=650)
+        self.btnC2 = CTK.CTkButton(self.frC, image=self.images[9], text=None, fg_color="transparent", hover=False, width=650, command=lambda: self.WindowHandler(5))
         self.btnC2.pack(padx=12, pady=10, side="top", fill="y")
         # Alignment button
         self.btnA0.pack(padx=20, pady=20, side="left", anchor="ne")

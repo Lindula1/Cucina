@@ -59,7 +59,7 @@ def Write(array):
     with open('UserPantryData.csv', mode='w') as pantry:
         writer = csv.writer(pantry, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
-        writer.writerow(["Letter sort value", "Nutritional value", "Quantity", "Expiry date", "Ingredient name"])
+        writer.writerow(["Letter sort value", "Nutritional value","Item Weight", "Item Quantity", "Expiry date", "Ingredient name"])
         for i in range(len(array)):
-            writer.writerow([array[i][0], array[i][1], array[i][2], array[i][3], array[i][4]])
+            writer.writerow([array[i][0], array[i][1], array[i][2], array[i][3], array[i][4], array[i][5]])
         return "Write completed successfully"
