@@ -49,6 +49,7 @@ class App(CTK.CTk):
         #self.geometry(f"{aWidth}x{aHeight}")
         self.attributes("-fullscreen", "True") 
         self.item = [0,0,0,0,0]
+        self.loaded = False
         self.itemNames = [" KJ", "g", " Left", " Days to use", "Name: "]
         self.key = 0
         self.frA = CTK.CTkFrame(self, fg_color= "transparent")
@@ -112,7 +113,7 @@ class App(CTK.CTk):
         self.afr0.pack(fill="x", side="top", pady=200)
         self.lblA1 = CTK.CTkLabel(self.afr0, text=titles[0], font=LblFont, justify="center", width=780)
         self.lblA1.pack(side="top")
-        self.loaded = CTK.StringVar()
+        self.loaded = ""
         self.after(200, self.Load)
                 
     def Load(self):
@@ -129,7 +130,7 @@ class App(CTK.CTk):
             else:
                 self.lblA1.configure(text=f"Loaded {results[i]}")
                 self.after(40, lambda: progressBar.step())
-        self.loaded = "Complete"
+        self.loaded = True
         self.after(20, lambda: self.WindowHandler(1))
 
     def UnmapFrames(self):

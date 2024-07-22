@@ -17,8 +17,10 @@ import datetime
 
 class Pantry():
     def __init__(self):
-        if __name__ == "__main__":
-            self.Load()
+        try:
+            self.arr = CS.Reader()
+        except FileNotFoundError:
+            self.arr = []
     
     def Load(self):
         try:

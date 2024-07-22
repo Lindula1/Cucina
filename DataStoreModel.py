@@ -12,13 +12,15 @@ import random
 import json
 import datetime
 from cryptography.fernet import Fernet
-from CUCINA import app
 
 class DataBase():
     def __init__(self):
-        if __name__ == "__main__":
-            self.Load()
-    
+        try:
+            self.arr = self.ReadJson()
+            self.checks = True
+        except GitCommunication.github.GithubException:
+            self.arr = []
+
     def Load(self):
         try:
             self.arr = self.ReadJson()
@@ -26,7 +28,6 @@ class DataBase():
         except GitCommunication.github.GithubException:
             self.arr = []
         if self.arr == []:
-            app.disableLogin == True
             return True
     
     def EncryptJson(self, data):
@@ -114,9 +115,7 @@ class DataBase():
             file.write(dumped)
         '''
     def SaveOnline(self):
-        print(self.arr)
         dumped = json.dumps(self.arr, indent=4)
-        print(dumped)
         GitCommunication.UpdateGist(self.EncryptJson(bytes(dumped.encode("utf-8"))))
 
     def ReadJson(self):
@@ -124,8 +123,8 @@ class DataBase():
         
     
     def BulkSearch(self, query):
-        self.arr = self.Sort(self.arr)
         if self.arr == []: 
+            self.arr = self.Sort(self.arr)
             print("\033[41mFATAL ERROR DATABSE EMPTY\033[0m")
             return None, None, None
         query = ord(query[0].upper())
