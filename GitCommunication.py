@@ -12,39 +12,48 @@ secretGistKey = "35ac08ae2142858815ceebff88b30462"
 
 def ErrorCheck():
     try:
-        gist = git.get_gist(gistKey)
+        gist = git.get_gist(secretGistKey)
         raw = requests.get(gist.url)
         data = json.loads(raw.text)
         try: 
             out = data["files"]["Accounts.json"]["content"]
-            try:
-                with open("Accounts.json", "rb") as file:
-                    encrypted = file.read()
-            except FileNotFoundError:
-                return False
         except KeyError:
-            return True
+            if Force():
+                 return False
+            else:
+                return True
     except github.GithubException:
-        return True
+        if Force():
+            return False
+        else:
+            return True
+
+def Force():
+    try:
+        with open("Accounts.json", "rb") as file:
+            encrypted = file.read()
+        return encrypted
+    except FileNotFoundError:
+        return False
 
 def UpdateGist(data):
-    gist = git.get_gist(gistKey)
+    gist = git.get_gist(secretGistKey)
     gist.edit("", {"Accounts.json": github.InputFileContent(data.decode("utf-8"))})
 
 def LoadGist():
-    gist = git.get_gist(gistKey)
+    gist = git.get_gist(secretGistKey)
     raw = requests.get(gist.url)
     data = json.loads(raw.text)
     try: 
         out = data["files"]["Accounts.json"]["content"]
-    except KeyError:
-        with open("Accounts.json", "rb") as file:
-            out = file.read()
         return out
-
+    except KeyError:
+        print("force")
+        if Force():
+            return Force()
     
 
 
 if __name__ == "__main__":
-    print(ErrorCheck())
+    #print(ErrorCheck())
     print(LoadGist())

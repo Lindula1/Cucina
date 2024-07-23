@@ -73,12 +73,10 @@ class App(CTK.CTk):
             with os.scandir("../Cucina/Images/") as files:
                 for item in files: items.append(item.name)
             for i in range(len(items)):
-                try:
-                    img = Image.open(f"../Cucina/Images/{i}.png")
-                except FileNotFoundError:
-                    img = Image.open(f"C:\\Users\\budwi\\OneDrive\\Documents\\GitHub\\Cucina\\Images{i}.png")
+                img = Image.open(f"../Cucina/Images/{i}.png")
                 w, h = img.size
                 self.images.append(CTK.CTkImage(img, size=(w,h)))
+            return False
         except FileNotFoundError:
             return True
     
@@ -136,7 +134,7 @@ class App(CTK.CTk):
         progressBar.pack(side="top")
         checks = [ErrorCheck, self.LoadImages, dataBase.checks, pantry.checks]
         results = ["Database", "Accounts", "Images", "Pantry"]
-        errors = ["FATAL ERROR. Gist server connection lost.\nThe software should be terminated", "FATAL ERROR. Database not loaded\nThe software should be terminated", "ERROR. Images did not load\nThe software should be terminated", "Making a new pantry"]
+        errors = ["FATAL ERROR. Gist server connection lost.\nTry again later", "ERROR. Images did not load\nThe software should be terminated", "FATAL ERROR. Database not loaded\nThe software should be terminated", "Making a new pantry"]
         for i in range(4):
             if i < 2:
                 result = checks[i]()
@@ -151,7 +149,7 @@ class App(CTK.CTk):
             else:
                 self.lblA1.configure(text=f"Loaded {results[i]}")
                 self.after(10, lambda: progressBar.step())
-        if self.loaded: self.after(0, lambda: self.WindowHandler(1))
+        if self.loaded: self.after(10, lambda: self.WindowHandler(1))
 
     def UnmapFrames(self):
         frames = [self.sfrBA, self.frBB, self.frA, self.frB, self.frC]

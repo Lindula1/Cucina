@@ -15,15 +15,11 @@ from cryptography.fernet import Fernet
 
 class DataBase():
     def __init__(self):
-        try:
-            if GitCommunication.ErrorCheck():
-                self.checks = True
-            else:
-                self.arr = self.ReadJson()
-                self.checks = True
-        except GitCommunication.github.GithubException:
-            self.arr = []
+        if GitCommunication.ErrorCheck():
             self.checks = True
+        else:
+            self.arr = self.ReadJson()
+            self.checks = False
 
     def Load(self):
         try:
