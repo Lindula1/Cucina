@@ -109,14 +109,16 @@ class DataBase():
     def SaveLocally(self):
         dumped = json.dumps(self.arr, indent=4)
         self.EncryptJson(bytes(dumped.encode("utf-8")))
-        '''
         dumped = json.dumps(self.arr, indent=4)
-        with open("Accounts.json", "w") as file:
+        with open("Accounts.json", "wb") as file:
             file.write(dumped)
-        '''
+
     def SaveOnline(self):
-        dumped = json.dumps(self.arr, indent=4)
-        GitCommunication.UpdateGist(self.EncryptJson(bytes(dumped.encode("utf-8"))))
+        if self.checks:
+            self.SaveLocally()
+        else:
+            dumped = json.dumps(self.arr, indent=4)
+            GitCommunication.UpdateGist(self.EncryptJson(bytes(dumped.encode("utf-8"))))
 
     def ReadJson(self):
         return self.DecryptJson()

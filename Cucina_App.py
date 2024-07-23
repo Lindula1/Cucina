@@ -53,7 +53,7 @@ class App(CTK.CTk):
         self.attributes("-fullscreen", "True") 
         self.item = [0,0,0,0,0]
         self.loaded = False
-        self.itemNames = [" KJ", "g", " Left", " Days to use", "Name: "]
+        self.itemNames = [" Cal", "g", " Left", " Days to use", "Name: "]
         self.key = 0
         self.frA = CTK.CTkFrame(self, fg_color= "transparent")
         self.frB = CTK.CTkFrame(self, fg_color= "transparent")
@@ -114,15 +114,14 @@ class App(CTK.CTk):
         # Frames
         self.frA.pack(fill="both", side="top")
         self.afr0 = CTK.CTkFrame(self.frA, fg_color= "transparent")
-        self.afr0.pack(fill="both", side="top", pady=400)
+        self.afr0.pack(fill="x", side="top", pady=300)
         self.lblA1 = CTK.CTkLabel(self.afr0, text=titles[0], font=LblFont, justify="center", width=780)
         self.lblA1.pack(side="top")
         self.btnA0 = CTK.CTkButton(self.afr0, text=titles[1], font=LblFont, width=280, height=100, command=self.destroy, corner_radius=30)
         self.loaded = ""
-        self.after(200, self.Load)
+        self.after(120, self.Load)
                 
     def Load(self):
-        self.loaded = True
         global cucina
         from CUCINA import app as cucina
         global dataBase
@@ -130,7 +129,7 @@ class App(CTK.CTk):
         global pantry
         from IngredientDataStore import pantry
         from GitCommunication import ErrorCheck
-        progressBar = CTK.CTkProgressBar(self.afr0, orientation="horizontal", width=1680, height=45, determinate_speed=3)
+        progressBar = CTK.CTkProgressBar(self.afr0, orientation="horizontal", width=1680, height=45, determinate_speed=4)
         progressBar.pack(side="top")
         checks = [ErrorCheck, self.LoadImages, dataBase.checks, pantry.checks]
         results = ["Database", "Accounts", "Images", "Pantry"]
@@ -141,15 +140,16 @@ class App(CTK.CTk):
             else:
                 result = checks[i]
             if result:
-                self.after(0, lambda: self.lblA1.configure(text=errors[i], text_color="red"))
+                self.after(10, lambda: self.lblA1.configure(text=errors[i], text_color="red"))
                 self.btnA0.pack(side="top", pady=40)
-                progressBar.pack_forget()
                 self.loaded = False
                 break
             else:
                 self.lblA1.configure(text=f"Loaded {results[i]}")
-                self.after(10, lambda: progressBar.step())
-        if self.loaded: self.after(10, lambda: self.WindowHandler(1))
+                self.after(20, lambda: progressBar.step())
+                self.loaded = True
+        if self.loaded: 
+            self.after(10, lambda: self.WindowHandler(1))
 
     def UnmapFrames(self):
         frames = [self.sfrBA, self.frBB, self.frA, self.frB, self.frC]
@@ -283,6 +283,7 @@ class App(CTK.CTk):
         BtnFont1 = CTK.CTkFont(family="Helvetica", size=24, weight=Font.NORMAL)
         RdbFont = CTK.CTkFont(family="Helvetica", size=28, weight=Font.NORMAL)
         EtyFont = CTK.CTkFont(family="Helvetica", size=34, weight=Font.NORMAL) 
+        EtyFont1 = CTK.CTkFont(family="Helvetica", size=29, weight=Font.NORMAL) 
         # Text
         titles = ["YOUR PANTRY", "RECIPES", "HOME", "ADD AN ITEM", "ITEM COUNT", "ADD NEW", "CANCEL"]
         filters = ["SORT BY NAME", "SORT EXPIRY", "SORT BY NUTRITION", "SORT BY QUANTITY"]
@@ -305,7 +306,7 @@ class App(CTK.CTk):
         self.entries = []
         fields = ["NUTRITION", "ITEM WEIGHT", "ITEM COUNT", "EXPIRY DATE", "ITEM NAME"]
         dateLbl = ["0000", "00", "00"]
-        units = ["J", "g", "x"]
+        units = ["cal", "g", "x"]
         for i in range(5):
             afr = CTK.CTkFrame(self.frBB, fg_color="#eee9e1", width=680)
             afr.pack(side="top", anchor="n", padx=20, fill="x", pady=4)
@@ -325,7 +326,7 @@ class App(CTK.CTk):
                 ety.pack(side="right", pady=10, padx=12, anchor="e")
                 self.entries.append(ety)
             else:
-                unt = CTK.CTkLabel(afr, font=EtyFont, anchor="w", text=units[i], width=52, fg_color="#d9d9d9", height=46, corner_radius=6)
+                unt = CTK.CTkLabel(afr, font=EtyFont1, anchor="w", text=units[i], width=52, fg_color="#d9d9d9", height=46, corner_radius=6)
                 unt.pack(side="right", pady=10, anchor="w", padx=12)
                 ety = CTK.CTkEntry(afr, placeholder_text="000000", validate="all", validatecommand=(numVal, "%P"), font=EtyFont, width=536, justify="center")
                 ety.pack(side="right", pady=10, anchor="e")
