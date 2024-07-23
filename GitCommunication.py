@@ -11,6 +11,7 @@ gistKey = "f08ed4ef55b029514b988ef53c4506af"
 secretGistKey = "35ac08ae2142858815ceebff88b30462"
 
 def ErrorCheck():
+    return False
     try:
         gist = git.get_gist(secretGistKey)
         raw = requests.get(gist.url)
@@ -41,6 +42,7 @@ def UpdateGist(data):
     gist.edit("", {"Accounts.json": github.InputFileContent(data.decode("utf-8"))})
 
 def LoadGist():
+    return Force()
     gist = git.get_gist(secretGistKey)
     raw = requests.get(gist.url)
     data = json.loads(raw.text)

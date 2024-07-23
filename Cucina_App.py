@@ -4,12 +4,13 @@ Author: Lindula Pallawela Appuhamilage
 Contributors: -
 Date Created: 09/07/2024
 Last Edited: 22/07/2024 
-Version: 1.0.3.5 (Release)
+Version: 1.0.3.9 (Release)
 Description:
 **PLEASE USE DISPLAY SCALE OF 100% TO ENSURE THAT THE UI ALIGNS PROPERLY**
 pyinstaller --noconsole Cucina_App.py --onefile
 """
 
+gitComm = None
 cucina = None
 dataBase = None
 pantry = None
@@ -119,37 +120,43 @@ class App(CTK.CTk):
         self.lblA1.pack(side="top")
         self.btnA0 = CTK.CTkButton(self.afr0, text=titles[1], font=LblFont, width=280, height=100, command=self.destroy, corner_radius=30)
         self.loaded = ""
-        self.after(120, self.Load)
+        self.after(0, self.Load)
                 
     def Load(self):
-        global cucina
-        from CUCINA import app as cucina
-        global dataBase
-        from DataStoreModel import run as dataBase
-        global pantry
-        from IngredientDataStore import pantry
-        from GitCommunication import ErrorCheck
-        progressBar = CTK.CTkProgressBar(self.afr0, orientation="horizontal", width=1680, height=45, determinate_speed=4)
-        progressBar.pack(side="top")
-        checks = [ErrorCheck, self.LoadImages, dataBase.checks, pantry.checks]
+        self.progressBar = CTK.CTkProgressBar(self.afr0, orientation="horizontal", width=1680, height=45, determinate_speed=4)
+        self.progressBar.pack(side="top")
+        for i in range(4):
+            if i == 0:
+                global gitComm
+                import GitCommunication as gitComm
+                self.Progress(gitComm.ErrorCheck(), i)
+            elif i == 1:
+                global cucina
+                from CUCINA import app as cucina
+                self.Progress(self.LoadImages(), i)
+            elif i == 2:
+                global dataBase
+                from DataStoreModel import run as dataBase
+                self.Progress(dataBase.checks, i)
+            elif i == 3:
+                global pantry
+                from IngredientDataStore import pantry
+                self.Progress(pantry.checks, i)
+        if self.loaded:
+            self.after(10, lambda: self.WindowHandler(1))
+
+
+    def Progress(self, result, i):
         results = ["Database", "Accounts", "Images", "Pantry"]
         errors = ["FATAL ERROR. Gist server connection lost.\nTry again later", "ERROR. Images did not load\nThe software should be terminated", "FATAL ERROR. Database not loaded\nThe software should be terminated", "Making a new pantry"]
-        for i in range(4):
-            if i < 2:
-                result = checks[i]()
-            else:
-                result = checks[i]
-            if result:
-                self.after(10, lambda: self.lblA1.configure(text=errors[i], text_color="red"))
-                self.btnA0.pack(side="top", pady=40)
-                self.loaded = False
-                break
-            else:
-                self.lblA1.configure(text=f"Loaded {results[i]}")
-                self.after(20, lambda: progressBar.step())
-                self.loaded = True
-        if self.loaded: 
-            self.after(10, lambda: self.WindowHandler(1))
+        if result:
+            self.after(10, lambda: self.lblA1.configure(text=errors[i], text_color="red"))
+            self.btnA0.pack(side="top", pady=40)
+            self.loaded = False
+        else:
+            lambda: self.lblA1.configure(text=f"Loaded {results[i]}")
+            self.progressBar.step()
+            self.loaded = True
 
     def UnmapFrames(self):
         frames = [self.sfrBA, self.frBB, self.frA, self.frB, self.frC]
@@ -207,7 +214,7 @@ class App(CTK.CTk):
             return False
 
     def Filter(self):
-        filter = int(self.rdbBB1Var.get())
+        filter = int(self.rdbBB1Var.get()) + 1
         self.UnpackWidgets(self.sfrBA)
         arr = pantry.SortFunc(pantry.arr, filter)
         self.after(0, self.GridFormatList(self.sfrBA, arr, self.itemNames))
@@ -285,8 +292,8 @@ class App(CTK.CTk):
         EtyFont = CTK.CTkFont(family="Helvetica", size=34, weight=Font.NORMAL) 
         EtyFont1 = CTK.CTkFont(family="Helvetica", size=29, weight=Font.NORMAL) 
         # Text
-        titles = ["YOUR PANTRY", "RECIPES", "HOME", "ADD AN ITEM", "ITEM COUNT", "ADD NEW", "CANCEL"]
-        filters = ["SORT BY NAME", "SORT EXPIRY", "SORT BY NUTRITION", "SORT BY QUANTITY"]
+        titles = ["YOUR PANTRY", "RECIPES", "HOME", "ADD AN ITEM", "ITEM COUNT", "ADD NEW", "CANCEL", "SHOWING ASCENDING"]
+        filters = ["SORT BY NUTRITION", "SORT BY WEIGHT", "SORT BY COUNT", "SORT BY EXPIRY"]
         # Frame mapping
         self.frA.pack(fill="both", side="top")
         self.frB.pack(fill="both", expand=True, side="top", padx=80, pady=80)
@@ -337,10 +344,6 @@ class App(CTK.CTk):
         # Add/Update button
         self.btnBB2 = CTK.CTkButton(afr0, text=titles[5], font=BtnFont, width=280, command=self.Add, corner_radius=30, height=80)
         self.btnBB2.pack(pady=12, anchor="n", side="left")
-        # User Information
-        usrInfo = "This is the pantry view of the Cucina software\nTo use this feature effectively please read the prompts"
-        lblafr1 = CTK.CTkLabel(afr0, text=usrInfo, font=LblFont)
-        lblafr1.pack(side="left", fill="x", padx=12)
         # Clear button
         self.btnBB3 = CTK.CTkButton(afr0, text=titles[6], font=BtnFont, width=280, command=self.ClearItem, corner_radius=30, height=80)
         self.btnBB3.pack(pady=12, anchor="n", side="right")
@@ -348,24 +351,42 @@ class App(CTK.CTk):
         #self.lblBB1 = CTK.CTkLabel(self.frBB, text="", image=self.images[10])
         #self.lblBB1.pack(side="top", fill="x", padx=12)
         # Filters
-        self.rdbBB1Var = CTK.StringVar(value=4)
+        aFr4 = CTK.CTkFrame(self.frBB, fg_color="transparent")
+        aFr4.pack(side="top", anchor="n", fill="x", expand=True)
+        self.rdbBB1Var = CTK.StringVar(value=-1)
         cnt = 0
         for x in range(2):
-            horiz = ["right", "left"]
-            aFr2 = CTK.CTkFrame(self.frBB, fg_color="transparent", width=400)
-            aFr2.pack(side=horiz[x], pady=20, padx=80)
+            horiz = ["left", "left"]
+            aFr2 = CTK.CTkFrame(aFr4, fg_color="transparent", width=400)
+            aFr2.pack(side=horiz[x], pady=10, padx=100)
             for z in range(2):
-                snap = ["w", "e"]
+                snap = ["w", "w"]
                 aFr3 = CTK.CTkFrame(aFr2, fg_color="transparent", width=400)
                 aFr3.pack(side="top", anchor=snap[x])
                 #lblBB1 = CTK.CTkLabel(aFr3, text=filters[cnt], font=RdbFont, width=300, height=40)
                 #lblBB1.pack(padx=48, pady=12, side=horiz[x], anchor=snap[x])
-                self.rdbBB1 = CTK.CTkRadioButton(aFr3, text=filters[cnt], font=RdbFont, value=x+z, variable=self.rdbBB1Var, command=self.Filter)
+                self.rdbBB1 = CTK.CTkRadioButton(aFr3, text=filters[cnt], font=RdbFont, value=cnt, variable=self.rdbBB1Var, command=self.Filter)
                 self.rdbBB1.pack(pady=12, side=horiz[x], anchor=snap[x])
                 cnt += 1
         # Load Pantry
+        self.btnBB4 = CTK.CTkButton(master=self.frBB, text=titles[7], font=BtnFont, width=400, command=self.Descending, corner_radius=30, height=60)
+        self.btnBB4.pack(side="top", pady=10)
         self.after(0,self.GridFormatList(self.sfrBA, pantry.PantryList(), self.itemNames))
     
+    def Descending(self):
+        filter = int(self.rdbBB1Var.get()) + 1
+        self.UnpackWidgets(self.sfrBA)
+        arr = pantry.SortFunc(pantry.arr, filter)
+        self.btnBB4.configure(text="SHOWING DESCENDING", command=self.Ascending)
+        self.after(0, self.GridFormatList(self.sfrBA, arr[::-1], self.itemNames))
+    
+    def Ascending(self):
+        filter = int(self.rdbBB1Var.get()) + 1
+        self.UnpackWidgets(self.sfrBA)
+        arr = pantry.SortFunc(pantry.arr, filter)
+        self.btnBB4.configure(text="SHOWING ASCENDING", command=self.Descending)
+        self.after(0, self.GridFormatList(self.sfrBA, arr, self.itemNames))
+
     def Add(self):
         s = True
         self.btnBB2.configure(state="disabled")
@@ -407,7 +428,6 @@ class App(CTK.CTk):
         else:
             self.btnBB2.configure(text="FAILED")
             if self.item != [0,0,0,0,0]: 
-                print("men")
                 pantry.AddRaw(self.item)
         self.after(320, self.ClearItem)
 
@@ -428,6 +448,11 @@ class App(CTK.CTk):
     def ClearItem(self):
         self.UnpackWidgets(self.sfrBA)
         self.GridFormatList(self.sfrBA, pantry.PantryList(), self.itemNames)
+        self.rdbBB1Var.set(-1)
+        self.Ascending()
+        #arr = pantry.SortFunc(pantry.arr, 0)
+        #self.after(0, self.GridFormatList(self.sfrBA, arr, self.itemNames))
+        self.Ascending()
         for entry in range(len(self.entries)):
             if entry == 3:
                 for i in range(len(self.entries[entry])):
