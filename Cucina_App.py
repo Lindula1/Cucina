@@ -7,7 +7,7 @@ Last Edited: 22/07/2024
 Version: 1.0.3.5 (Release)
 Description:
 **PLEASE USE DISPLAY SCALE OF 100% TO ENSURE THAT THE UI ALIGNS PROPERLY**
-pyinstaller Cucina_App.py --onefile –noconsole 
+pyinstaller --noconsole Cucina_App.py --onefile
 """
 
 cucina = None
@@ -73,9 +73,12 @@ class App(CTK.CTk):
             with os.scandir("../Cucina/Images/") as files:
                 for item in files: items.append(item.name)
             for i in range(len(items)):
-                img = Image.open(f"../Cucina/Images/{i}.png")
+                try:
+                    img = Image.open(f"../Cucina/Images/{i}.png")
+                except FileNotFoundError:
+                    img = Image.open(f"C:\\Users\\budwi\\OneDrive\\Documents\\GitHub\\Cucina\\Images{i}.png")
                 w, h = img.size
-                self.images.append(CTK.CTkImage(Image.open(f"../Cucina/Images/{i}.png"), size=(w,h)))
+                self.images.append(CTK.CTkImage(img, size=(w,h)))
         except FileNotFoundError:
             return True
     
@@ -109,17 +112,19 @@ class App(CTK.CTk):
         LblFont = CTK.CTkFont(family="Arial Bold", size=54, weight=Font.BOLD)
         BtnFont = CTK.CTkFont(family="Times Bold", size=32, weight=Font.BOLD)
         EtyFont = CTK.CTkFont(family="Helvetica", size=39, weight=Font.NORMAL) 
-        titles = ["CONNECTING TO SERVER"]
+        titles = ["CONNECTING TO SERVER", "CLOSE"]
         # Frames
         self.frA.pack(fill="both", side="top")
         self.afr0 = CTK.CTkFrame(self.frA, fg_color= "transparent")
-        self.afr0.pack(fill="x", side="top", pady=200)
+        self.afr0.pack(fill="both", side="top", pady=400)
         self.lblA1 = CTK.CTkLabel(self.afr0, text=titles[0], font=LblFont, justify="center", width=780)
         self.lblA1.pack(side="top")
+        self.btnA0 = CTK.CTkButton(self.afr0, text=titles[1], font=LblFont, width=280, height=100, command=self.destroy, corner_radius=30)
         self.loaded = ""
         self.after(200, self.Load)
                 
     def Load(self):
+        self.loaded = True
         global cucina
         from CUCINA import app as cucina
         global dataBase
@@ -127,20 +132,26 @@ class App(CTK.CTk):
         global pantry
         from IngredientDataStore import pantry
         from GitCommunication import ErrorCheck
-        progressBar = CTK.CTkProgressBar(self.afr0, orientation="horizontal", width=1680, height=45, determinate_speed=4)
+        progressBar = CTK.CTkProgressBar(self.afr0, orientation="horizontal", width=1680, height=45, determinate_speed=3)
         progressBar.pack(side="top")
-        checks = [ErrorCheck, dataBase.Load, self.LoadImages, pantry.Load]
+        checks = [ErrorCheck, self.LoadImages, dataBase.checks, pantry.checks]
         results = ["Database", "Accounts", "Images", "Pantry"]
-        errors = ["FATAL ERROR. Git Connection Lost\nThe software should be terminated", "FATAL ERROR. Database not laoded\nThe software should be terminated", "ERROR. Images did not laod\nThe software should be terminated", "Making a new pantry"]
+        errors = ["FATAL ERROR. Gist server connection lost.\nThe software should be terminated", "FATAL ERROR. Database not loaded\nThe software should be terminated", "ERROR. Images did not load\nThe software should be terminated", "Making a new pantry"]
         for i in range(4):
-            result = checks[i]()
+            if i < 2:
+                result = checks[i]()
+            else:
+                result = checks[i]
             if result:
-                self.after(0, lambda: self.lblA1.configure(text=errors[i]))
+                self.after(0, lambda: self.lblA1.configure(text=errors[i], text_color="red"))
+                self.btnA0.pack(side="top", pady=40)
+                progressBar.pack_forget()
+                self.loaded = False
+                break
             else:
                 self.lblA1.configure(text=f"Loaded {results[i]}")
-                self.after(40, lambda: progressBar.step())
-        self.loaded = True
-        self.after(20, lambda: self.WindowHandler(1))
+                self.after(10, lambda: progressBar.step())
+        if self.loaded: self.after(0, lambda: self.WindowHandler(1))
 
     def UnmapFrames(self):
         frames = [self.sfrBA, self.frBB, self.frA, self.frB, self.frC]

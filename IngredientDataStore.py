@@ -10,7 +10,6 @@ and transferring any and all ingredient data.
 """
 import random
 import string
-import pwinput
 import CSVHandler as CS
 import datetime
 #item = ["letter sort value (left empty)", "nutritional value", "item weight", "item count", "expiry date" "ingredient name"]
@@ -19,8 +18,10 @@ class Pantry():
     def __init__(self):
         try:
             self.arr = CS.Reader()
+            self.checks = False
         except FileNotFoundError:
             self.arr = []
+            self.checks = True
     
     def Load(self):
         try:

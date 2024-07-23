@@ -6,3 +6,4 @@ Pillow==10.4.0
 pwinput==1.0.3
 pypdf==4.3.1
 pymupdf==1.24.6
+pygithub==1.4.0

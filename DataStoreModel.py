@@ -3,7 +3,7 @@
 Author: Lindula Pallawela Appuhamilage
 Contributors: -
 Date Created: 17/05/2024
-Last Edited: 06/07/2024
+Last Edited: 23/07/2024
 Description:
 
 """
@@ -16,10 +16,14 @@ from cryptography.fernet import Fernet
 class DataBase():
     def __init__(self):
         try:
-            self.arr = self.ReadJson()
-            self.checks = True
+            if GitCommunication.ErrorCheck():
+                self.checks = True
+            else:
+                self.arr = self.ReadJson()
+                self.checks = True
         except GitCommunication.github.GithubException:
             self.arr = []
+            self.checks = True
 
     def Load(self):
         try:

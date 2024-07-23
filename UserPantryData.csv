@@ -1,14 +1,7 @@
-Letter sort value,Nutritional value,Item Weight,Item Quantity,Expiry date,Ingredient name
-
-70,36000,1000,3,50113,Froot Loops
-
-75,123123,211,2,49544,Kesh
-
-77,999999,999999,999999,2962352,MAXIMUMCHARACTERLENGTH
-
-77,5,600,2,51390,mushroom
-
-83,1,80000,1,49557,Sonal
-
-83,12312,214,1000,-689676,Sonal's cake
-
+Letter sort value,Nutritional value,Item Weight,Item Quantity,Expiry date,Ingredient name
+70,36000,1000,3,50113,Froot Loops
+75,123123,211,2,49544,Kesh2
+77,999999,999999,999999,2962352,MAXIMUMCHARACTERLENGTH
+77,5,600,2,51390,mushroom
+83,1,80000,1,49557,Sonal
+83,12312,214,1000,-689676,Sonal's cake
