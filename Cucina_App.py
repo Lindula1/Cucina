@@ -7,7 +7,7 @@ Last Edited: 22/07/2024
 Version: 1.0.3.9 (Release)
 Description:
 **PLEASE USE DISPLAY SCALE OF 100% TO ENSURE THAT THE UI ALIGNS PROPERLY**
-pyinstaller --noconsole Cucina_App.py --onefile
+pyinstaller --noconfirm --onedir --console Cucina_App.py
 """
 
 gitComm = None
@@ -25,7 +25,6 @@ try:
     import datetime
     from CTkPDFViewer import *
     import ctypes
-    
     import PDFHandler as PDF
 
 except ModuleNotFoundError as missing:
@@ -38,14 +37,6 @@ alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 sys.path.insert(0, "../Cucina/Images")
 sys.path.insert(0, "../Cucina/PDFs")
-
-CTK.set_appearance_mode("light")
-CTK.set_default_color_theme("bisque-theme.json")
-CTK.deactivate_automatic_dpi_awareness()
-scaleFactor = ctypes.windll.shcore.GetScaleFactorForDevice(0) / 100
-if scaleFactor != 1.0:
-    CTK.set_widget_scaling(scaleFactor*0.65)
-    CTK.set_window_scaling(scaleFactor*0.65)
 
 #aWidth, aHeight = "1920", "1080"
 class App(CTK.CTk):
@@ -822,7 +813,15 @@ class App(CTK.CTk):
                 self.after(800, lambda: self.btnB1.configure(True, text="          LOG IN          ", state="normal", text_color="#fbf4ed"))
             
 if __name__ == "__main__":
+    CTK.set_appearance_mode("light")
+    CTK.set_default_color_theme("bisque-theme.json")
+    scaleFactor = ctypes.windll.shcore.GetScaleFactorForDevice(0) / 100
     app = App()
+    w = app.winfo_screenwidth()
+    factor = w/1920 * scaleFactor
+    CTK.deactivate_automatic_dpi_awareness()
+    CTK.set_widget_scaling(factor)
+    CTK.set_window_scaling(factor)
     app.after(0, lambda: app.state("zoomed"))
     app.WindowHandler(-1)
     app.mainloop() 
