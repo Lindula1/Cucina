@@ -244,7 +244,9 @@ class App(CTK.CTk):
         if T == "":
             return True
         # Type and range check
-        elif T[0].isdigit() or len(T) > 22:
+        elif len(T.strip()) > 0:
+            if T.strip()[0].isdigit(): return False
+        elif len(T) > 22:
             return False
         return True
     
@@ -414,8 +416,9 @@ class App(CTK.CTk):
                     break
                 item.append(self.entries[entry].get())
         self.btnBB2.configure(state="normal", command=None)
+        if pantry.arr < 1: s = False
         if s:
-            self.btnBB2.configure(text="SUCESS")
+            self.btnBB2.configure(text="SUCCESS")
             cucina.AddToPantry(item)
             self.item = [0,0,0,0,0]
         else:

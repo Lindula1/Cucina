@@ -191,10 +191,11 @@ class Pantry():
         return "Fatal Error"
         
     def SortFunc(self, array, sortIndex):
+        n = len(array)
+        if n < 1: return self.arr
         if abs(sortIndex) > (len(self.arr[0])-1):
             print("Sort index out of range, Item list not sorted")
             return self.arr
-        n = len(array)
         for i in range(n):
             sorted = True
             for j in range(n - i - 1):
