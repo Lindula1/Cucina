@@ -33,9 +33,6 @@ except ModuleNotFoundError as missing:
     print(f"You're missing: {missing.name}\nTry running: pip install -r requirements.txt")
     exit()
 
-scaleFactor = ctypes.windll.shcore.GetScaleFactorForDevice(0) / 100
-if scaleFactor != 1.0:
-    print("\033[31mFATAL ERROR. User resolution scale is not 100%\nThe software should be terminate\033[0m")
 # A unique validation check to prevent entry of Chinese characters
 alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
@@ -44,6 +41,11 @@ sys.path.insert(0, "../Cucina/PDFs")
 
 CTK.set_appearance_mode("light")
 CTK.set_default_color_theme("bisque-theme.json")
+CTK.deactivate_automatic_dpi_awareness()
+scaleFactor = ctypes.windll.shcore.GetScaleFactorForDevice(0) / 100
+if scaleFactor != 1.0:
+    CTK.set_widget_scaling(scaleFactor*0.65)
+    CTK.set_window_scaling(scaleFactor*0.65)
 
 #aWidth, aHeight = "1920", "1080"
 class App(CTK.CTk):
@@ -120,7 +122,7 @@ class App(CTK.CTk):
         self.lblA1.pack(side="top")
         self.btnA0 = CTK.CTkButton(self.afr0, text=titles[1], font=LblFont, width=280, height=100, command=self.destroy, corner_radius=30)
         self.loaded = ""
-        self.after(0, self.Load)
+        self.after(60, self.Load)
                 
     def Load(self):
         self.progressBar = CTK.CTkProgressBar(self.afr0, orientation="horizontal", width=1680, height=45, determinate_speed=4)
