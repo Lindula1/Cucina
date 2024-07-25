@@ -7,12 +7,12 @@ Last Edited: 06/07/2024
 Description:
 This python file holds all functions for transforming
 and transferring any and all ingredient data.
+
+Item variable data structure:
+item = ["letter sort value (left empty)", "nutritional value", "item weight", "item count", "expiry date" "ingredient name"]
 """
-import random
-import string
 import CSVHandler as CS
 import datetime
-#item = ["letter sort value (left empty)", "nutritional value", "item weight", "item count", "expiry date" "ingredient name"]
 
 class Pantry():
     def __init__(self):
@@ -66,7 +66,22 @@ class Pantry():
         daysLeft = datetime.date(int(explist[0]), int(explist[1]), int(explist[2])) - d2
         return expDate, daysLeft.days
 
+    """
+    INPUTS: None
 
+    PROCESS:
+        Attempts to read the pantry data using `CS.Reader()`.
+        - If a `FileNotFoundError` occurs:
+            - Prints an error message indicating no items are in the pantry and an empty list will be created.
+            - Initializes `raw` as an empty list.
+        - If no error occurs:
+            - Processes the data read from `CS.Reader()`.
+            - Creates a list `ilist` containing the 6th element (index 5) from each item in `raw`.
+        - Returns the `raw` list of pantry items.
+
+    OUTPUTS:
+        raw (list) - A list of pantry items. Each item in the list is assumed to be a structure from which the 6th element (index 5) is extracted for `ilist` but not used further.
+    """
     def PantryList(self):
         try:
             raw = CS.Reader()
@@ -77,23 +92,88 @@ class Pantry():
         for item in raw: ilist.append(item[5])
         return raw
 
+    """
+    INPUTS:
+        item (list) - A list containing item data where each element corresponds to different attributes of the item to be added.
+
+    PROCESS:
+        Iterates through each element in the `item` list except the last one:
+            - Checks if the current element is `0`.
+            - If an element is `0`, returns an error message indicating which field is empty.
+        Appends the formatted and sorted item to `self.arr`.
+        Calls `self.SaveToDevice()` to save the updated list.
+        Returns a success message indicating the item was added successfully.
+
+    OUTPUTS:
+        str - A message indicating the result of the operation:
+            - "Field {i} is empty. HOW?" if any field in the item is empty.
+            - "Item Added Successfully" if the item was added to the list successfully.
+    """
     def AddItem(self, item):
         for i in range(len(item) - 1):
             if item[i] == 0:
                 return "Field {i} is empty. HOW?"
-        self.arr.append(self.FormatDate(self.LetterSort(item)))
-        self.SaveToDevice()
-        return "Item Added Successfully"
+        if self.Search(item[-1])[-1] == item[-1]:
+            return "Item already exists"
+        else:
+            self.arr.append(self.FormatDate(self.LetterSort(item)))
+            self.SaveToDevice()
+            return "Item Added Successfully"
 
+    """
+    INPUTS:
+        item (any) - An item to be added directly to `self.arr`. The structure or type of `item` should be compatible with `self.arr`.
+
+    PROCESS:
+        Appends the provided `item` to the `self.arr` list.
+        Calls `self.SaveToDevice()` to persist the updated list.
+
+    OUTPUTS: None
+    """
     def AddRaw(self, item):
         self.arr.append(item)
         self.SaveToDevice()
         
+    """
+    INPUTS:
+        item (list) - A list where the 5th element (index 4) is expected to be a string from which the first character is used for sorting.
 
+    PROCESS:
+        Inserts the ASCII value of the uppercase version of the first character of the 5th element (index 4) into the beginning of the `item` list.
+        Returns the modified `item` list.
+
+    OUTPUTS:
+        list - The modified `item` list with the ASCII value prepended to the original elements.
+    """
     def LetterSort(self, item):
         item.insert(0, ord(item[4][0].upper()))
         return item
     
+    """
+    INPUTS:
+        query (str) - A string used for searching the `self.arr` list. It is expected that the first character of the query will be used for comparison.
+
+    PROCESS:
+        - Checks if the length of `query` is greater than 0. If not, prints an error message and returns `None` values.
+        - Converts the first character of `query` to its uppercase ASCII value.
+        - Sorts `self.arr` using `self.SortFunc()` with the sort key as `0`.
+        - If `self.arr` is empty after sorting, prints a message and returns `None` values.
+        - Performs a binary search to locate the range of items in `self.arr` that match the ASCII value of `query`:
+            - Initializes `low`, `high`, `ingredients`, and `posRange`.
+            - Iteratively narrows the search range until the desired items are found.
+            - Collects all items with the matching ASCII value and determines their positions and range in `self.arr`.
+        - Returns a tuple containing:
+            - `ingredients` (list) - A list of items that match the search query.
+            - `pos` (int) - The position of the first matching item.
+            - `posRange` (list) - A list containing the number of matches before and after the initial match.
+
+    OUTPUTS:
+        tuple - A tuple of:
+            - ingredients (list) - Items matching the query.
+            - pos (int) - Position of the first match.
+            - posRange (list) - List indicating the range of matches around the initial match.
+            - If no items match or if the query length is too short, returns `None` values.
+    """
     def BulkSearch(self, query):
         if len(query) > 0:
             self.arr = self.SortFunc(self.arr, 0)
@@ -138,15 +218,32 @@ class Pantry():
             print("Query length too short")
             return None, None, None
     
+    """
+    INPUTS:
+        query (str) - The string used to search for an item in `self.arr`.
+
+    PROCESS:
+        - Calls `self.BulkSearch(query)` to perform a bulk search based on the query.
+        - Checks the result of the `BulkSearch` function:
+            - If `result` is `None`, returns "No item found".
+            - If `result` contains items:
+                - Iterates through the `result` list to find an item that matches the query.
+                - Compares the `4th` element (index `4`) of each item with the `query`.
+                - If more than one item matches the query, returns "Too many items match query".
+                - If exactly one item matches, returns that item.
+
+    OUTPUTS:
+        - "No item found" (str) - If no items match the query or if `BulkSearch` returns `None`.
+        - "Too many items match query" (str) - If more than one item matches the query.
+        - item (list) - If exactly one item matches the query.
+    """
     def Search(self, query):
         result, pos, ran = self.BulkSearch(query)
         if result == None:
             return "No item found"
         else:
             for i in range(len(result)):
-                if result[i][4].lower() == query.lower():
-                    if result[i + 1][4].lower() == query.lower():
-                        return "Too many items match query"
+                if result[i][-1].lower() == query.lower():
                     return result[i]
     
     def Remove(self, query):
@@ -189,7 +286,36 @@ class Pantry():
                         self.SaveToDevice()
                         return "Item Deleted"
         return "Fatal Error"
-        
+    """
+    INPUTS:
+        query (str) - The string used to identify the item to be removed from `self.arr`.
+
+    PROCESS:
+        - Converts `query` to lowercase for case-insensitive comparison.
+        - If `self.arr` contains only one item:
+            - Prints a message indicating it is the last item.
+            - Removes the item from `self.arr` and saves the updated list.
+            - Returns "Item Deleted".
+        - If `self.arr` contains more than one item:
+            - Calls `self.BulkSearch(query.lower())` to find matching items.
+            - If no items are found, returns "Item Not Found".
+            - Counts the number of items that match the `query`.
+                - If multiple items are found:
+                    - Identifies the index of the item to remove based on its position in the list.
+                    - Removes the first matching item and saves the updated list.
+                    - Returns "First instance of item deleted."
+                - If a single item is found:
+                    - Identifies the index of the item to remove based on its position in the list.
+                    - Removes the item and saves the updated list.
+                    - Returns "Item Deleted".
+        - Returns "Fatal Error" if an unexpected issue occurs.
+
+    OUTPUTS:
+        - "Item Deleted" (str) - If the item is successfully removed from `self.arr`.
+        - "First instance of item deleted." (str) - If multiple items match the query and the first instance is deleted.
+        - "Item Not Found" (str) - If no items match the query.
+        - "Fatal Error" (str) - If an unexpected error occurs.
+    """
     def SortFunc(self, array, sortIndex):
         n = len(array)
         if n < 1: return self.arr
@@ -204,13 +330,34 @@ class Pantry():
                     sorted = False
             if sorted == True:
                 return array
-        return []
+        return self.arr
 
+    """
+    INPUTS: None
+
+    PROCESS:
+        - Calls `CS.Write()` to save the sorted list of items to the device.
+            - The list is sorted using `self.SortFunc(self.arr, 0)`, which sorts `self.arr` based on the specified criteria.
+        - Returns a message indicating the success of the write operation.
+
+    OUTPUTS:
+        - "Write Completed Successfully" (str) - Confirmation that the list has been saved successfully.
+    """
     def SaveToDevice(self):
         #Must be called when the list of items is updated
         CS.Write(self.SortFunc(self.arr, 0))
         return "Write Completed Successfully"
     
+    """
+    INPUTS: None
+
+    PROCESS:
+        - Clears the list `self.arr` by setting it to an empty list.
+        - Calls `self.SaveToDevice()` to update the device with the now-empty list.
+
+    OUTPUTS:
+        - None
+    """
     def Clear(self):
         self.arr = []
         self.SaveToDevice()

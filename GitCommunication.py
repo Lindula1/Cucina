@@ -1,3 +1,12 @@
+"""
+===CUCINA ONLINE DATABASE MODULE===
+Author: Lindula Pallawela Appuhamilage
+Contributors: -
+Date Created: 18/05/2024
+Last Edited: 06/07/2024
+Description:
+A failed module that was meant to simulate a pseudo database.
+"""
 from github import Github
 import github.InputFileContent
 import requests
@@ -35,7 +44,7 @@ def Force():
             encrypted = file.read()
         return encrypted
     except FileNotFoundError:
-        return False
+        return []
 
 def UpdateGist(data):
     gist = git.get_gist(secretGistKey)

@@ -71,7 +71,8 @@ a hash value based on the modulo operation with a predefined key,
 extracts a substring from a predefined pi string, converts it to an
 integer, performs digit conversion, and generates a hashed value by
 transforming the digits.
-OUTPUTS: hashed (string) - The encrypted entry"""
+OUTPUTS: hashed (string) - The encrypted entry
+"""
 def HashinFunc2(entry):
     d = ""
     for i in entry:

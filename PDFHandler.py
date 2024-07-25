@@ -10,6 +10,7 @@ A python file holding all functions for handling any and all PDF data.
 import sys
 import os
 from pypdf import PdfReader
+import fitz
 import json
 sys.path.insert(0, "../Cucina/PDFs")
 
@@ -23,35 +24,69 @@ sys.path.insert(0, "../Cucina/PDFs")
 \S (Uppercase S) Look for any character not whitespace.
 """
 
-"""
-INPUTS: pdf - The name of the PDF file to be read.
-
-PROCESS:
-The function attempts to read the PDF file from a specific directory relative to the current working directory.
-The function then extracts text from each page of the PDF, identifies lines containing ingredient information and step information,
-and adds them to separate lists (ingredients and steps) while ignoring lines related to utensils or options.
-The function also collects all text from the PDF pages into a separate list (text).
-
-OUTPUT: 
-ingredients - A list of ingredient lines extracted from the PDF, 
-steps - A list of step lines extracted from the PDF,
-text - A list containing all text lines from the PDF.
-"""
-
 import pdfplumber
 import re
 
-def Read1(pdf):
-    extraText = []
-    ingredients = []
-    steps = []
-    with pdfplumber.open(f"../Cucina/PDFs/{pdf}.pdf") as read:
-        for page in read.pages:
-            text = page.extract_text()
-            extraText.append(text)
-            potentialIngredients = re.findall(r'\d+(?:\s+\d+/\d+)?\s+(?:cup|tablespoon|teaspoon|ounce|pound|g|ml|L|lb|oz|tbsp|tsp)s?\s+.+', text, re.IGNORECASE)
-    ingredients.extend(potentialIngredients)
-    return ingredients, steps, extraText
+def extract_ingredients_from_pdf(pdf_path):
+    """
+    Extracts ingredients from a recipe PDF using text extraction and regex.
+
+    INPUTS:
+        pdf_path (str): The file path to the PDF.
+
+    OUTPUTS:
+        ingredients (list of str): List of extracted ingredients.
+    """
+
+    def extract_text_from_pdf(pdf_path):
+        """Extract text from each page of the PDF."""
+        text = ""
+        with fitz.open(f"../Cucina/PDFs/{pdf_path}.pdf") as doc:
+            for page_num in range(len(doc)):
+                page = doc.load_page(page_num)
+                text += page.get_text()
+        return text
+
+    def clean_text(text):
+        """Clean up text by removing special characters and unwanted formatting."""
+        # Replace non-breaking spaces with regular spaces
+        text = text.replace('\xa0', ' ')
+        # Replace newlines and multiple spaces with a single space
+        text = re.sub(r'\s+', ' ', text)
+        return text
+
+    def find_ingredients(text):
+        """Identify ingredients using regex patterns."""
+        # Regex pattern for common ingredient formats
+        ingredient_pattern = r'\b(\d+(?:[\.,]\d+)?\s*(?:cup|cups|tablespoon|tablespoons|teaspoon|teaspoons|gram|grams|kg|kilogram|ml|milliliter|liter|ounces|ounce|pound|pounds|lb|lbs|oz|g|kg|l|tbsp|tsp)?\s*[a-zA-Z\s]+)\b'
+
+        # Find all matches
+        matches = re.findall(ingredient_pattern, text, re.IGNORECASE)
+
+        # Filter out known date, time, and timing patterns
+        date_time_pattern = r'\b(\d{1,4}[/-]\d{1,2}[/-]\d{1,4}|\d{1,2}:\d{2}(?:\s?[AP]M)?|20[0-9]{2})\b'
+        timing_pattern = r'\b\d+\s*(?:minute|minutes|hour|hours|second|seconds)\b'
+
+        filtered_matches = [
+            match for match in matches
+            if not re.search(date_time_pattern, match) and not re.search(timing_pattern, match)
+        ]
+
+        # Clean and deduplicate ingredients
+        ingredients = list(set(filtered_matches))
+        ingredients = [ingredient.strip() for ingredient in ingredients if ingredient.strip()]
+
+        return ingredients
+
+    # Extract text from the PDF
+    text = extract_text_from_pdf(pdf_path)
+    
+    # Clean text
+    clean_text_content = clean_text(text)
+    
+    # Find and return ingredients
+    ingredients = find_ingredients(clean_text_content)
+    return ingredients
 
 def Read2(pdf_path):
     ingredients = []
@@ -73,9 +108,7 @@ def Read2(pdf_path):
                 break
         
         if not ingredient_section_found:
-            print("balls")
             # If no header found, try to identify ingredient patterns
-            print(full_text)
             regex = r'\n[\d½¼¾⅓⅔⅛⅜⅝⅞]+\s*(?:cup|g|kg|ml|l|tsp|tbsp|oz|pound|lb)s?\s+\w+'
             out = re.findall(r'\•.*|\uf0b7.*', full_text)
             potential_ingredients = re.findall(r'(\d+g.*)|(\d+\s{1}\S+)', full_text)
@@ -119,6 +152,20 @@ def Read2(pdf_path):
     
     return ingredients, potential_ingredients
 
+"""
+INPUTS: pdf - The name of the PDF file to be read.
+
+PROCESS:
+The function attempts to read the PDF file from a specific directory relative to the current working directory.
+The function then extracts text from each page of the PDF, identifies lines containing ingredient information and step information,
+and adds them to separate lists (ingredients and steps) while ignoring lines related to utensils or options.
+The function also collects all text from the PDF pages into a separate list (text).
+
+OUTPUT: 
+ingredients - A list of ingredient lines extracted from the PDF, 
+steps - A list of step lines extracted from the PDF,
+text - A list containing all text lines from the PDF.
+"""
 def Read(pdf):
     try:
         reader = PdfReader(f"../Cucina/PDFs/{pdf}.pdf")
@@ -271,10 +318,11 @@ def Quantity(entry):
 
 if __name__ == "__main__":
     recipes = ReadPDFData()
+    print(extract_ingredients_from_pdf(recipes[1]))
     #ingredients, steps, text = Read("Lasagne")
-    ingredients, text = Read2(recipes[1])
-    print(ingredients)
-    print(text)
+    #ingredients, text = Read2(recipes[2])
+    #print(ingredients)
+    #print(text)
 
 '''
     print("***********STEPS***********")

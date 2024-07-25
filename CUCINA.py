@@ -9,21 +9,44 @@ Description:
 This python file contains all functions of the Cucina App.
 """
 
-import random
-import string
 from DataStoreModel import DataBase
-import PDFHandler as PDF
 import IngredientDataStore as Pantry
-import datetime
-from Hashing import HashingFunc
 ds = DataBase()
 al = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 class CUCINA():
     def __init__(self):
-        self.disableLogin = False
+        try:
+            global HashingFunc
+            from Hashing import HashingFunc
+            global PDF
+            import PDFHandler as PDF
+            self.disableLogin = False
+        except ModuleNotFoundError:
+            self.disableLogin = True
         self.admin = False
 
+    """
+    INPUTS:
+        usrm (str): The username for the new account. Must be a non-empty string with specific format constraints.
+        pwrd (str): The password for the new account. Must meet length and character type constraints.
+        name (str): The name associated with the new account. 
+
+    PROCESS:
+        - Validates the username for length and character constraints.
+        - Checks if the password meets length and character constraints.
+        - Verifies that the username does not already exist.
+        - If valid, creates a new account with a hashed password and adds it to the account storage.
+
+    OUTPUTS:
+        - (str) - Returns a message indicating the result of the registration attempt.
+            - "Username is too short": If the username is shorter than 3 non-space characters.
+            - "Username type error": If the username does not start with a valid character.
+            - "Password is too short": If the password is shorter than 3 non-space characters.
+            - "Password Type error": If the password only contains letters (and thus lacks required complexity).
+            - "Username already exists": If the username is already taken.
+            - "Success": If the registration is successful.
+    """
     def RegisterAccount(self, usrm, pwrd, name):
         usLength = 0
         for u in usrm:
@@ -52,6 +75,25 @@ class CUCINA():
         else:
             return "Username already exists"
 
+    """
+    INPUTS:
+        usrm (str): The username provided for logging in. Must be a valid string.
+        pwrd (str): The password provided for logging in. Must be a valid string.
+
+    PROCESS:
+        - Checks if the login feature is disabled (`self.disableLogin`).
+        - Searches for an account with the provided username using `self.Search`.
+        - Verifies the provided password against the stored hashed password using `HashingFunc`.
+        - Determines the login type based on the account details.
+
+    OUTPUTS:
+        - (str) - Returns a message indicating the result of the login attempt:
+            - "Login feature is disabled": If login functionality is currently disabled.
+            - "Username doesn't exist": If the username is not found in the system.
+            - "Password is Incorrect": If the password provided does not match the stored password.
+            - "Logged in as Admin": If the account is identified as an admin based on specific conditions.
+            - "Login successful": If the login is successful and the user is not an admin.
+    """
     def LogIn(self, usrm, pwrd):
         if self.disableLogin:
             return "Login feature is disabled"
@@ -66,6 +108,23 @@ class CUCINA():
         else:
             return "Password is Incorrect"
 
+    """
+    INPUTS:
+        query (str): The username of the account to be removed. Must be a valid string.
+
+    PROCESS:
+        - Checks if the database contains only one item and removes it if true.
+        - Performs a bulk search for the account using `ds.BulkSearch`.
+        - Iterates through the search results to find the matching username.
+        - Determines the index to delete based on the search results and removes the account from the database.
+        - Saves the updated database to an online repository.
+
+    OUTPUTS:
+        - (str) - Returns a message indicating the result of the removal attempt:
+            - "The last item in the database has been removed.": If the only item in the database is removed.
+            - "Item Deleted": If the specified account is successfully found and removed from the database.
+            - "Item Not Found": If the specified account is not found in the database.
+    """
     def RemoveAccount(self, query):
         if len(ds.arr) == 1:
             ds.arr.pop(0)
@@ -86,6 +145,19 @@ class CUCINA():
                     return "Item Deleted"
         return "Item Not Found"
     
+    """
+    INPUTS:
+        query (str): The username to search for. Must be a valid string.
+
+    PROCESS:
+        - Calls `ds.BulkSearch` with the query to retrieve a list of accounts matching the query.
+        - If no accounts are found, returns `None`.
+        - Iterates through the list of found accounts to match the username with the query.
+        - Returns the account information if a match is found.
+
+    OUTPUTS:
+        - (dict or None) - Returns the account information if a match is found, otherwise `None`.
+    """
     def Search(self, query):
         accountList, pos, ran = ds.BulkSearch(query.lower())
         if accountList == None: return None
@@ -93,10 +165,36 @@ class CUCINA():
             for i in accountList:
                 if i[1]["username"].lower() == query.lower():
                     return i
-                
+
+    """
+    INPUTS:
+        item (dict): The item to be added to the pantry. Should include necessary details like name, quantity, etc.
+
+    PROCESS:
+        - Calls `AddItem` method from `Pantry.pantry` to add the provided item to the pantry.
+
+    OUTPUTS:
+        - None
+    """          
     def AddToPantry(self, item):
         Pantry.pantry.AddItem(item)
     
+    """
+    INPUTS:
+        recipe (str): The name of the recipe (e.g., a PDF filename) to be searched for ingredients.
+
+    PROCESS:
+        - Reads the recipe file to extract ingredients and other details using `PDF.Read`.
+        - Retrieves the list of items from the pantry using `Pantry.pantry.PantryList`.
+        - Compares the ingredients from the recipe with the pantry items to find matches and opposites:
+            - Matches are ingredients found in both the recipe and the pantry.
+            - Opposites are ingredients in the recipe that are not found in the pantry.
+
+    OUTPUTS:
+        - (list, list): A tuple containing:
+            - `opposite` (list): Ingredients from the recipe not found in the pantry.
+            - `matches` (list): Ingredients from the recipe that match with items in the pantry.
+    """
     def DishSearch(self, recipe):
         ingredients, text, steps = PDF.Read(recipe)
         pantryItems = Pantry.pantry.PantryList()
@@ -113,6 +211,24 @@ class CUCINA():
                 opposite.append(ing)
         return opposite, matches
     
+    """
+    INPUTS:
+        dishName (str): The name of the dish to search for in the recipe list.
+
+    PROCESS:
+        - Retrieves a list of all recipes using `PDF.ReadPDFData()`.
+        - Searches for recipes whose names contain the `dishName` (case-insensitive).
+        - For each matching recipe, performs a `DishSearch` to find ingredients and their availability in the pantry.
+        - Collects and organizes the results:
+            - `names` contains lists of ingredients not found in the pantry for each recipe.
+            - `matches` contains lists of ingredients found in the pantry for each recipe.
+
+    OUTPUTS:
+        - (tuple): A tuple containing:
+            - `names` (list of lists): Lists of ingredients not found in the pantry for each matching recipe.
+            - `matches` (list of lists): Lists of ingredients found in the pantry for each matching recipe.
+        - If no recipes are found, returns a tuple with the `dishName` and a message indicating no recipes were found.
+    """
     def RecipeCompare(self, dishName):
         recipes = []
         recipeList = PDF.ReadPDFData()
