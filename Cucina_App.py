@@ -1214,13 +1214,13 @@ class App(CTK.CTk):
 if __name__ == "__main__":
     CTK.set_appearance_mode("light")
     CTK.set_default_color_theme("bisque-theme.json")
-    CTK.deactivate_automatic_dpi_awareness()
     scaleFactor = ctypes.windll.shcore.GetScaleFactorForDevice(0) / 100
     app = App()
     w = app.winfo_screenwidth()
     factor = w/1920 * scaleFactor
+    CTK.deactivate_automatic_dpi_awareness()
     CTK.set_widget_scaling(factor)
     CTK.set_window_scaling(factor)
     app.after(0, lambda: app.state("zoomed"))
     app.WindowHandler(-1)
-    app.mainloop()
+    app.mainloop() 
