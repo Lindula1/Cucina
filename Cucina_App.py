@@ -4,7 +4,7 @@ Author: Lindula Pallawela Appuhamilage
 Contributors: -
 Date Created: 09/07/2024
 Last Edited: 25/07/2024 
-Version: 1.0.6.0 (Alpha Release)
+Version: 1.0.6.2 (Alpha Release)
 Description:
 PLEASE READ THIS BEFORE ATTEMPTING TO UNDERSTAND MY CODE
 My ctk widget naming format:
@@ -22,7 +22,7 @@ My ctk widget naming format:
 This method is used because within the object these variables are universal and can be
 called and re-assigned anywhere. 
 
-pyinstaller --noconfirm --onedir --console Cucina_App.py
+pyinstaller --noconfirm --onedir --noconsole Cucina_App.py
 """
 
 # Module import check of all imported scripts
@@ -54,7 +54,7 @@ class App(CTK.CTk):
         super().__init__(*args, **kwargs)
         self.title("CUCINA")
         self.attributes("-fullscreen", "True") 
-        self.item = [0,0,0,0,0]
+        self.item = ["0","0","0","0","0"]
         self.loaded = False
         self.itemNames = [" Cal", "g", " Left", " Days to use", "Name: "]
         self.key = 0
@@ -617,15 +617,15 @@ class App(CTK.CTk):
                     break
                 item.append(self.entries[entry].get())
         self.btnBB2.configure(state="normal", command=None)
-        if len(pantry.arr) < 1: s = False
-        elif pantry.Search(item[-1])[-1] == item[-1]: s = False
+        if s != False and item != ["0","0","0","0","0"] or item != []:
+            if pantry.Search(item[-1])[-1] == item[-1]: s = False
         if s:
             self.btnBB2.configure(text="SUCCESS")
             cucina.AddToPantry(item)
-            self.item = [0,0,0,0,0]
+            self.item = ["0","0","0","0","0"]
         else:
             self.btnBB2.configure(text="FAILED")
-            if self.item != [0,0,0,0,0]: 
+            if self.item != ["0","0","0","0","0"]: 
                 pantry.AddRaw(self.item)
         self.after(320, self.ClearItem)
 
@@ -633,11 +633,11 @@ class App(CTK.CTk):
         if self.entries[2].get() != "":
             if int(self.entries[2].get()) == 0:
                 self.btnBB2.configure(state="disabled")
-                pantry.Remove(self.item[5])
-                self.btnBB2.configure(state="normal", command=None)
-                self.after(320, self.ClearItem)
+                pantry.Remove(self.item[-1])
+                self.after(210, lambda: self.btnBB2.configure(state="normal", command=None))
+                self.after(210, self.ClearItem)
             else:
-                pantry.Remove(self.item[5])
+                pantry.Remove(self.item[-1])
                 self.Add()                
         else:
             self.btnBB2.configure(text="FAILED")
