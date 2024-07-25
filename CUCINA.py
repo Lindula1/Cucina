@@ -11,6 +11,8 @@ This python file contains all functions of the Cucina App.
 
 from DataStoreModel import DataBase
 import IngredientDataStore as Pantry
+import random
+import string
 ds = DataBase()
 al = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
@@ -249,16 +251,17 @@ class CUCINA():
 
 app = CUCINA()
 
-#Debugging Code
-'''
-ds.arr = []
-ds.SaveLocally
-accounts = [{"uid":None, "username":"Lindt", "password":HashingFunc("2039")}]
-for j in range(74):
-    accounts.append({"uid":None, "username":''.join(random.choices(string.ascii_letters, k=6)), "password":HashingFunc(str(random.choices(string.ascii_letters, k=5))), "name":''.join(random.choices(string.ascii_letters, k=13))})
-for i in accounts:
-    ds.AddTo(i)
-'''
+
 
 if __name__ == "__main__":
+    #Debugging Code
+    '''
+    ds.arr = []
+    ds.SaveLocally
+    accounts = [{"uid":None, "username":"Lindt", "password":HashingFunc("2039")}]
+    for j in range(19):
+        accounts.append({"uid":None, "username":''.join(random.choices(string.ascii_letters, k=6)), "password":HashingFunc(str(random.choices(string.ascii_letters, k=5))), "name":''.join(random.choices(string.ascii_letters, k=13))})
+    for i in accounts:
+        ds.AddTo(i)
+    '''
     pass
