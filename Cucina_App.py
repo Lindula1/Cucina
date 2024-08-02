@@ -58,6 +58,8 @@ class App(CTK.CTk):
         self.loaded = False
         self.itemNames = [" Cal", "g", " Left", " Days to use", "Name: "]
         self.key = 0
+        self.saveLogin = ""
+        self.enbSaveLogin = False
         # Creating main frames. These frames are used all throughout the code and are constant
         self.frA = CTK.CTkFrame(self, fg_color= "transparent")
         self.frB = CTK.CTkFrame(self, fg_color= "transparent")
@@ -109,7 +111,11 @@ class App(CTK.CTk):
         self.unbind_all(self.Click)
         self.UnmapFrames()
         if next == 0:
-            self.after(0, self.AdminPage())
+            print(self.account)
+            if len(self.account[1]) < 4:
+                self.after(0, self.AdminPage())
+            else:
+                self.after(0, self.AccountPage())
         elif next == 1:
             self.after(0, self.LoginWindow())
             self.bind('<Return>', self.Login)
@@ -124,6 +130,28 @@ class App(CTK.CTk):
             self.after(0, self.RecipePage())
         else:
             self.after(0, self.LoadingScreen())
+
+    def AccountPage(self):
+        # Fonts
+        TtlFont = CTK.CTkFont(family="Arial Black", size=80, weight=Font.BOLD)
+        LblFont = CTK.CTkFont(family="Arial Bold", size=54, weight=Font.BOLD)
+        EtyFont = CTK.CTkFont(family="Helvetica", size=39, weight=Font.NORMAL)
+        BtnFont = CTK.CTkFont(family="Times Bold", size=32, weight=Font.BOLD)
+        # Texts
+        titles = ["ACCOUNT SETTINGS", "BACK", "CONTINUE?"]
+        # Frames
+        self.frA.pack(fill="x", side="top")
+        self.frB.pack(fill="both", side="left", padx=20)
+        self.frC.pack(fill="both", side="right", padx=20)
+        # Title
+        self.lblB1 = CTK.CTkLabel(self.frA, text=titles[0], font=TtlFont, justify="center", width=780, text_color="#cc5308")
+        self.lblB1.pack(padx=12, pady=46)
+        # Headers
+        for key in self.account[1]:
+            afr0 = CTK.CTkFrame(self.frB, width=600)
+            afr0.pack(side="top", pady=40, anchor="e")
+            self.lblA1 = CTK.CTkLabel(afr0, text=key, font=LblFont, justify="right", width=340)
+            self.lblA1.pack(side="right", anchor="e")
 
     def LoadingScreen(self):
         # Fonts
@@ -158,6 +186,7 @@ class App(CTK.CTk):
             elif i == 2 and self.loaded:
                 global dataBase
                 from DataStoreModel import run as dataBase
+                # Save Login Data
                 self.Progress(dataBase.checks, i)
             elif i == 3 and self.loaded:
                 global pantry
@@ -208,14 +237,25 @@ class App(CTK.CTk):
                 i.pack_forget()
                 i.configure(bg_color= "transparent", border_width=0)
     
+    def EnableSaveLogin(self):
+        if self.enbSaveLogin == False:
+            self.btnB3.configure(text_color="green", text="LOGIN INFORMATION SAVED")
+            self.enbSaveLogin = True
+        elif self.enbSaveLogin == True:
+            self.btnB3.configure(text_color="black", text="SAVE LOGIN INFORMATION")
+            self.enbSaveLogin = False
+            self.LoginInfo(self.enbSaveLogin)
+    
     def LoginWindow(self):
+        self.logindta = dataBase.LoadLoginInfo()
         textVal = (self.register(self.TextCallback))
         TtlFont = CTK.CTkFont(family="Arial Black", size=80, weight=Font.BOLD)
         LblFont = CTK.CTkFont(family="Arial Bold", size=54, weight=Font.BOLD)
         BtnFont = CTK.CTkFont(family="Times Bold", size=32, weight=Font.BOLD)
+        BtnFont1 = CTK.CTkFont(family="Times Bold", size=24, weight=Font.BOLD)
         EtyFont = CTK.CTkFont(family="Helvetica", size=39, weight=Font.NORMAL)
         # Texts
-        titles = ["USER LOG-IN","ENTER USERNAME BELOW" ,"USERNAME", "ENTER PASSWORD BELOW", "PASSWORD", "          LOG IN          ", "      REGISTER      "]
+        titles = ["USER LOG-IN","ENTER USERNAME BELOW" ,"USERNAME", "ENTER PASSWORD BELOW", "PASSWORD", "          LOG IN          ", "REGISTER NEW","SAVE LOGIN INFORMATION"]
         # Frames
         self.frA.pack(fill="both", expand=True, side="left")
         self.frB.pack(fill="both", expand=True, side="left")
@@ -242,12 +282,19 @@ class App(CTK.CTk):
         self.lblB3.pack(padx=12, pady=10)
         self.etyB2 = CTK.CTkEntry(self.frB, placeholder_text=titles[4], font=EtyFont, show="*", width=760, justify="center", height=78, corner_radius=240)
         self.etyB2.pack(padx=12, pady=10)
+        # Save login button
+        self.btnB3 = CTK.CTkButton(self.frB, text=titles[7], font=BtnFont1, command=self.EnableSaveLogin, fg_color="transparent", hover_color="#f3e8c6", text_color="black")
+        self.btnB3.pack(padx=12, pady=2)
         # Log In button
         self.btnB1 = CTK.CTkButton(self.frB, text=titles[5], font=BtnFont, command=lambda: self.Login(), corner_radius=30, height=80)
         self.btnB1.pack(padx=12, pady=30)
         # Register button
         self.btnB2 = CTK.CTkButton(self.frB, text=titles[6], font=BtnFont, command=lambda: self.WindowHandler(2), corner_radius=30, height=80)
-        self.btnB2.pack(padx=12, pady=10, anchor="n")
+        self.btnB2.pack(padx=12, pady=12, anchor="n")
+        if self.logindta != None:
+            self.etyB1.insert(0, str(self.logindta))
+            self.btnB3.configure(text_color="green", text="LOGIN INFORMATION SAVED")
+            self.enbSaveLogin = True
 
     """
     INPUTS: parent (widget) - The parent widget containing child widgets to be unpacked.
@@ -625,7 +672,7 @@ class App(CTK.CTk):
             self.item = ["0","0","0","0","0"]
         else:
             self.btnBB2.configure(text="FAILED")
-            if self.item != ["0","0","0","0","0"]: 
+            if self.item != ["0","0","0","0","0"] and pantry.Search(self.item[-1]) == ["0","0","0","0","0"]: 
                 pantry.AddRaw(self.item)
         self.after(320, self.ClearItem)
 
@@ -634,14 +681,14 @@ class App(CTK.CTk):
             if int(self.entries[2].get()) == 0:
                 self.btnBB2.configure(state="disabled")
                 pantry.Remove(self.item[-1])
-                self.after(210, lambda: self.btnBB2.configure(state="normal", command=None))
-                self.after(210, self.ClearItem)
+                self.after(420, lambda: self.btnBB2.configure(state="normal", command=None))
+                self.after(420, self.ClearItem)
             else:
                 pantry.Remove(self.item[-1])
                 self.Add()                
         else:
             self.btnBB2.configure(text="FAILED")
-            self.after(320, self.ClearItem)
+            self.after(520, self.ClearItem)
 
     """
     INPUTS: None
@@ -840,6 +887,7 @@ class App(CTK.CTk):
             name = self.account[1]["name"]
             titles = [name + "'s Kitchen", "DISCOVER RECIPES", "SEARCH YOUR PANTRY", "LOGOUT"]
             self.btnA0 = CTK.CTkButton(self.frA, text=titles[3], font=BtnFont, corner_radius=30, height=80, text_color_disabled="#f3e8c6", fg_color="#f3e8c6", hover="#f3e8c6",text_color="#f3e8c6", command=None)
+            self.btnA0 = CTK.CTkButton(self.frA, text="ACCOUNT", font=BtnFont, corner_radius=30, height=80, command=lambda: self.WindowHandler(0))
         except KeyError:
             titles = ["Admin Access", "DISCOVER RECIPES", "SEARCH YOUR PANTRY", "LOGOUT"]
             self.btnA0 = CTK.CTkButton(self.frA, text=" ADMIN ", font=BtnFont, corner_radius=30, height=80, command=lambda: self.WindowHandler(0))
@@ -1065,8 +1113,8 @@ class App(CTK.CTk):
         LblFont1 = CTK.CTkFont(family="Arial Bold", size=14, weight=Font.NORMAL)
         BtnFont = CTK.CTkFont(family="Times Bold", size=32, weight=Font.BOLD)
         EtyFont = CTK.CTkFont(family="Helvetica", size=34, weight=Font.NORMAL) 
-        titles = [ "ACCOUNT REGISTRATION","ENTER YOUR OWN NAME BELOW" ,"NAME", "ENTER A UNIQUE USERNAME BELOW", "USERNAME", "ENTER A SECURE PASSWORD BELOW", "PASSWORD", "          REGISTER          ", "          LOGIN          "]
-        prompts = ["• Do not enter numbers", "• Must be longer than 3 letters", "• Must contain atleast one non-alaphabetical character\n• Must be longer than 3 letters"]
+        titles = [ "ACCOUNT REGISTRATION","ENTER YOUR OWN NAME BELOW" ,"NAME", "ENTER A UNIQUE USERNAME BELOW", "USERNAME", "ENTER A SECURE PASSWORD BELOW", "PASSWORD", "          REGISTER          ", "CONFIRM YOUR PASSWORD", "PASSWORD"]
+        prompts = ["• Do not enter numbers", "• Must be longer than 3 letters", "• Must contain atleast one non-alaphabetical character\n• Must be longer than 3 letters", "• Re-enter the same password to confirm."]
         # Frames
         self.frA.pack(fill="both", expand=True, side="left")
         self.frB.pack(fill="both", expand=True, side="left")
@@ -1102,6 +1150,13 @@ class App(CTK.CTk):
         self.etyB3.pack(padx=12, pady=2)
         self.lblB7 = CTK.CTkLabel(self.frB, text=prompts[2], font=LblFont1, justify="center", width=780)
         self.lblB7.pack(padx=12, pady=2)
+        # Confirm Password Entry Field
+        self.lblB5 = CTK.CTkLabel(self.frB, text=titles[8], font=LblFont, justify="center", width=780)
+        self.lblB5.pack(padx=12, pady=12)
+        self.etyB4 = CTK.CTkEntry(self.frB, placeholder_text=titles[9], font=EtyFont, show="*", width=620, justify="center", height=68, corner_radius=240)
+        self.etyB4.pack(padx=12, pady=2)
+        self.lblB8 = CTK.CTkLabel(self.frB, text=prompts[3], font=LblFont1, justify="center", width=780)
+        self.lblB8.pack(padx=12, pady=2)
         # Register button
         self.btnB1 = CTK.CTkButton(self.frB, text=titles[7], font=BtnFont, command=lambda: self.Register(), corner_radius=30, height=80)
         self.btnB1.pack(padx=12, pady=60)
@@ -1135,28 +1190,35 @@ class App(CTK.CTk):
         name = self.etyB1.get()
         usrm = self.etyB2.get()
         pwrd = self.etyB3.get()
+        cpwrd = self.etyB4.get()
        
         if name == "" or usrm == "" or pwrd == "":
-            pass
+            self.btnB1.configure(True, state="disabled")
         else:
-            result = cucina.RegisterAccount(usrm, pwrd, name)
-            if result == "Success":
-                self.etyB1.delete(0, CTK.END)
-                self.etyB3.delete(0, CTK.END)
-                self.etyB2.delete(0, CTK.END)
-                self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="black")
-                self.after(1200, lambda: self.WindowHandler(1))
-            elif "username" in result.lower():
-                self.etyB2.configure(text_color="red")
-                self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="black")
-                self.after(2000, lambda: self.etyB2.configure(text_color="#0d0c0a"))
+            if cpwrd == pwrd:
+                result = cucina.RegisterAccount(usrm, pwrd, name)
+                if result == "Success":
+                    self.etyB1.delete(0, CTK.END)
+                    self.etyB3.delete(0, CTK.END)
+                    self.etyB2.delete(0, CTK.END)
+                    self.etyB4.delete(0, CTK.END)
+                    self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="black")
+                    self.after(700, lambda: self.WindowHandler(1))
+                    return None
+                elif "username" in result.lower():
+                    self.etyB2.configure(text_color="red")
+                    self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="black")
+                    self.after(1000, lambda: self.etyB2.configure(text_color="#0d0c0a"))
+                    self.after(1000, lambda: self.btnB1.configure(True, text="REGISTER", state="normal", text_color="#fbf4ed"))
+                elif "password" in result.lower():
+                    self.etyB3.configure(text_color="red")
+                    self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="black")
+                    self.after(1000, lambda: self.etyB3.configure(text_color="#0d0c0a"))
+                    self.after(1000, lambda: self.btnB1.configure(True, text="REGISTER", state="normal", text_color="#fbf4ed"))
+            else:
+                self.btnB1.configure(True, text="Passwords Mismatch", state="disabled", text_color_disabled="black")
                 self.after(1000, lambda: self.btnB1.configure(True, text="REGISTER", state="normal", text_color="#fbf4ed"))
-            elif "password" in result.lower():
-                self.etyB3.configure(text_color="red")
-                self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="black")
-                self.after(2000, lambda: self.etyB3.configure(text_color="#0d0c0a"))
-                self.after(1000, lambda: self.btnB1.configure(True, text="REGISTER", state="normal", text_color="#fbf4ed"))
-
+        self.after(200, lambda: self.btnB1.configure(state="normal"))
     """
     INPUTS:
         event (optional) - An optional event parameter, typically used for event-driven calls (e.g., button clicks). Default is None.
@@ -1184,9 +1246,16 @@ class App(CTK.CTk):
 
     OUTPUTS: None
     """
+    def LoginInfo(self, enable):
+        if self.saveLogin != "" and enable:
+            dataBase.SaveLoginInfo(self.saveLogin)
+        elif not enable:
+            dataBase.ClearLoginInfo()
+
     def Login(self, event=None):
         usrm = self.etyB1.get()
         pwrd = self.etyB2.get()
+        self.after(0, lambda: self.btnB1.configure(state="disabled"))
         if usrm == "" or pwrd == "":
             pass
         else:
@@ -1196,21 +1265,25 @@ class App(CTK.CTk):
                 self.etyB2.delete(0, CTK.END)
                 self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="black")
                 self.account = cucina.Search(usrm)
+                self.saveLogin = usrm
+                self.LoginInfo(self.enbSaveLogin)
                 self.WindowHandler(3)
             elif "password" in result.lower():
                 self.etyB2.configure(text_color="red")
                 self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="black")
                 self.after(1000, lambda: self.btnB1.configure(True, text="          LOG IN          ", state="normal", text_color="#fbf4ed"))
                 self.after(2000, lambda: self.etyB2.configure(text_color="#0d0c0a"))
+                self.after(2000, lambda: self.etyB1.configure(text_color="#0d0c0a"))
             elif "username" in result.lower():
                 self.etyB1.configure(text_color="red")
                 self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="black")
                 self.after(1000, lambda: self.btnB1.configure(True, text="          LOG IN          ", state="normal", text_color="#fbf4ed"))
                 self.after(2000, lambda: self.etyB1.configure(text_color="#0d0c0a"))
+                self.after(2000, lambda: self.etyB2.configure(text_color="#0d0c0a"))
             else:
                 self.btnB1.configure(True, text=result.upper(), state="disabled", text_color_disabled="black")
                 self.after(1000, lambda: self.btnB1.configure(True, text="          LOG IN          ", state="normal", text_color="#fbf4ed"))
-            
+        self.after(200, lambda: self.btnB1.configure(state="normal"))
 if __name__ == "__main__":
     CTK.set_appearance_mode("light")
     CTK.set_default_color_theme("bisque-theme.json")
@@ -1223,4 +1296,4 @@ if __name__ == "__main__":
     CTK.set_window_scaling(factor)
     app.after(0, lambda: app.state("zoomed"))
     app.WindowHandler(-1)
-    app.mainloop() 
+    app.mainloop()

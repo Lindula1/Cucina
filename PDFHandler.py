@@ -182,7 +182,7 @@ def Read(pdf):
         page = i.extract_text()
         #print(page)
         for line in page.split("\n"):
-            if "ingredient" in line.lower():
+            if "ingredient" in line.lower() or "what you need" in line.lower():
                 #print("Ingredients being added")
                 ingLine = True
                 stepLine = False
@@ -191,9 +191,8 @@ def Read(pdf):
                 stepLine = True
                 ingLine = False
             elif "utensils" in line.lower() or  "options"  in line.lower():
-                #print("Random stuff")
-                ingLine = False
-                stepLine = False
+                #print("Random stuff")/
+                ingLine = False**-**+-+                stepLine = False
             elif "equipment" in line.lower():
                 ingLine = False
                 stepLine = False

@@ -100,7 +100,7 @@ class CUCINA():
         if self.disableLogin:
             return "Login feature is disabled"
         account = self.Search(usrm.lower())
-        if account == None: return "Username doesn't exist"
+        if account == None: return "Credentials are incorrect"
         if HashingFunc(pwrd) == account[1]["password"]: 
             if len(account[1]) < 4:
                 self.admin = True
@@ -108,7 +108,7 @@ class CUCINA():
             self.admin = False
             return "Login successful"
         else:
-            return "Password is Incorrect"
+            return "Credentials are incorrect"
 
     """
     INPUTS:

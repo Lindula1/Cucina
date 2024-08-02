@@ -11,6 +11,7 @@ import GitCommunication
 import json
 import datetime
 from cryptography.fernet import Fernet
+from Hashing import HashingFunc
 
 class DataBase():
     def __init__(self):
@@ -324,6 +325,29 @@ class DataBase():
                 high = mid - 1
         return None, None, None
     
+    def SaveLoginInfo(self, usrm):
+        with open('keyFile.key', 'rb') as filekey:
+            key = filekey.read()
+        fernet = Fernet(key)
+        with open("SaveData.json","wb") as file:
+            encrypted = fernet.encrypt(bytes(usrm.encode("utf-8")))
+            file.write(encrypted)
+    
+    def ClearLoginInfo(self):
+        with open("SaveData.json","wb") as file:
+            file.write(b'')
+    
+    def LoadLoginInfo(self):
+        with open('keyFile.key', 'rb') as filekey:
+            key = filekey.read()
+        fernet = Fernet(key)
+        with open("SaveData.json","rb") as file:
+            raw = file.read()
+            if not raw == b'':
+                decrypted = str((fernet.decrypt(raw)).decode("utf-8"))
+                return decrypted
+        return None
+
 run = DataBase()
 
 if __name__ == "__main__":
@@ -331,4 +355,6 @@ if __name__ == "__main__":
     #print(run.arr)
     #run.SaveLocally()
     #run.SaveOnline()
-    print(run.DecryptJson())
+    #print(run.DecryptJson())
+    #run.SaveLoginInfo("Men")
+    print(run.LoadLoginInfo())
