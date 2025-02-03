@@ -192,7 +192,8 @@ def Read(pdf):
                 ingLine = False
             elif "utensils" in line.lower() or  "options"  in line.lower():
                 #print("Random stuff")/
-                ingLine = False**-**+-+                stepLine = False
+                ingLine = False
+                stepLine = False
             elif "equipment" in line.lower():
                 ingLine = False
                 stepLine = False
